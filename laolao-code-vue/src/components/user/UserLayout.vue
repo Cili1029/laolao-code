@@ -16,7 +16,7 @@
                     </div>
                 </ResizablePanel>
                 <ResizableHandle />
-                <ResizablePanel :default-size="80">
+                <ResizablePanel :default-size="70">
                     <div class="flex items-center justify-center p-6">
                         <span class="font-semibold">Two</span>
                     </div>
@@ -30,9 +30,5 @@
     import AppSidebar from "@/components/user/sidebar/AppSidebar.vue"
     import { Separator } from "@/components/ui/separator"
     import { SidebarInset, SidebarProvider, SidebarTrigger, } from "@/components/ui/sidebar"
-    import {
-        ResizableHandle,
-        ResizablePanel,
-        ResizablePanelGroup,
-    } from '@/components/ui/resizable'
+    import { ResizableHandle, ResizablePanel, ResizablePanelGroup, } from '@/components/ui/resizable'
 </script>
