@@ -1,8 +1,19 @@
+import Sign from "@/components/common/Sign.vue";
+import Test from "@/components/common/Test.vue";
 import UserHome from "@/components/user/UserHome.vue";
 import UserLayout from "@/components/user/UserLayout.vue";
 import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
 
 const routes: Array<RouteRecordRaw> = [
+    // 登录
+    {
+        path: '/sign',
+        component: Sign,
+    },
+    {
+        path: '/test',
+        component: Test,
+    },
     // 用户端
     {
         path: '/',

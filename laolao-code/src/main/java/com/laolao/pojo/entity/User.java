@@ -11,6 +11,7 @@ import java.io.Serializable;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Builder
 public class User implements Serializable {
 
@@ -20,9 +21,9 @@ public class User implements Serializable {
     private Integer id;
 
     /**
-     * 邮箱：也为登录账号
+     * 账号
      */
-    private String email;
+    private String username;
 
     /**
      * 密码
@@ -38,4 +39,17 @@ public class User implements Serializable {
      * 用户角色：0-导师，1-成员
      */
     private Integer role;
+
+    // 获取权限标识
+    public String getRoleName() {
+        if (this.role == 0) {
+            return "ADMIN";
+        } else if (this.role == 1) {
+            return "ADVISOR";
+        } else if (this.role == 2) {
+            return "MEMBER";
+        } else {
+            return "ERROR";
+        }
+    }
 }
