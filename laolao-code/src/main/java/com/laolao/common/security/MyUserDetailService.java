@@ -23,7 +23,8 @@ public class MyUserDetailService implements UserDetailsService {
             throw new UsernameNotFoundException(username);
         }
 
-        return new MyUserDetail(user.getId(),
+        return new MyUserDetail(
+                user.getId(),
                 user.getUsername(),
                 user.getPassword(),
                 Collections.singletonList(new SimpleGrantedAuthority(user.getRoleName())));

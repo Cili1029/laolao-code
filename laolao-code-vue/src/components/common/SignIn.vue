@@ -32,9 +32,9 @@
               </Field>
               <FieldDescription class="text-center">
                 没有账号？
-                <a href="#">
+                <RouterLink to="/sign-up">
                   去注册
-                </a>
+                </RouterLink>
               </FieldDescription>
             </FieldGroup>
           </form>
@@ -45,7 +45,7 @@
         </CardContent>
       </Card>
       <FieldDescription class="px-6 text-center">
-        日落尤其温柔 人间皆是浪漫
+        日落尤其温柔
       </FieldDescription>
     </div>
   </div>
@@ -58,7 +58,7 @@
   import { Card, CardContent } from '@/components/ui/card'
   import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field'
   import { Input } from '@/components/ui/input'
-  import axios from "axios"
+   import axios from "@/utils/myAxios"
 
   const props = defineProps<{
     class?: HTMLAttributes["class"]
@@ -69,7 +69,7 @@
 
   const signIn = async () => {
     try {
-      const res = await axios.postForm("/api/user/sign-in", {
+      await axios.postForm("/api/user/sign-in", {
         username: username.value,
         password: password.value
       }, {

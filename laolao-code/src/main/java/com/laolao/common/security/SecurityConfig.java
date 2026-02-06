@@ -1,8 +1,13 @@
 package com.laolao.common.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.laolao.common.result.Result;
+import io.jsonwebtoken.Claims;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.Cookie;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.config.Customizer;
@@ -29,26 +34,29 @@ public class SecurityConfig {
     private JwtFilter jwtFilter;
     @Resource
     private JwtUtil jwtUtil;
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+    @Resource
+    private ObjectMapper objectMapper;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                // 1. 必须改为无状态，不使用 Session
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/user/sign-in").permitAll()
+                        .requestMatchers("/api/user/sign-in", "/api/user/sign-up").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(401);
                             response.setContentType("application/json;charset=utf-8");
-                            response.getWriter().write("{\"code\": 401, \"msg\": \"未登录\"}");
+                            response.getWriter().write(objectMapper.writeValueAsString(Result.error("未登录")));
                         })
                 )
-                // 2. 修改登录逻辑，不再使用默认的重定向，而是返回 HttpOnly Cookie
+                // 登录操作
                 .formLogin(form -> form
                         .loginProcessingUrl("/api/user/sign-in")
                         .successHandler((request, response, authentication) -> {
@@ -64,27 +72,52 @@ public class SecurityConfig {
                             ResponseCookie cookie = ResponseCookie.from("jwt", token)
                                     .httpOnly(true)  // JS 无法读取，防 XSS
                                     .path("/")
-                                    .maxAge(3600)
-                                    .sameSite("Lax") // 防 CSRF
+                                    .maxAge(604800) // 7天
                                     .build();
 
                             response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
                             response.setContentType("application/json;charset=utf-8");
-                            response.getWriter().write("{\"code\": 200, \"msg\": \"登录成功\"}");
+                            response.getWriter().write(objectMapper.writeValueAsString(Result.success("登录成功")));
                         })
                         .failureHandler((request, response, exception) -> {
                             response.setStatus(401);
                             response.setContentType("application/json;charset=utf-8");
-                            response.getWriter().write("{\"code\": 401, \"msg\": \"账号或密码错误\"}");
+                            response.getWriter().write(objectMapper.writeValueAsString(Result.error("账号或密码错误")));
                         })
                 )
-                // 3. 将 JWT 过滤器加入过滤链
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                // 将JWT过滤器加入过滤链
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                // 推出操作
+                .logout(logout -> logout
+                        .logoutUrl("/api/user/sign-out")
+                        .addLogoutHandler((request, response, authentication) -> {
+                            // 清理redis里的token
+                            Cookie[] cookies = request.getCookies();
+                            String jwt = jwtFilter.getJwtFromCookie(cookies);
+                            if (jwt != null) {
+                                try {
+                                    Claims claims = jwtUtil.parseJWT(jwt);
+                                    int userId = Integer.parseInt(claims.get("userId").toString());
+                                    stringRedisTemplate.delete("CODE:TOKEN:" + userId);
+                                } catch (Exception ignored) {}
+                            }
+                        })
+                        .logoutSuccessHandler((request, response, authentication) -> {
+                            // 删除jwt
+                            ResponseCookie cookie = ResponseCookie.from("jwt", "")
+                                    .httpOnly(true)  // JS 无法读取，防 XSS
+                                    .path("/")
+                                    .maxAge(0) // 立即失效
+                                    .build();
+                            response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+                            response.setContentType("application/json;charset=utf-8");
+                            response.getWriter().write(objectMapper.writeValueAsString(Result.success("已注销")));
+                        }));
 
         return http.build();
     }
 
-    // 跨域配置保持不变
+    // 跨域配置
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();

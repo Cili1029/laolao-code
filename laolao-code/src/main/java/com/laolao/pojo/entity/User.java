@@ -36,7 +36,7 @@ public class User implements Serializable {
     private String name;
 
     /**
-     * 用户角色：0-导师，1-成员
+     * 用户角色：0-管理员，1-导师，2-成员
      */
     private Integer role;
 

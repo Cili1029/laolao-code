@@ -1,6 +1,6 @@
 package com.laolao.common.security;
 
-import com.laolao.context.UserContext;
+import com.laolao.common.context.UserContext;
 import io.jsonwebtoken.Claims;
 import jakarta.annotation.Resource;
 import jakarta.servlet.FilterChain;
@@ -8,7 +8,9 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -40,13 +42,12 @@ public class JwtFilter extends OncePerRequestFilter {
             // 合法但是redis不一致，顶号/异账号登陆
             if (claims == null) {
                 // 删除jwt
-                Cookie cookie = new Cookie("jwt", null);
-                cookie.setHttpOnly(true);        // 防止 XSS 攻击
-                cookie.setSecure(false);         // 本地开发用 false，生产环境用 true (HTTPS)
-                cookie.setPath("/");             // 对整个应用有效
-                cookie.setMaxAge(0);
-                response.addCookie(cookie);
-                response.setStatus(HttpStatus.UNAUTHORIZED.value());
+                ResponseCookie cookie = ResponseCookie.from("jwt", "")
+                        .httpOnly(true)  // JS 无法读取，防 XSS
+                        .path("/")
+                        .maxAge(604800) // 7天
+                        .build();
+                response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
                 return;
             }
 
