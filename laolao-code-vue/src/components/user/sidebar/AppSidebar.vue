@@ -6,12 +6,10 @@
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" as-child class="md:h-8 md:p-0">
-              <a href="#">
-                <div
-                  class="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <img :src="logo" />
-                </div>
-              </a>
+              <div
+                class="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
+                <img :src="logo" />
+              </div>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -35,7 +33,7 @@
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <NavUser :user="data.user" />
+        <NavUser />
       </SidebarFooter>
     </Sidebar>
 
@@ -90,11 +88,6 @@
   })
 
   const data = {
-    user: {
-      name: "shadcn",
-      email: "m@example.com",
-      avatar: "/avatars/shadcn.jpg",
-    },
     navMain: [
       { title: "我的班级", url: "#", icon: School, isActive: true },
       { title: "我的考试", url: "#", icon: BugPlay, isActive: false },

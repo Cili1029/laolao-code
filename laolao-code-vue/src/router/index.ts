@@ -8,12 +8,12 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router"
 const routes: Array<RouteRecordRaw> = [
     // 注册
     {
-        path: '/sign-Up',
+        path: '/sign-up',
         component: SignUp,
     },
     // 登录
     {
-        path: '/sign-In',
+        path: '/sign-in',
         component: SignIn,
     },
     {
