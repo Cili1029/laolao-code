@@ -5,7 +5,7 @@ import lombok.*;
 import java.io.Serializable;
 
 /**
- * 班级成员关联表
+ * 组成员关联表
  */
 @Getter
 @Setter

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { toast } from "vue-sonner"
 import router from '@/router'
-// import { useUserStore } from '@/stores/UserStore'
+import { useUserStore } from '@/stores/UserStore'
 
 const request = axios.create({
     baseURL: '',
@@ -43,8 +43,8 @@ request.interceptors.response.use(
                     router.replace('/sign-in')
                     toast.info("登录已过期，请重新登录！")
                     // 清空现有user数据
-                    // const userStore = useUserStore()
-                    // userStore.clearUser()
+                    const userStore = useUserStore()
+                    userStore.clearUser()
                     break
                 case 403:
                     // 跳转到用户首页

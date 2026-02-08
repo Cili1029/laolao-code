@@ -2,6 +2,7 @@ package com.laolao.common.security;
 
 import com.laolao.common.context.UserContext;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import jakarta.annotation.Resource;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -63,7 +64,7 @@ public class JwtFilter extends OncePerRequestFilter {
             UserContext.setCurrentId(userId);
 
             filterChain.doFilter(request, response);
-        } catch (Exception e) {
+        } catch (JwtException e) {
             // jwt无效
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         } finally {

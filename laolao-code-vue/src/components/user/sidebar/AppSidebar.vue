@@ -6,10 +6,10 @@
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" as-child class="md:h-8 md:p-0">
-              <div
+              <RouterLink to="/common"
                 class="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                 <img :src="logo" />
-              </div>
+              </RouterLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
@@ -18,15 +18,17 @@
         <SidebarGroup>
           <SidebarGroupContent class="px-1.5 md:px-0">
             <SidebarMenu>
-              <SidebarMenuItem v-for="item in data.navMain" :key="item.title">
-                <SidebarMenuButton :tooltip="h('div', { hidden: false }, item.title)"
-                  :is-active="activeItem?.title === item.title" class="px-2.5 md:px-2" @click="() => {
-                    activeItem = item
-                    setOpen(true)
-                  }">
-                  <component :is="item.icon" />
-                  <span>{{ item.title }}</span>
-                </SidebarMenuButton>
+              <SidebarMenuItem v-for="item in type" :key="item.title">
+                <RouterLink to="/common">
+                  <SidebarMenuButton :tooltip="h('div', { hidden: false }, item.title)"
+                    :is-active="activeItem?.title === item.title" class="px-2.5 md:px-2" @click="() => {
+                      activeItem = item
+                      setOpen(true)
+                    }">
+                    <component :is="item.icon" />
+                    <span>{{ item.title }}</span>
+                  </SidebarMenuButton>
+                </RouterLink>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
@@ -49,18 +51,18 @@
       <SidebarContent>
         <SidebarGroup class="px-0">
           <SidebarGroupContent>
-            <a v-for="result in results" :key="result.id" href="#"
+            <RouterLink :to="activeItem.url + '/' + result.id" v-for="result in results" :key="result.id"
               class="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0">
-              <div class="flex w-full items-center gap-2">
-                <span>{{ result.name }}</span>
-                <span class="ml-auto text-xs">{{ result.date }}</span>
-              </div>
-              <span v-show="result.teacher" class="font-medium">老师：{{ result.teacher }}</span>
-              <span v-show="result.class" class="font-medium">所属班级：{{ result.class }}</span>
-              <span class="line-clamp-2 w-64 whitespace-break-spaces text-xs">
-                {{ result.describe }}
-              </span>
-            </a>
+              <p class="flex w-full items-center justify-between">
+                <span class="w-50 overflow-hidden text-ellipsis whitespace-nowrap">{{ result.name }}</span>
+                <span v-show="result.time" class="text-xs">{{ dayjs(result.time).fromNow() }}</span>
+              </p>
+              <p v-show="result.advisor" class="font-medium">导师：{{ result.advisor }}</p>
+              <p v-show="result.group" class="font-medium">所属组：{{ result.group }}</p>
+              <p class="line-clamp-2 whitespace-break-spaces text-xs">
+                {{ result.description }}
+              </p>
+            </RouterLink>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
@@ -70,67 +72,66 @@
 
 <script setup lang="ts">
   import type { SidebarProps } from '@/components/ui/sidebar'
-  import { Brain, BugPlay, NotebookText, School, } from "lucide-vue-next"
-  import { h, ref, type Component } from "vue"
+  import { Brain, BugPlay, NotebookText, UsersRound } from "lucide-vue-next"
+  import { h, onMounted, ref, watch, type Component } from "vue"
   import logo from '@/assets/logo.jpg'
   import NavUser from '@/components/user/sidebar/NavUser.vue'
   import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar, } from '@/components/ui/sidebar'
-
-  interface NavItem {
-    title: string
-    url: string
-    icon: Component
-    isActive: boolean
-  }
+  import axios from "@/utils/myAxios"
+  import dayjs from 'dayjs'
 
   const props = withDefaults(defineProps<SidebarProps>(), {
     collapsible: "icon",
   })
 
-  const data = {
-    navMain: [
-      { title: "我的班级", url: "#", icon: School, isActive: true },
-      { title: "我的考试", url: "#", icon: BugPlay, isActive: false },
-      { title: "考试情况", url: "#", icon: NotebookText, isActive: false },
-      { title: "人工智障", url: "#", icon: Brain, isActive: false },
-    ] as NavItem[],
-    results: [
-      {
-        id: 1,
-        name: "班级1",
-        teacher: "甲",
-        class: "",
-        date: "",
-        describe: "软件工程",
-      },
-      {
-        id: 2,
-        name: "考试2",
-        teacher: "",
-        class: "班级1",
-        date: "3天后开始",
-        describe: "别偷抄",
-      },
-      {
-        id: 4,
-        name: "考试情况4",
-        teacher: "",
-        class: "班级1",
-        date: "",
-        describe: "",
-      },
-      {
-        id: 5,
-        name: "AI5",
-        teacher: "",
-        class: "",
-        date: "",
-        describe: "这是一个人工智障",
-      },
-    ],
+  onMounted(() => {
+    getResult()
+  })
+
+  interface Type {
+    title: string
+    url: String
+    icon: Component
+    isActive: boolean
   }
 
-  const activeItem = ref<NavItem>(data.navMain[0]!)
-  const results = ref(data.results)
+  const type = [
+    { title: "我的学习组", url: "/group", icon: UsersRound, isActive: true },
+    { title: "我的考试", url: "/exam", icon: BugPlay, isActive: false },
+    { title: "考试记录", url: "/exam-record", icon: NotebookText, isActive: false },
+    { title: "人工智障", url: "/ai", icon: Brain, isActive: false },
+  ] as Type[]
+
+  const activeItem = ref<Type>(type[0]!)
+
+  interface Result {
+    id: number
+    name: string
+    advisor: String
+    description: String
+    group: string
+    time: string
+  }
+
+  const results = ref<Result[]>([])
+
+  const getResult = async () => {
+    try {
+      const res = await axios.get("/api" + activeItem.value.url)
+      results.value = res.data.data
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  watch(
+    () => activeItem.value.url,
+    async (newUrl) => {
+      if (newUrl) { // 避免 url 为空时请求
+        await getResult();
+      }
+    }
+  )
+
   const { setOpen } = useSidebar()
 </script>

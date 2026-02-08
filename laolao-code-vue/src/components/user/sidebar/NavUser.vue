@@ -66,7 +66,7 @@
   import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
   import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar'
   import axios from "@/utils/myAxios"
-  import { useUserStore } from "@/store/UserStore"
+  import { useUserStore } from "@/stores/UserStore"
   import router from "@/router"
 
 

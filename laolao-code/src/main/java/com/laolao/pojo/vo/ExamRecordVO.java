@@ -1,19 +1,17 @@
-package com.laolao.pojo.entity;
+package com.laolao.pojo.vo;
 
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
-/**
- * 组表
- */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
 @Builder
-public class Group implements Serializable {
+public class ExamRecordVO implements Serializable {
 
     /**
      * 主键ID
@@ -21,22 +19,22 @@ public class Group implements Serializable {
     private Integer id;
 
     /**
-     * 组名
+     * 记录标题
      */
     private String name;
 
     /**
-     * 组描述
+     * 记录整体评价
      */
     private String description;
 
     /**
-     * 创建老师的ID
+     * 所属组
      */
-    private Integer advisorId;
+    private String group;
 
     /**
-     * 组邀请码
+     * 开始时间
      */
-    private String inviteCode;
+    private LocalDateTime time;
 }

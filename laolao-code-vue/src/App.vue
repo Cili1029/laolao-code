@@ -8,7 +8,7 @@
   import 'vue-sonner/style.css'
   import { Toaster } from '@/components/ui/sonner'
   import axios from "@/utils/myAxios"
-  import { useUserStore } from "@/store/UserStore"
+  import { useUserStore } from "@/stores/UserStore"
   import { onMounted } from 'vue'
 
   const userStore = useUserStore()

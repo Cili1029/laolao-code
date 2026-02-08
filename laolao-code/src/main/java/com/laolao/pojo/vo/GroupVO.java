@@ -10,7 +10,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @ToString
 @Builder
-public class UserInfoVO implements Serializable {
+public class GroupVO implements Serializable {
 
     /**
      * 主键ID
@@ -18,17 +18,18 @@ public class UserInfoVO implements Serializable {
     private Integer id;
 
     /**
-     * 账号
-     */
-    private String username;
-
-    /**
-     * 名字
+     * 组名
      */
     private String name;
 
     /**
-     * 用户角色：0-管理员，1-导师，2-成员
+     * 创建老师
      */
-    private Integer role;
+    private String advisor;
+
+    /**
+     * 组描述
+     */
+    private String description;
 }
+
