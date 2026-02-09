@@ -1,5 +1,4 @@
 <template>
-    <!-- 根容器：添加 overflow-hidden 防止边缘滚动条溢出 -->
     <div ref="editorContainer" class="monaco-container overflow-hidden"></div>
 </template>
 
@@ -11,12 +10,11 @@
         modelValue: string;
         language?: string;
         theme?: string;
-        // 允许父组件传入更精细的配置
         options?: monaco.editor.IStandaloneEditorConstructionOptions;
     }
 
     const props = withDefaults(defineProps<Props>(), {
-        language: 'java', // 既然你主要用Java，这里默认值改一下
+        language: 'java',
         theme: 'vs-dark',
         options: () => ({})
     });
@@ -34,7 +32,7 @@
         fontSize: 14,                // 字体大小
         fontFamily: 'Menlo, Monaco, "Courier New", monospace', // 常用等宽字体
         automaticLayout: true,       // 随父容器大小变化自动重绘（配合 Resizable 必开）
-        minimap: { enabled: true },  // 开启右侧缩略图
+        minimap: { enabled: false }, // 右侧缩略图
         scrollBeyondLastLine: false, // 滚动完最后一行后停止，不留白
         readOnly: false,             // 是否只读
         renderWhitespace: 'none',    // 是否渲染空格/制表符

@@ -1,14 +1,14 @@
 <template>
     <div>
         <ResizablePanelGroup direction="horizontal">
-            <ResizablePanel :default-size="30">
+            <ResizablePanel :default-size="40">
                 <div class="flex items-center justify-center p-6">
                     <span class="font-semibold">One</span>
                 </div>
             </ResizablePanel>
             <ResizableHandle />
-            <ResizablePanel :default-size="70">
-                <MonacoEditor v-model="javaCode" language="java" theme="vs-dark" class="h-full" />
+            <ResizablePanel :default-size="60">
+                <MonacoEditor v-model="javaCode" language="java" theme="vs" class="h-full" />
             </ResizablePanel>
         </ResizablePanelGroup>
         <div>

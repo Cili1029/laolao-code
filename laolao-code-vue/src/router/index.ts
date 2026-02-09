@@ -28,27 +28,47 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
         component: UserLayout,
-        redirect: 'common',
+        redirect: '/group',
         children: [
             {
-                path: 'common',
+                path: 'group',
                 component: Common,
+                children: [
+                    {
+                        path: ':id',
+                        component: Group,
+                    }
+                ]
             },
             {
-                path: 'group/:id',
-                component: Group,
+                path: 'exam',
+                component: Common,
+                children: [
+                    {
+                        path: ':id',
+                        component: Exam,
+                    }
+                ]
             },
             {
-                path: 'exam/:id',
-                component: Exam,
+                path: 'exam-record',
+                component: Common,
+                children: [
+                    {
+                        path: ':id',
+                        component: ExamRecord,
+                    }
+                ]
             },
             {
-                path: 'exam-record/:id',
-                component: ExamRecord,
-            },
-            {
-                path: 'ai/:id',
-                component: Ai,
+                path: 'ai',
+                component: Common,
+                children: [
+                    {
+                        path: ':id',
+                        component: Ai,
+                    }
+                ]
             },
         ]
     }
