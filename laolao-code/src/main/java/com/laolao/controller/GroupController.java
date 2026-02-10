@@ -3,6 +3,7 @@ package com.laolao.controller;
 import com.laolao.common.result.Result;
 import com.laolao.pojo.dto.JoinGroupDTO;
 import com.laolao.pojo.vo.DetailBaseGroupVO;
+import com.laolao.pojo.vo.DetailExamGroupVO;
 import com.laolao.pojo.vo.GroupVO;
 import com.laolao.service.GroupService;
 import jakarta.annotation.Resource;
@@ -32,7 +33,7 @@ public class GroupController {
     }
 
     @GetMapping("/detail-exam")
-    public Result<List<GroupVO>> getDetailGroupExam(@RequestParam Integer groupId) {
+    public Result<List<DetailExamGroupVO>> getDetailGroupExam(@RequestParam Integer groupId) {
         return groupService.getDetailGroupExam(groupId);
     }
 }

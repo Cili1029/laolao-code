@@ -1,7 +1,7 @@
 package com.laolao.mapper;
 
+import com.laolao.pojo.vo.ExamInfoVO;
 import com.laolao.pojo.vo.ExamVO;
-import com.laolao.pojo.vo.GroupVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -19,4 +19,12 @@ public interface ExamMapper {
             where gm.member_id = 2;
             """)
     List<ExamVO> selectSimpleExam(Integer userId);
+
+    @Select("""
+            select e.id, e.title, e.description, g.name as `group`, JSON_LENGTH(e.questions) as questions, e.start_time, e.end_time
+            from exam e
+                     join `group` g on g.id = e.group_id
+            where e.id = #{examId};
+            """)
+    ExamInfoVO selectExamInfo(Integer examId);
 }

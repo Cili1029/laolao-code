@@ -2,12 +2,14 @@ import SignIn from "@/components/common/SignIn.vue";
 import SignUp from "@/components/common/SignUp.vue";
 import Test from "@/components/common/Test.vue";
 import Ai from "@/components/user/Ai.vue";
-import Exam from "@/components/user/Exam.vue";
+import ExamTool from "@/components/user/exam/ExamTool.vue";
 import ExamRecord from "@/components/user/ExamRecord.vue";
 import Group from "@/components/user/Group.vue";
 import Common from "@/components/user/Common.vue";
 import UserLayout from "@/components/user/UserLayout.vue";
 import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
+import Exam from "@/components/user/exam/Exam.vue";
+import ExamInfo from "@/components/user/exam/ExamInfo.vue";
 
 const routes: Array<RouteRecordRaw> = [
     // 注册
@@ -46,7 +48,7 @@ const routes: Array<RouteRecordRaw> = [
                 children: [
                     {
                         path: ':id',
-                        component: Exam,
+                        component: ExamInfo,
                     }
                 ]
             },

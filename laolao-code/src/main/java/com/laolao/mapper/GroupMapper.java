@@ -2,6 +2,7 @@ package com.laolao.mapper;
 
 import com.laolao.pojo.dto.JoinGroupDTO;
 import com.laolao.pojo.vo.DetailBaseGroupVO;
+import com.laolao.pojo.vo.DetailExamGroupVO;
 import com.laolao.pojo.vo.GroupVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -40,4 +41,7 @@ public interface GroupMapper {
 
     @Select("select count(id) from group_member where group_id = #{groupId}")
     Integer selectMemberCount(Integer groupId);
+
+    @Select("select id, title, start_time, end_time from exam where group_id = #{groupId} order by start_time desc")
+    List<DetailExamGroupVO> selectDetailExam(Integer groupId);
 }

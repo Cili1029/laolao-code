@@ -7,6 +7,7 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import updateLocale from 'dayjs/plugin/updateLocale'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import isBetween from 'dayjs/plugin/isBetween'
 
 const app = createApp(App)
 const pinia = createPinia()
@@ -30,6 +31,7 @@ dayjs.updateLocale('zh-cn', {
     }
 })
 dayjs.extend(relativeTime)
+dayjs.extend(isBetween);
 
 
 

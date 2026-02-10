@@ -3,6 +3,7 @@ package com.laolao.service.impl;
 import com.laolao.common.context.UserContext;
 import com.laolao.common.result.Result;
 import com.laolao.mapper.ExamMapper;
+import com.laolao.pojo.vo.ExamInfoVO;
 import com.laolao.pojo.vo.ExamVO;
 import com.laolao.service.ExamService;
 import jakarta.annotation.Resource;
@@ -20,5 +21,11 @@ public class ExamServiceImpl implements ExamService {
         Integer userId = UserContext.getCurrentId();
         List<ExamVO> examVOList = examMapper.selectSimpleExam(userId);
         return Result.success(examVOList);
+    }
+
+    @Override
+    public Result<ExamInfoVO> getExamInfo(Integer examId) {
+        ExamInfoVO examInfoVO = examMapper.selectExamInfo(examId);
+        return Result.success(examInfoVO);
     }
 }

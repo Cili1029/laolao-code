@@ -5,6 +5,7 @@ import com.laolao.common.result.Result;
 import com.laolao.mapper.GroupMapper;
 import com.laolao.pojo.dto.JoinGroupDTO;
 import com.laolao.pojo.vo.DetailBaseGroupVO;
+import com.laolao.pojo.vo.DetailExamGroupVO;
 import com.laolao.pojo.vo.GroupVO;
 import com.laolao.service.GroupService;
 import jakarta.annotation.Resource;
@@ -53,8 +54,9 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public Result<List<GroupVO>> getDetailGroupExam(Integer groupId) {
+    public Result<List<DetailExamGroupVO>> getDetailGroupExam(Integer groupId) {
         // 班级考试数据
-        return null;
+        List<DetailExamGroupVO> detailExamGroupVOList = groupMapper.selectDetailExam(groupId);
+        return Result.success(detailExamGroupVOList);
     }
 }
