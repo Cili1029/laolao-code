@@ -20,7 +20,26 @@
 <script setup lang="ts">
     import { ResizableHandle, ResizablePanel, ResizablePanelGroup, } from '@/components/ui/resizable'
     import MonacoEditor from '@/components/common/MonacoEditor.vue'
-    import { ref } from 'vue';
+    import { onMounted, ref } from 'vue'
+    import axios from "@/utils/myAxios"
+    import { useRoute } from 'vue-router'
+    const route = useRoute()
+
+    onMounted(() => {
+        getQuestions()
+    })
+
+    const getQuestions = async () => {
+        try {
+            const res = await axios.get("/api/exam/questions", {
+                params: {
+                    recordId: route.params.id
+                }
+            })
+        } catch (e) {
+            console.log(e)
+        }
+    }
 
     const javaCode = ref(`public class HelloWorld {
     public static void main(String[] args) {

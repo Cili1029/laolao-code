@@ -50,4 +50,9 @@ public class ExamRecord implements Serializable {
      * 学生开始答题时间
      */
     private LocalDateTime startTime;
+
+    /**
+     * 学生结束答题时间
+     */
+    private LocalDateTime endTime;
 }

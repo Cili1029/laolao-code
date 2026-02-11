@@ -1,8 +1,13 @@
 package com.laolao.mapper;
 
+import com.laolao.pojo.entity.Exam;
+import com.laolao.pojo.entity.ExamRecord;
 import com.laolao.pojo.vo.ExamInfoVO;
+import com.laolao.pojo.vo.ExamQuestionVO;
 import com.laolao.pojo.vo.ExamVO;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
@@ -27,4 +32,15 @@ public interface ExamMapper {
             where e.id = #{examId};
             """)
     ExamInfoVO selectExamInfo(Integer examId);
+
+    @Select("select id, status from exam_record where user_id = #{userId} and exam_id = #{examId}")
+    ExamRecord selectExamRecord(Integer userId, Integer examId);
+
+    @Options(useGeneratedKeys = true, keyProperty = "id")
+    @Insert("insert into exam_record(exam_id, user_id) value (#{examId}, #{userId})")
+    void insertRecord(ExamRecord record);
+
+    Exam selectExamByRecordId(Integer recordId);
+
+    List<ExamQuestionVO> selectQuestionById(List<Integer> questionIds);
 }

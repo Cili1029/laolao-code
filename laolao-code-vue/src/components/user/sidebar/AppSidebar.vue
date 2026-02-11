@@ -42,7 +42,7 @@
       </SidebarFooter>
     </Sidebar>
 
-    <!-- 第二个侧边栏（邮件列表） -->
+    <!-- 第二个侧边栏 -->
     <Sidebar collapsible="none" class="hidden flex-1 md:flex">
       <SidebarHeader class="gap-3.5 border-b p-4">
         <div class="flex w-full items-center justify-between">
@@ -55,7 +55,7 @@
       <SidebarContent>
         <SidebarGroup class="px-0">
           <SidebarGroupContent>
-            <RouterLink :to="activeItem.url + '/' + result.id" v-for="result in results" :key="result.id"
+            <RouterLink :to="activeItem.url + '/' + result.id" v-for="result in results" :key="result.id" @click="setOpen(false)"
               class="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0">
               <p class="flex w-full items-center justify-between">
                 <span class="w-50 overflow-hidden text-ellipsis whitespace-nowrap">{{ result.name }}</span>

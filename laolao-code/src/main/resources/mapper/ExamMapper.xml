@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.laolao.mapper.ExamMapper">
+
+    <resultMap id="ExamMap" type="com.laolao.pojo.entity.Exam">
+        <result column="questions" property="questions"
+                typeHandler="com.laolao.common.util.JsonTypeHandler"/>
+    </resultMap>
+
+    <select id="selectExamByRecordId" resultMap="ExamMap">
+        select e.id, e.questions
+        from exam e
+                 join exam_record r on r.exam_id = e.id
+        where r.id = #{recordId}
+    </select>
+
+    <select id="selectQuestionById" resultType="com.laolao.pojo.vo.ExamQuestionVO">
+        select id, title, content, difficulty, template_code
+        from question
+        where id in
+        <foreach collection="questionIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+</mapper>

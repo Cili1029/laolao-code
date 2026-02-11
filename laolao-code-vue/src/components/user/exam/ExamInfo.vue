@@ -13,7 +13,7 @@
                         <p class="text-gray-600">{{ exam?.group }}</p>
                         <p class="text-gray-600">{{ exam?.description }}</p>
                     </div>
-                    <div class="w-1/2">
+                    <div class="w-1/2 flex flex-col">
                         <div class="flex justify-end mb-1">
                             <Badge variant="secondary"
                                 :class="['mb-2',
@@ -22,6 +22,13 @@
                                 {{ dayjs().isBetween(exam?.startTime, exam?.endTime, null, '[]') ? '进行中' :
                                     dayjs().isAfter(exam?.startTime) ? "已结束" : "未开始" }}
                             </Badge>
+                        </div>
+                        <div class="flex flex-1 items-center justify-center">
+                            <Button @click="startExam()" variant="outline"
+                                :disabled="!dayjs().isBetween(exam?.startTime, exam?.endTime, null, '[]')">
+                                {{ dayjs().isBetween(exam?.startTime, exam?.endTime, null, '[]') ? '开始答题' :
+                                    dayjs().isAfter(exam?.startTime) ? "已结束" : "未开始" }}
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -53,32 +60,42 @@
             </div>
             <div class="w-1/5 h-full shadow rounded-lg p-3 space-y-2 bg-white">
                 <p class="font-bold">时间线</p>
-                <Stepper orientation="vertical" class="mx-auto flex w-full max-w-md flex-col justify-start gap-10">
-                    <StepperItem v-for="step in steps" :key="step.step" v-slot="{ state }"
-                        class="relative flex w-full items-start gap-6" :step="step.step">
-                        <StepperSeparator v-if="step.step !== steps[steps.length - 1]?.step"
-                            class="absolute left-4.5 top-9.5 block h-[105%] w-0.5 shrink-0 rounded-full bg-muted group-data-[state=completed]:bg-primary" />
-                        <StepperTrigger as-child>
-                            <Button :variant="state === 'completed' || state === 'active' ? 'default' : 'outline'"
-                                size="icon" class="z-10 rounded-full shrink-0"
-                                :class="[state === 'active' && 'ring-2 ring-ring ring-offset-2 ring-offset-background']">
-                                <Check v-if="state === 'completed'" class="size-5" />
-                                <Circle v-if="state === 'active'" />
-                                <Dot v-if="state === 'inactive'" />
-                            </Button>
-                        </StepperTrigger>
-                        <div class="flex flex-col gap-1">
-                            <StepperTitle :class="[state === 'active' && 'text-primary']"
-                                class="text-sm font-semibold transition">
-                                {{ step.title }}
-                            </StepperTitle>
-                            <StepperDescription :class="[state === 'active' && 'text-primary']"
-                                class="sr-only text-xs text-muted-foreground transition md:not-sr-only">
-                                {{ step.description }}
-                            </StepperDescription>
+                <div class="flex justify-center items-center pt-5">
+                    <div class="relative border-l border-slate-200 ml-3 space-y-8">
+                        <div class="relative pl-8">
+                            <div class="absolute -left-1.5 mt-1.5 h-3 w-3 rounded-full border border-white"
+                                :class="dayjs().isAfter(exam?.startTime) ? 'bg-blue-500 ring-4 ring-blue-50' : 'bg-slate-300'">
+                            </div>
+                            <time class="mb-1 text-xs font-mono text-slate-600 uppercase tracking-wide">{{
+                                dayjs(exam?.startTime).format('YYYY/MM/DD HH:mm') }}</time>
+                            <h3 class="text-sm font-semibold text-slate-700">考试开放时间</h3>
                         </div>
-                    </StepperItem>
-                </Stepper>
+                        <div class="relative pl-8">
+                            <div class="absolute -left-1.5 mt-1.5 h-3 w-3 rounded-full border border-white "
+                                :class="dayjs().isAfter(exam?.startTime) ? 'bg-blue-500 ring-4 ring-blue-50' : 'bg-slate-300'">
+                            </div>
+                            <time class="mb-1 text-xs font-mono text-slate-600 uppercase tracking-wide">{{
+                                dayjs(exam?.startTime).format('YYYY/MM/DD HH:mm') }}</time>
+                            <h3 class="text-sm font-semibold text-slate-700">考生开始答题时间</h3>
+                        </div>
+                        <div class="relative pl-8">
+                            <div class="absolute -left-1.5 mt-1.5 h-3 w-3 rounded-full border border-white"
+                                :class="dayjs().isAfter(exam?.endTime) ? 'bg-blue-500 ring-4 ring-blue-50' : 'bg-slate-300'">
+                            </div>
+                            <time class="mb-1 text-xs font-mono text-slate-600 uppercase tracking-wide">{{
+                                dayjs(exam?.endTime).format('YYYY/MM/DD HH:mm') }}</time>
+                            <h3 class="text-sm font-semibold text-slate-700">考生结束答题时间</h3>
+                        </div>
+                        <div class="relative pl-8">
+                            <div class="absolute -left-1.5 mt-1.5 h-3 w-3 rounded-full border border-white"
+                                :class="dayjs().isAfter(exam?.endTime) ? 'bg-blue-500 ring-4 ring-blue-50' : 'bg-slate-300'">
+                            </div>
+                            <time class="mb-1 text-xs font-mono text-slate-600 uppercase tracking-wide">{{
+                                dayjs(exam?.endTime).format('YYYY/MM/DD HH:mm') }}</time>
+                            <h3 class="text-sm font-semibold text-slate-700">考试结束时间</h3>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -90,10 +107,9 @@
     import axios from "@/utils/myAxios"
     import { Bug } from 'lucide-vue-next'
     import { Badge } from '@/components/ui/badge'
-    import dayjs from 'dayjs'
-    import { Check, Circle, Dot } from 'lucide-vue-next'
     import { Button } from '@/components/ui/button'
-    import { Stepper, StepperDescription, StepperItem, StepperSeparator, StepperTitle, StepperTrigger } from '@/components/ui/stepper'
+    import dayjs from 'dayjs'
+    import router from '@/router';
 
     const route = useRoute()
 
@@ -133,29 +149,16 @@
         }
     }
 
-    const steps = [
-        {
-            step: 1,
-            title: dayjs(exam.value?.startTime).format('YYYY/MM/DD HH:mm:ss'),
-            description:
-                '考试开始时间',
-        },
-        {
-            step: 2,
-            title: dayjs(exam.value?.startTime).format('YYYY/MM/DD HH:mm:ss'),
-            description: '考试实际开始答题的时间',
-        },
-        {
-            step: 3,
-            title: dayjs(exam.value?.endTime).format('YYYY/MM/DD HH:mm:ss'),
-            description:
-                '考生提交时间',
-        },
-        {
-            step: 4,
-            title: dayjs(exam.value?.endTime).format('YYYY/MM/DD HH:mm:ss'),
-            description:
-                '考生结束时间',
-        },
-    ]
+    const startExam = async () => {
+        try {
+            const res = await axios.post("/api/exam/start", {}, {
+                params: {
+                    examId: route.params.id
+                }
+            })
+            router.push(`/exam/start/${res.data.data}`);
+        } catch (e) {
+            console.log(e)
+        }
+    }
 </script>

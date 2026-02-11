@@ -2,13 +2,11 @@ package com.laolao.controller;
 
 import com.laolao.common.result.Result;
 import com.laolao.pojo.vo.ExamInfoVO;
+import com.laolao.pojo.vo.ExamQuestionVO;
 import com.laolao.pojo.vo.ExamVO;
 import com.laolao.service.ExamService;
 import jakarta.annotation.Resource;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,5 +24,15 @@ public class ExamController {
     @GetMapping("/info")
     public Result<ExamInfoVO> getExamInfo(@RequestParam Integer examId) {
         return examService.getExamInfo(examId);
+    }
+
+    @PostMapping("/start")
+    public Result<Integer> startExam(@RequestParam Integer examId) {
+        return examService.startExam(examId);
+    }
+
+    @GetMapping("/questions")
+    public Result<List<ExamQuestionVO>> getExamQuestion(@RequestParam Integer recordId) {
+        return examService.getExamQuestion(recordId);
     }
 }

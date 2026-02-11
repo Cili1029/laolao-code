@@ -8,7 +8,6 @@ import Group from "@/components/user/Group.vue";
 import Common from "@/components/user/Common.vue";
 import UserLayout from "@/components/user/UserLayout.vue";
 import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
-import Exam from "@/components/user/exam/Exam.vue";
 import ExamInfo from "@/components/user/exam/ExamInfo.vue";
 
 const routes: Array<RouteRecordRaw> = [
@@ -49,7 +48,11 @@ const routes: Array<RouteRecordRaw> = [
                     {
                         path: ':id',
                         component: ExamInfo,
-                    }
+                    },
+                    {
+                        path: 'start/:id',
+                        component: ExamTool,
+                    },
                 ]
             },
             {
