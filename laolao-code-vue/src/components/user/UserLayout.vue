@@ -6,7 +6,11 @@
                 <SidebarTrigger
                     :class="['-ml-1', sidebarStore.exam ? 'pointer-events-none select-none opacity-50' : '']" />
                 <Separator orientation="vertical" class="mr-2 data-[orientation=vertical]:h-4" />
-                <p @click="sidebarStore.exam = !sidebarStore.exam">开始考试</p>
+                <div class="flex w-full justify-between">
+                    <p @click="sidebarStore.exam = !sidebarStore.exam">开始考试</p>
+                    <p @click="sidebarStore.exam = !sidebarStore.exam">1</p>
+                </div>
+                
             </header>
             <RouterView class="flex flex-1"></RouterView>
         </SidebarInset>

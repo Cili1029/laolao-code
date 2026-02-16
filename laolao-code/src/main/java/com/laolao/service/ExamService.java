@@ -1,9 +1,11 @@
 package com.laolao.service;
 
 import com.laolao.common.result.Result;
+import com.laolao.pojo.dto.JudgeDTO;
 import com.laolao.pojo.vo.ExamInfoVO;
 import com.laolao.pojo.vo.ExamQuestionVO;
 import com.laolao.pojo.vo.ExamVO;
+import com.laolao.pojo.vo.JudgeResultVO;
 
 import java.util.List;
 
@@ -15,4 +17,6 @@ public interface ExamService {
     Result<Integer> startExam(Integer examId);
 
     Result<List<ExamQuestionVO>> getExamQuestion(Integer recordId);
+
+    Result<JudgeResultVO> judge(JudgeDTO judgeDTO);
 }

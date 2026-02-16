@@ -1,9 +1,11 @@
 package com.laolao.controller;
 
 import com.laolao.common.result.Result;
+import com.laolao.pojo.dto.JudgeDTO;
 import com.laolao.pojo.vo.ExamInfoVO;
 import com.laolao.pojo.vo.ExamQuestionVO;
 import com.laolao.pojo.vo.ExamVO;
+import com.laolao.pojo.vo.JudgeResultVO;
 import com.laolao.service.ExamService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
@@ -34,5 +36,10 @@ public class ExamController {
     @GetMapping("/questions")
     public Result<List<ExamQuestionVO>> getExamQuestion(@RequestParam Integer recordId) {
         return examService.getExamQuestion(recordId);
+    }
+
+    @PostMapping("/judge")
+    public Result<JudgeResultVO> judge(@RequestBody JudgeDTO judgeDTO) {
+        return examService.judge(judgeDTO);
     }
 }

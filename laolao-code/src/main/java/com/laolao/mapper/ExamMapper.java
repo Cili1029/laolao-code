@@ -21,7 +21,7 @@ public interface ExamMapper {
                      join group_member gm on gm.group_id = e.group_id
                      join `group` g on gm.group_id = g.id
                      join user u on u.id = g.advisor_id
-            where gm.member_id = 2;
+            where gm.member_id = #{userId};
             """)
     List<ExamVO> selectSimpleExam(Integer userId);
 

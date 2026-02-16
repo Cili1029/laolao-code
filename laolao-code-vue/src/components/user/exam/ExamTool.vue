@@ -14,6 +14,7 @@
                         <article class="prose prose-slate dark:prose-invert max-w-none" v-html="renderedContent">
                         </article>
                     </div>
+                    <p @click="judge()">123</p>
                 </div>
             </ResizablePanel>
 
@@ -77,4 +78,14 @@
         if (!content) return ''
         return md.render(content);
     })
+
+    const judge = async () => {
+        try {
+            const res = await axios.post("/api/exam/judge", {
+                code: currentQuestion.value?.templateCode
+            })
+        } catch (e) {
+            console.log(e)
+        }
+    }
 </script>

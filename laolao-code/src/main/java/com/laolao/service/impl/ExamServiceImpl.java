@@ -1,13 +1,16 @@
 package com.laolao.service.impl;
 
 import com.laolao.common.context.UserContext;
+import com.laolao.common.docker.JudgeService;
 import com.laolao.common.result.Result;
 import com.laolao.mapper.ExamMapper;
+import com.laolao.pojo.dto.JudgeDTO;
 import com.laolao.pojo.entity.Exam;
 import com.laolao.pojo.entity.ExamRecord;
 import com.laolao.pojo.vo.ExamInfoVO;
 import com.laolao.pojo.vo.ExamQuestionVO;
 import com.laolao.pojo.vo.ExamVO;
+import com.laolao.pojo.vo.JudgeResultVO;
 import com.laolao.service.ExamService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,8 @@ import java.util.List;
 public class ExamServiceImpl implements ExamService {
     @Resource
     private ExamMapper examMapper;
+    @Resource
+    private JudgeService judgeService;
 
     @Override
     public Result<List<ExamVO>> getSimpleExam() {
@@ -55,5 +60,16 @@ public class ExamServiceImpl implements ExamService {
         Exam exam = examMapper.selectExamByRecordId(recordId);
         List<ExamQuestionVO> examQuestionVOList = examMapper.selectQuestionById(exam.getQuestions());
         return Result.success(examQuestionVOList);
+    }
+
+    @Override
+    public Result<JudgeResultVO> judge(JudgeDTO judgeDTO) {
+        try {
+            judgeService.judge(judgeDTO.getCode());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return Result.success(new JudgeResultVO());
     }
 }

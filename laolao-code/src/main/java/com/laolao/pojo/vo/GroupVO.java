@@ -9,7 +9,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Builder
 public class GroupVO implements Serializable {
 
     /**
