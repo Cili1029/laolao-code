@@ -3,9 +3,12 @@ package com.laolao.common.docker;
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.async.ResultCallback;
 import com.github.dockerjava.api.command.CreateContainerResponse;
+import com.github.dockerjava.api.command.InspectExecResponse;
 import com.github.dockerjava.api.model.Container;
 import com.github.dockerjava.api.model.Frame;
 import com.github.dockerjava.api.model.HostConfig;
+import com.github.dockerjava.api.model.StreamType;
+import com.laolao.pojo.entity.JudgeResult;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -107,10 +110,14 @@ public class JudgeService {
      *
      * @param userCode 用户提交的 Java 代码字符串
      */
-    public void judge(String userCode) throws Exception {
+    public JudgeResult judge(String userCode) throws Exception {
         // 从池中取出一个容器（如果池子空了，最多等 5 秒）
         String containerId = containerQueue.poll(5, TimeUnit.SECONDS);
         if (containerId == null) throw new RuntimeException("当前无可用容器（判题繁忙）");
+
+        // 准备存放输出的容器
+        StringBuilder stdoutBuilder = new StringBuilder();
+        StringBuilder stderrBuilder = new StringBuilder();
 
         try {
             // dockerClient 要求通过 Tar 流的方式上传文件
@@ -130,18 +137,24 @@ public class JudgeService {
                     .exec()
                     .getId();
 
-            StringBuilder output = new StringBuilder();
             // 开始执行 Exec 指令并监听结果
             dockerClient.execStartCmd(execId).exec(new ResultCallback.Adapter<Frame>() {
                 @Override
                 public void onNext(Frame item) {
-                    // item 代表容器输出的一行内容
-                    output.append(new String(item.getPayload()));
+                    String payload = new String(item.getPayload());
+                    if (item.getStreamType() == StreamType.STDOUT) {
+                        stdoutBuilder.append(payload);
+                    } else if (item.getStreamType() == StreamType.STDERR) {
+                        stderrBuilder.append(payload);
+                    }
                 }
             }).awaitCompletion(10, TimeUnit.SECONDS); // 限制运行时间 10 秒（防止死循环）
 
-            System.out.println("判题运行结果:\n" + output);
+            // 获取 Exec 命令的退出码（核心新增逻辑）
+            InspectExecResponse exec = dockerClient.inspectExecCmd(execId).exec();
 
+            // 组装结果返回实体类
+            return setResult(stdoutBuilder, stderrBuilder, exec.getExitCodeLong());
         } finally {
             // 容器用完即焚，创建新容器补上
             CompletableFuture.runAsync(() -> {
@@ -173,6 +186,53 @@ public class JudgeService {
             taos.finish();
         }
         return new ByteArrayInputStream(bos.toByteArray());
+    }
+
+    private static JudgeResult setResult(StringBuilder stdoutBuilder, StringBuilder stderrBuilder, Long exitCodeLong) {
+        JudgeResult result = new JudgeResult();
+
+        String stdout = stdoutBuilder.toString().trim();
+        String stderr = stderrBuilder.toString().trim();
+
+        // 先存下输出，方便调试
+        result.setStdout(stdout);
+        result.setExitCode(exitCodeLong);
+
+        // 从后往前查找指标，因为指标通常在最后一行
+        String metricFlag = "TIME:";
+        int errIndex = stderr.lastIndexOf(metricFlag);
+
+        if (errIndex != -1) {
+            // 提取指标之前的真正错误信息
+            String realError = stderr.substring(0, errIndex).trim();
+            if (!realError.isEmpty()) {
+                result.setStderr(realError);
+            }
+
+            // 提取指标字符串 (TIME:0.10 MEM:35072)
+            String metricPart = stderr.substring(errIndex);
+
+            // 提取 TIME
+            int timeEnd = metricPart.indexOf("MEM:");
+            if (timeEnd != -1) {
+                String timeStr = metricPart.substring(metricFlag.length(), timeEnd).trim();
+                try {
+                    result.setTime(Double.parseDouble(timeStr) * 1000);
+                } catch (Exception ignore) {}
+
+                // 提取 MEM
+                String memStr = metricPart.substring(timeEnd + 4).trim();
+                try {
+                    // 如果后面还有其他杂质，可以再截取第一个空格前的数字
+                    memStr = memStr.split("\\s+")[0];
+                    result.setMemory(Long.parseLong(memStr) / 1024);
+                } catch (Exception ignore) {}
+            }
+        } else {
+            // 如果没找到指标，说明可能是编译阶段就挂了或者系统错误
+            result.setStderr(stderr);
+        }
+        return result;
     }
 
     /**

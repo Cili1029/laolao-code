@@ -2,7 +2,7 @@
   <!-- 考试时就禁用 -->
   <Sidebar :class="[
     'overflow-hidden *:data-[sidebar=sidebar]:flex-row',
-    sidebarStore.exam ? 'pointer-events-none select-none opacity-50' : '']" v-bind="props">
+    examStore.exam ? 'pointer-events-none select-none opacity-50' : '']" v-bind="props">
     <!-- 第一个侧边栏（图标列） -->
     <Sidebar collapsible="none" class="w-[calc(var(--sidebar-width-icon)+1px)]! border-r">
       <SidebarHeader>
@@ -85,8 +85,8 @@
   import dayjs from 'dayjs'
   import JoinGroup from '../JoinGroup.vue'
   import { useRoute } from 'vue-router'
-  import { useSidebarStore } from "@/stores/SidebarStore"
-  const sidebarStore = useSidebarStore()
+  import { useExamStore } from "@/stores/ExamStore"
+  const examStore = useExamStore()
 
   const props = withDefaults(defineProps<SidebarProps>(), {
     collapsible: "icon",
@@ -143,7 +143,7 @@
   }
 
   watch(
-    () => sidebarStore.exam,
+    () => examStore.exam,
     async (status) => {
       if (status) { // 开始考试
         setOpen(false)

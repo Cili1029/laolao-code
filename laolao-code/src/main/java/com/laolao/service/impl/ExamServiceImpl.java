@@ -7,10 +7,10 @@ import com.laolao.mapper.ExamMapper;
 import com.laolao.pojo.dto.JudgeDTO;
 import com.laolao.pojo.entity.Exam;
 import com.laolao.pojo.entity.ExamRecord;
+import com.laolao.pojo.entity.JudgeResult;
 import com.laolao.pojo.vo.ExamInfoVO;
 import com.laolao.pojo.vo.ExamQuestionVO;
 import com.laolao.pojo.vo.ExamVO;
-import com.laolao.pojo.vo.JudgeResultVO;
 import com.laolao.service.ExamService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -63,13 +63,12 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public Result<JudgeResultVO> judge(JudgeDTO judgeDTO) {
+    public Result<JudgeResult> judge(JudgeDTO judgeDTO) {
         try {
-            judgeService.judge(judgeDTO.getCode());
+            JudgeResult judge = judgeService.judge(judgeDTO.getCode());
+            return Result.success(judge);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            return Result.error("判题失败！");
         }
-
-        return Result.success(new JudgeResultVO());
     }
 }
