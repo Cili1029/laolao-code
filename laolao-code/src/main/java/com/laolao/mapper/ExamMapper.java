@@ -1,14 +1,12 @@
 package com.laolao.mapper;
 
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.laolao.pojo.entity.Exam;
 import com.laolao.pojo.entity.ExamRecord;
 import com.laolao.pojo.vo.ExamInfoVO;
 import com.laolao.pojo.vo.ExamQuestionVO;
 import com.laolao.pojo.vo.ExamVO;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Options;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -40,6 +38,13 @@ public interface ExamMapper {
     @Insert("insert into exam_record(exam_id, user_id) value (#{examId}, #{userId})")
     void insertRecord(ExamRecord record);
 
+    @Select("""
+            select e.id, e.questions
+            from exam e
+                    join exam_record r on r.exam_id = e.id
+            where r.id = #{recordId}
+            """)
+    @Results({@Result(column = "questions", property = "questions", typeHandler = JacksonTypeHandler.class)})
     Exam selectExamByRecordId(Integer recordId);
 
     List<ExamQuestionVO> selectQuestionById(List<Integer> questionIds);

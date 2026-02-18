@@ -1,5 +1,8 @@
 package com.laolao.pojo.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
 import java.io.Serializable;
@@ -15,6 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @Builder
+@TableName(autoResultMap = true)
 public class Exam implements Serializable {
 
     /**
@@ -40,6 +44,7 @@ public class Exam implements Serializable {
     /**
      * 题目ID列表
      */
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private List<Integer> questions;
 
     /**

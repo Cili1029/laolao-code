@@ -9,7 +9,12 @@ import lombok.*;
 @ToString
 public class JudgeDTO {
     /**
-     * 主键ID
+     * 题目主键
+     */
+    private Integer id;
+
+    /**
+     * 学生代码
      */
     private String Code;
 }

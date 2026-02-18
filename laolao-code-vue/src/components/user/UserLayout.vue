@@ -8,7 +8,7 @@
                 <Separator orientation="vertical" class="mr-2 data-[orientation=vertical]:h-4" />
                 <div class="flex w-full justify-between">
                     <p @click="examStore.exam = !examStore.exam">开始考试</p>
-                    <Button @click="examStore.judge()">提交答案</Button>
+                    <div v-if="examStore.exam" @click="examStore.judge()" class="">提交答案</div>
                 </div>
             </header>
             <RouterView class="flex flex-1"></RouterView>
@@ -23,5 +23,4 @@
     import { RouterView } from "vue-router"
     import { useExamStore } from "@/stores/ExamStore"
     const examStore = useExamStore()
-    import { Button } from '@/components/ui/button'
 </script>

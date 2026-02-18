@@ -48,6 +48,7 @@ export const useExamStore = defineStore('sidebar', {
                 this.judgeDialog = true
 
                 const res = await axios.post("/api/exam/judge", {
+                    id: this.currentQuestion.id,
                     code: this.currentQuestion.templateCode
                 })
 

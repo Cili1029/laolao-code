@@ -1,11 +1,13 @@
 package com.laolao.pojo.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 /**
  * 题目表
@@ -16,6 +18,7 @@ import java.util.Map;
 @AllArgsConstructor
 @ToString
 @Builder
+@TableName(autoResultMap = true)
 public class Question implements Serializable {
 
     /**
@@ -36,6 +39,7 @@ public class Question implements Serializable {
     /**
      * 标签列表 [ "栈", "简单", "Java" ]
      */
+    @TableField(typeHandler = JacksonTypeHandler.class)
     private List<String> tags;
 
     /**
@@ -56,7 +60,8 @@ public class Question implements Serializable {
     /**
      * 测试用例 [ {"input": "1 2", "output": "3"}, {"input": "2 2", "output": "4"} ]
      */
-    private List<Map<String, String>> testCases;
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private List<TestCase> testCases;
 
     /**
      * 初始化模板代码 (如 public class Main...)

@@ -4,10 +4,9 @@ import com.laolao.common.context.UserContext;
 import com.laolao.common.docker.JudgeService;
 import com.laolao.common.result.Result;
 import com.laolao.mapper.ExamMapper;
+import com.laolao.mapper.QuestionMapper;
 import com.laolao.pojo.dto.JudgeDTO;
-import com.laolao.pojo.entity.Exam;
-import com.laolao.pojo.entity.ExamRecord;
-import com.laolao.pojo.entity.JudgeResult;
+import com.laolao.pojo.entity.*;
 import com.laolao.pojo.vo.ExamInfoVO;
 import com.laolao.pojo.vo.ExamQuestionVO;
 import com.laolao.pojo.vo.ExamVO;
@@ -23,6 +22,8 @@ public class ExamServiceImpl implements ExamService {
     private ExamMapper examMapper;
     @Resource
     private JudgeService judgeService;
+    @Resource
+    private QuestionMapper questionMapper;
 
     @Override
     public Result<List<ExamVO>> getSimpleExam() {
@@ -65,10 +66,13 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public Result<JudgeResult> judge(JudgeDTO judgeDTO) {
         try {
-            JudgeResult judge = judgeService.judge(judgeDTO.getCode());
+            // 获取测试用例
+            Question question = questionMapper.selectById(judgeDTO.getId());
+            JudgeResult judge = judgeService.judge(judgeDTO.getCode(), question.getTestCases());
             return Result.success(judge);
         } catch (Exception e) {
-            return Result.error("判题失败！");
+            e.printStackTrace();
+            return Result.error("判题失败！练习管理员！");
         }
     }
 }
