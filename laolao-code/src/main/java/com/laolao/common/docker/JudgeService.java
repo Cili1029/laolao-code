@@ -34,7 +34,7 @@ public class JudgeService {
     // 判题时从这里取，用完后销毁，再补新的，保证用户请求判题秒开
     private final BlockingQueue<String> containerQueue = new LinkedBlockingQueue<>(10);
     // 定义池子的大小
-    private final int POOL_SIZE = 5;
+    private final int POOL_SIZE = 10;
 
     // 构造函数：Spring 自动注入配置好的 dockerClient
     public JudgeService(DockerClient dockerClient) {
@@ -108,7 +108,7 @@ public class JudgeService {
     /**
      * 判题服务核心代码
      *
-     * @param userCode 用户提交的 Java 代码字符串
+     * @param userCode  用户提交的 Java 代码字符串
      * @param testCases 示例
      * @return 判题结果
      */
@@ -124,15 +124,13 @@ public class JudgeService {
             String compileError = compile(containerId);
             // 为空，直接返回失败信息
             if (compileError != null) {
-                JudgeResult judgeResult = new JudgeResult();
-                judgeResult.setExitCode(1L);
-                judgeResult.setStderr(compileError);
-                return judgeResult;
+                return JudgeResult.compileError(compileError);
             }
 
             // 编译成功，开始逐个运行测试用例
-            long maxMemory = 0;
-            double maxTime = 0;
+            int maxMemory = 0;
+            int maxTime = 0;
+            int passTestCaseCount = 0;
 
             for (TestCase tc : testCases) {
                 // 将当前输入写入 input.txt
@@ -142,33 +140,25 @@ public class JudgeService {
                 JudgeResult response = runSingleCase(containerId);
 
                 // 判断是否超时或发生运行错误
+                //TODO
                 if (response.getExitCode() != 0) {
-                    JudgeResult judgeResult = new JudgeResult();
-                    judgeResult.setExitCode(1L);
-                    return judgeResult;
+                    return JudgeResult.commonError(response.getStderr(), "否超时或发生运行错误TODO");
                 }
-                // 比对输出结果
+                // 比对输出结果，后期要返回示例数据testCase
+                //TODO
                 boolean isPassed = tc.getOutput().trim().equals(response.getStdout().trim());
                 if (!isPassed) {
-//                    JudgeResult res = JudgeResult.fail("Wrong Answer", "Output mismatch at case " + i);
-                    JudgeResult judgeResult = new JudgeResult();
-                    judgeResult.setStdout(response.getStdout());
-//                    judgeResult.setExpected(tc.getOutput());
-                    return judgeResult;
+                    return JudgeResult.testCaseError(response.getStdout(), tc, passTestCaseCount, testCases.size());
                 }
 
                 // 记录最大消耗
                 maxMemory = Math.max(maxMemory, response.getMemory());
                 maxTime = Math.max(maxTime, response.getTime());
+                passTestCaseCount ++;
             }
 
             // 全部通过
-//            return JudgeResult.success("Accepted", maxTime, maxMemory);
-            JudgeResult judgeResult = new JudgeResult();
-            judgeResult.setExitCode(0L);
-            judgeResult.setTime(maxTime);
-            judgeResult.setMemory(maxMemory);
-            return judgeResult;
+            return JudgeResult.success(maxTime, maxMemory);
         } finally {
             // 容器用完即焚，创建新容器补上
             CompletableFuture.runAsync(() -> {
@@ -194,10 +184,11 @@ public class JudgeService {
 
     /**
      * 编译代码
+     *
      * @return 编译错误信息，如果成功则返回 null
      */
     private String compile(String containerId) throws InterruptedException {
-        StringBuilder sb = new StringBuilder();
+        StringBuilder stderr = new StringBuilder();
         String execId = dockerClient.execCreateCmd(containerId)
                 .withAttachStderr(true)
                 .withCmd("javac", "Main.java")
@@ -206,14 +197,14 @@ public class JudgeService {
         dockerClient.execStartCmd(execId).exec(new ResultCallback.Adapter<Frame>() {
             @Override
             public void onNext(Frame item) {
-                if (item.getStreamType() == StreamType.STDERR) sb.append(new String(item.getPayload()));
+                if (item.getStreamType() == StreamType.STDERR) stderr.append(new String(item.getPayload()));
             }
         }).awaitCompletion(5, TimeUnit.SECONDS);
         Long exitCode = dockerClient.inspectExecCmd(execId).exec().getExitCodeLong();
 
         // 只有退出码不为 0 且有错误信息时才判定为编译失败
         if (exitCode != null && exitCode != 0) {
-            return sb.isEmpty() ? "Unknown Compilation Error" : sb.toString();
+            return stderr.isEmpty() ? "未知编译错误" : stderr.toString();
         }
         return null;
     }
@@ -222,10 +213,9 @@ public class JudgeService {
         JudgeResult res = new JudgeResult();
         // 清理标准输出前后的空白字符
         res.setStdout(out == null ? "" : out.trim());
-        res.setExitCode(exitCode);
+        res.setExitCode(exitCode.intValue());
 
         if (err == null || err.isEmpty()) {
-            res.setStderr("");
             return res;
         }
 
@@ -251,28 +241,27 @@ public class JudgeService {
                 try {
                     // /usr/bin/time %e 返回的是秒（如 0.01），转成 Double 再乘 1000 得到毫秒
                     double timeInSeconds = Double.parseDouble(timeStr);
-                    res.setTime(timeInSeconds * 1000);
+                    res.setTime((int) Math.ceil(timeInSeconds * 1000));
                 } catch (Exception e) {
-                    res.setTime(0.0);
+                    res.setTime(0);
                 }
 
                 // 提取内存 (单位：KB)
                 String memStr = metricPart.substring(memIndex + 4).trim();
                 try {
-                    // Linux 下 /usr/bin/time %M 返回的是最大常驻内存，单位通常是 KB
-                    // 如果你想转成 MB，可以除以 1024
+                    // Linux 下 /usr/bin/time %M 返回的是最大常驻内存，单位是 KB
                     long memoryInKb = Long.parseLong(memStr);
-                    res.setMemory(memoryInKb);
+                    res.setMemory((int) (memoryInKb / 1024));
                 } catch (Exception e) {
-                    res.setMemory(0L);
+                    res.setMemory(0);
                 }
             }
         } else {
             // 如果没找到 TIME: 标识，说明程序可能因为某种原因中途被系统杀死了（如 OOM Killer）
             // 或者产生了一些无法解析的系统错误，直接把全部错误存入 stderr
             res.setStderr(stderrStr);
-            res.setTime(0.0);
-            res.setMemory(0L);
+            res.setTime(0);
+            res.setMemory(0);
         }
 
         return res;

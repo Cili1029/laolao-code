@@ -2,17 +2,21 @@
     <div>
         <ResizablePanelGroup direction="horizontal">
             <ResizablePanel :default-size="40">
-                <div class="h-full flex">
-                    <div class="flex flex-col w-18 py-3 space-y-2 items-center overflow-y-auto border-2 shrink-0">
-                        <div v-for="(question, index) in questions" :key="index"
-                            class="w-12 h-12 border-2 border-dashed border-blue-400 flex justify-center items-center cursor-pointer hover:bg-gray-100"
-                            @click="examStore.currentQuestion = question">
+                <div class="h-full flex border-t">
+                    <div
+                        class="w-16 flex flex-col items-center py-4 gap-4 border-r bg-gray-50 overflow-y-auto">
+                        <div v-for="(q, index) in questions" :key="index" @click="examStore.currentQuestion = q" :class="[
+                            'w-10 h-10 flex items-center justify-center rounded-lg cursor-pointer text-lg font-semibold transition',
+                            examStore.currentQuestion === q
+                                ? 'bg-black text-white'
+                                : 'bg-white border text-gray-600 hover:bg-gray-200'
+                        ]">
                             {{ index + 1 }}
                         </div>
                     </div>
-                    <div class="flex-1 p-6 overflow-y-auto bg-white dark:bg-zinc-950">
-                        <article class="prose prose-slate dark:prose-invert max-w-none" v-html="renderedContent">
-                        </article>
+
+                    <div class="flex-1 p-10 overflow-y-auto bg-white">
+                        <article v-html="renderedContent" />
                     </div>
                 </div>
             </ResizablePanel>
@@ -25,36 +29,81 @@
             </ResizablePanel>
         </ResizablePanelGroup>
         <Dialog v-model:open="examStore.judgeDialog">
-            <DialogTrigger as-child>
-            </DialogTrigger>
-            <DialogContent class="sm:max-w-180">
-                <DialogHeader>
-                    <DialogTitle>编译结果</DialogTitle>
-                    <DialogDescription>
-                        <Alert>
-                            <Spinner v-if="examStore.judgeLoading" />
-                            <CheckCircle2 v-if="!examStore.judgeLoading && examStore.judgeResult?.exitCode === 0" />
-                            <AlertCircle v-if="!examStore.judgeLoading && examStore.judgeResult?.exitCode !== 0" />
-
-                            <AlertTitle>{{ examStore.judgeLoading ? '少女祈祷中。。。' :
-                                examStore.judgeResult?.exitCode ? '未通过！' : '通过！'
-                            }}</AlertTitle>
-                            <AlertDescription>
-                                {{ examStore.judgeLoading ? '耐心等待。。。' :
-                                    examStore.judgeResult?.exitCode ? '去检查一下吧！' : '可以下一题了！'
-                                }}
-                            </AlertDescription>
-                        </Alert>
-                    </DialogDescription>
-                </DialogHeader>
-                <div v-if="examStore.judgeResult" class="flex flex-col">
-                    <p class="py-3 px-2 bg-black text-white">{{ examStore.judgeResult.stderr }}</p>
-                    <p>执行用时：{{ examStore.judgeResult.time }}ms</p>
-                    <p>消耗内存：{{ examStore.judgeResult.memory }}MB</p>
+            <DialogContent class="sm:max-w-150 p-0 overflow-hidden">
+                <!-- 状态头部：大标题 -->
+                <div :class="[
+                    'p-6 border-b',
+                    examStore.judgeLoading ? 'bg-blue-50' : (examStore.judgeResult?.status === 'AC' ? 'bg-emerald-50' : 'bg-red-50')
+                ]">
+                    <DialogHeader>
+                        <DialogTitle :class="[
+                            'text-3xl font-bold tracking-tight transition-colors',
+                            examStore.judgeLoading ? 'text-blue-600' : (examStore.judgeResult?.status === 'AC' ? 'text-emerald-600' : 'text-red-600')
+                        ]">
+                            {{ examStore.judgeLoading ? '提交中...' : examStore.judgeResult?.status }}
+                        </DialogTitle>
+                        <DialogDescription v-if="!examStore.judgeLoading" class="text-lg font-medium mt-1">
+                            {{ examStore.judgeResult?.msg }}
+                        </DialogDescription>
+                    </DialogHeader>
                 </div>
-                <DialogFooter>
+
+                <div class="p-6 space-y-6">
+                    <!-- 1. 成功状态 (AC)：大字号显示统计 -->
+                    <div v-if="examStore.judgeResult?.status === 'AC'" class="grid grid-cols-2 gap-6">
+                        <div class="space-y-1">
+                            <p class="text-sm text-gray-500 font-bold uppercase tracking-wider">执行用时</p>
+                            <p class="text-3xl font-mono font-semibold text-gray-900">
+                                {{ examStore.judgeResult.time }} <span
+                                    class="text-lg font-normal text-gray-500">ms</span>
+                            </p>
+                        </div>
+                        <div class="space-y-1">
+                            <p class="text-sm text-gray-500 font-bold uppercase tracking-wider">消耗内存</p>
+                            <p class="text-3xl font-mono font-semibold text-gray-900">
+                                {{ examStore.judgeResult.memory }} <span
+                                    class="text-lg font-normal text-gray-500">MB</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 2. 答案错误 (WA)：清晰的对比 -->
+                    <div v-if="examStore.judgeResult?.status === 'WA'" class="space-y-4">
+                        <div class="space-y-2">
+                            <p class="text-sm font-bold">测试输入</p>
+                            <pre
+                                class="w-full p-4 bg-gray-100 rounded-lg font-mono text-gray-800">{{ examStore.judgeResult.testCase?.input }}</pre>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-sm font-bold">预期输出</p>
+                            <pre
+                                class="w-full p-4 bg-gray-100 rounded-lg font-mono text-gray-800">{{ examStore.judgeResult.testCase?.output }}</pre>
+                        </div>
+                        <div class="space-y-2">
+                            <p class="text-sm font-bold">你的输出</p>
+                            <pre
+                                class="w-full p-4 bg-gray-100 rounded-lg font-mono text-gray-800">{{ examStore.judgeResult.stdout }}</pre>
+                        </div>
+                    </div>
+
+                    <!-- 3. 编译错误 (CE)：大字号终端感 -->
+                    <div v-if="examStore.judgeResult?.status === 'CE'" class="space-y-2">
+                        <p class="text-sm font-bold text-red-600">错误信息</p>
+                        <pre
+                            class="w-full p-5 bg-red-50 text-red-400 rounded-lg font-mono text-sm leading-relaxed overflow-x-auto max-h-75">{{ examStore.judgeResult.stderr }}</pre>
+                    </div>
+
+                    <!-- 加载中占位 -->
+                    <div v-if="examStore.judgeLoading" class="flex flex-col items-center py-12 space-y-4">
+                        <Spinner class="w-12 h-12 text-blue-500" />
+                        <p class="text-xl font-medium text-gray-500 italic">正在评测代码，请稍后...</p>
+                    </div>
+                </div>
+
+                <!-- 底部按钮 -->
+                <DialogFooter class="p-4 bg-gray-50 border-t">
                     <DialogClose as-child>
-                        <Button variant="outline">
+                        <Button variant="outline" class="w-full sm:w-24 py-5">
                             关闭
                         </Button>
                     </DialogClose>
@@ -65,10 +114,8 @@
 </template>
 
 <script setup lang="ts">
-    import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog'
-    import { AlertCircle, CheckCircle2 } from 'lucide-vue-next'
+    import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
     import { Spinner } from '@/components/ui/spinner'
-    import { Alert, AlertDescription, AlertTitle, } from '@/components/ui/alert'
     import { Button } from '@/components/ui/button'
     import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
     import MonacoEditor from '@/components/common/MonacoEditor.vue'

@@ -9,10 +9,18 @@ interface Questions {
     templateCode: string
 }
 
+interface TestCase {
+    input: string
+    output: string
+}
+
 interface JudgeResult {
     exitCode: number
     stdout: string
     stderr: string
+    msg: string
+    testCase: TestCase
+    status: string
     time: number
     memory: number
 }
@@ -45,7 +53,6 @@ export const useExamStore = defineStore('sidebar', {
 
             try {
                 this.judgeLoading = true
-                this.judgeDialog = true
 
                 const res = await axios.post("/api/exam/judge", {
                     id: this.currentQuestion.id,
@@ -53,6 +60,7 @@ export const useExamStore = defineStore('sidebar', {
                 })
 
                 this.judgeResult = res.data.data
+                this.judgeDialog = true
             } catch (e) {
                 console.error('判题失败：', e)
                 this.judgeResult = null
