@@ -45,7 +45,7 @@ public class Exam implements Serializable {
      * 题目ID列表
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<Integer> questions;
+    private List<QuestionScore> questions;
 
     /**
      * 开始时间

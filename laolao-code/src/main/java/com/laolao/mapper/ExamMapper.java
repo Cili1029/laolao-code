@@ -48,4 +48,19 @@ public interface ExamMapper {
     Exam selectExamByRecordId(Integer recordId);
 
     List<ExamQuestionVO> selectQuestionById(List<Integer> questionIds);
+
+    @Select("""
+            select jt.score
+            from exam e,
+                 JSON_TABLE(
+                         e.questions,
+                         '$[*]' columns (
+                             question int path '$.question',
+                             score int path '$.score'
+                             )
+                 ) jt
+            where e.id = #{examId}
+              and jt.question = #{questionId};
+            """)
+    Integer selectScoreByQuestionId(Integer examId, Integer questionId);
 }

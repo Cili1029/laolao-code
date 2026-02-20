@@ -3,8 +3,7 @@
         <ResizablePanelGroup direction="horizontal">
             <ResizablePanel :default-size="40">
                 <div class="h-full flex border-t">
-                    <div
-                        class="w-16 flex flex-col items-center py-4 gap-4 border-r bg-gray-50 overflow-y-auto">
+                    <div class="w-16 flex flex-col items-center py-4 gap-4 border-r bg-gray-50 overflow-y-auto">
                         <div v-for="(q, index) in questions" :key="index" @click="examStore.currentQuestion = q" :class="[
                             'w-10 h-10 flex items-center justify-center rounded-lg cursor-pointer text-lg font-semibold transition',
                             examStore.currentQuestion === q
@@ -149,12 +148,14 @@
 
     const getQuestions = async () => {
         try {
-            const res = await axios.get("/api/exam/questions", {
+            const res = await axios.get("/api/exam/begin", {
                 params: {
                     recordId: route.params.id
                 }
             })
-            questions.value = res.data.data
+            examStore.examId = res.data.data.examId
+            examStore.recordId = Number(route.params.id)
+            questions.value = res.data.data.questions
             examStore.currentQuestion = questions.value[0]!
         } catch (e) {
             console.error("Fetch error:", e)

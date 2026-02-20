@@ -14,6 +14,11 @@ public class JudgeResult {
     private Integer exitCode;
 
     /**
+     * 得分
+     */
+    private Integer score;
+
+    /**
      * 标准输出
      */
     private String stdout;
@@ -49,9 +54,10 @@ public class JudgeResult {
     private Integer memory;
 
     // 最终的评判结果，用于返回前端
-    public static JudgeResult success(Integer time, Integer memory) {
+    public static JudgeResult success(Integer time, Integer memory, Integer score) {
         JudgeResult result = new JudgeResult();
         result.exitCode = 0;
+        result.score = score;
         result.msg = "全部通过";
         result.status = "AC";
         result.time = time;
@@ -63,6 +69,7 @@ public class JudgeResult {
     public static JudgeResult commonError(String stderr, String msg) {
         JudgeResult result = new JudgeResult();
         result.exitCode = 1;
+        result.score = 0;
         result.stderr = stderr;
         result.msg = msg;
         return result;
@@ -72,16 +79,18 @@ public class JudgeResult {
     public static JudgeResult compileError(String stderr) {
         JudgeResult result = new JudgeResult();
         result.exitCode = 1;
+        result.score = 0;
         result.stderr = stderr;
         result.msg = "编译未通过";
         result.status = "CE";
         return result;
     }
 
-    // 示例错误返回结果
-    public static JudgeResult testCaseError(String stdout, TestCase testCase, int passTestCaseCount, int totalTestCaseCount) {
+    // 示例错误返回结果，可以按示例给分
+    public static JudgeResult testCaseError(String stdout, TestCase testCase, int passTestCaseCount, int totalTestCaseCount, Integer obtainedScore) {
         JudgeResult result = new JudgeResult();
         result.exitCode = 1;
+        result.score = obtainedScore;
         result.stdout = stdout;
         result.testCase = testCase;
         result.msg = passTestCaseCount + " / " + totalTestCaseCount +" 个通过的测试用例";

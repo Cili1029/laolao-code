@@ -156,6 +156,7 @@
                     examId: route.params.id
                 }
             })
+            
             router.push(`/exam/start/${res.data.data}`);
         } catch (e) {
             console.log(e)

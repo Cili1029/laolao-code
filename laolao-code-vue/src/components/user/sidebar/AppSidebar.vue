@@ -2,7 +2,7 @@
   <!-- 考试时就禁用 -->
   <Sidebar :class="[
     'overflow-hidden *:data-[sidebar=sidebar]:flex-row',
-    examStore.exam ? 'pointer-events-none select-none opacity-50' : '']" v-bind="props">
+    examStore.examBegin ? 'pointer-events-none select-none opacity-50' : '']" v-bind="props">
     <!-- 第一个侧边栏（图标列） -->
     <Sidebar collapsible="none" class="w-[calc(var(--sidebar-width-icon)+1px)]! border-r">
       <SidebarHeader>
@@ -143,7 +143,7 @@
   }
 
   watch(
-    () => examStore.exam,
+    () => examStore.examBegin,
     async (status) => {
       if (status) { // 开始考试
         setOpen(false)

@@ -1,5 +1,7 @@
 package com.laolao.pojo.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.*;
 
 import java.io.Serializable;
@@ -14,11 +16,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @ToString
 @Builder
-public class RecordReport implements Serializable {
+public class QuestionSubmitRecord implements Serializable {
 
     /**
      * 主键ID
      */
+    @TableId(value = "id", type = IdType.AUTO)
     private Integer id;
 
     /**
@@ -37,9 +40,9 @@ public class RecordReport implements Serializable {
     private Integer userId;
 
     /**
-     * 题目状态：0-未答, 1-通过(AC), 2-解答错误(WA), 3-运行超时, 4-编译错误
+     * 题目状态：0-通过(AC), 1-解答错误(WA)
      */
-    private Byte status;
+    private Integer status;
 
     /**
      * 该题得分
@@ -52,11 +55,6 @@ public class RecordReport implements Serializable {
     private String answerCode;
 
     /**
-     * AI对这道题的代码审查和改进建议
-     */
-    private String aiFeedback;
-
-    /**
      * 沙盒返回的原始错误信息
      */
     private String errorMessage;
@@ -64,15 +62,15 @@ public class RecordReport implements Serializable {
     /**
      * 执行耗时(ms)
      */
-    private Integer timeConsumed;
+    private Integer time;
 
     /**
      * 内存消耗(KB)
      */
-    private Integer memoryConsumed;
+    private Integer memory;
 
     /**
-     * 更新时间（自动更新）
+     * 提交时间
      */
-    private LocalDateTime updateTime;
+    private LocalDateTime submitTime;
 }

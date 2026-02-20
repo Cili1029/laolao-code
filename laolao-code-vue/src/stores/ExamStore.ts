@@ -16,6 +16,7 @@ interface TestCase {
 
 interface JudgeResult {
     exitCode: number
+    score: number
     stdout: string
     stderr: string
     msg: string
@@ -27,7 +28,9 @@ interface JudgeResult {
 
 export const useExamStore = defineStore('sidebar', {
     state: () => ({
-        exam: false,
+        examBegin: false,
+        examId: null as number | null,
+        recordId: null as number | null,
         currentQuestion: null as Questions | null,
         judgeResult: null as JudgeResult | null,
         judgeLoading: false, // 判题加载状态
@@ -36,11 +39,11 @@ export const useExamStore = defineStore('sidebar', {
 
     actions: {
         beginExam() {
-            this.exam = true
+            this.examBegin = true
         },
 
         endExam() {
-            this.exam = false
+            this.examBegin = false
             this.currentQuestion = null
             this.judgeResult = null
         },
@@ -55,7 +58,9 @@ export const useExamStore = defineStore('sidebar', {
                 this.judgeLoading = true
 
                 const res = await axios.post("/api/exam/judge", {
-                    id: this.currentQuestion.id,
+                    examId: this.examId,
+                    recordId: this.recordId,
+                    questionId: this.currentQuestion.id,
                     code: this.currentQuestion.templateCode
                 })
 

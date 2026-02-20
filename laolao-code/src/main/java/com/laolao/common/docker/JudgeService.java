@@ -110,9 +110,10 @@ public class JudgeService {
      *
      * @param userCode  用户提交的 Java 代码字符串
      * @param testCases 示例
+     * @param score 此题分值
      * @return 判题结果
      */
-    public JudgeResult judge(String userCode, List<TestCase> testCases) throws Exception {
+    public JudgeResult judge(String userCode, List<TestCase> testCases, Integer score) throws Exception {
         // 从池中取出一个容器（如果池子空了，最多等 5 秒）
         String containerId = containerQueue.poll(5, TimeUnit.SECONDS);
         if (containerId == null) throw new RuntimeException("当前无可用容器（判题繁忙）");
@@ -144,11 +145,10 @@ public class JudgeService {
                 if (response.getExitCode() != 0) {
                     return JudgeResult.commonError(response.getStderr(), "否超时或发生运行错误TODO");
                 }
-                // 比对输出结果，后期要返回示例数据testCase
-                //TODO
+                // 比对输出结果，同时根据示例通过数给分
                 boolean isPassed = tc.getOutput().trim().equals(response.getStdout().trim());
                 if (!isPassed) {
-                    return JudgeResult.testCaseError(response.getStdout(), tc, passTestCaseCount, testCases.size());
+                    return JudgeResult.testCaseError(response.getStdout(), tc, passTestCaseCount, testCases.size(), score * passTestCaseCount / testCases.size());
                 }
 
                 // 记录最大消耗
@@ -158,7 +158,7 @@ public class JudgeService {
             }
 
             // 全部通过
-            return JudgeResult.success(maxTime, maxMemory);
+            return JudgeResult.success(maxTime, maxMemory, score);
         } finally {
             // 容器用完即焚，创建新容器补上
             CompletableFuture.runAsync(() -> {

@@ -3,8 +3,8 @@ package com.laolao.controller;
 import com.laolao.common.result.Result;
 import com.laolao.pojo.dto.JudgeDTO;
 import com.laolao.pojo.entity.JudgeResult;
+import com.laolao.pojo.vo.ExamBeginVO;
 import com.laolao.pojo.vo.ExamInfoVO;
-import com.laolao.pojo.vo.ExamQuestionVO;
 import com.laolao.pojo.vo.ExamVO;
 import com.laolao.service.ExamService;
 import jakarta.annotation.Resource;
@@ -33,8 +33,8 @@ public class ExamController {
         return examService.startExam(examId);
     }
 
-    @GetMapping("/questions")
-    public Result<List<ExamQuestionVO>> getExamQuestion(@RequestParam Integer recordId) {
+    @GetMapping("/begin")
+    public Result<ExamBeginVO> getExamQuestion(@RequestParam Integer recordId) {
         return examService.getExamQuestion(recordId);
     }
 

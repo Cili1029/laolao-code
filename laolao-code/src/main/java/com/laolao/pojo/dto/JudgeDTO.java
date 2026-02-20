@@ -9,12 +9,22 @@ import lombok.*;
 @ToString
 public class JudgeDTO {
     /**
+     * 考试ID
+     */
+    private Integer examId;
+
+    /**
+     * 考试记录ID
+     */
+    private Integer recordId;
+
+    /**
      * 题目主键
      */
-    private Integer id;
+    private Integer questionId;
 
     /**
      * 学生代码
      */
-    private String Code;
+    private String code;
 }
