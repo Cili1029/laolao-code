@@ -97,4 +97,6 @@ public class JudgeResult {
         result.status = "WA";
         return result;
     }
+
+    // 提交记录历史
 }

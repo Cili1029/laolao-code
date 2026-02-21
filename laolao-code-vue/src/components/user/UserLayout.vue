@@ -23,4 +23,5 @@
     import { RouterView } from "vue-router"
     import { useExamStore } from "@/stores/ExamStore"
     const examStore = useExamStore()
+
 </script>

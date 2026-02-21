@@ -2,7 +2,6 @@ package com.laolao.controller;
 
 import com.laolao.common.result.Result;
 import com.laolao.pojo.vo.ExamRecordVO;
-import com.laolao.pojo.vo.ExamVO;
 import com.laolao.service.ExamRecordService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;

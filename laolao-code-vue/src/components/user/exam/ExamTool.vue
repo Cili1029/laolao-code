@@ -14,8 +14,42 @@
                         </div>
                     </div>
 
-                    <div class="flex-1 p-10 overflow-y-auto bg-white">
-                        <article v-html="renderedContent" />
+                    <div class="flex-1 flex flex-col overflow-y-auto bg-white">
+                        <div class="flex border-b">
+                            <p @click="currentSelect = 0" class="py-1 px-2 hover:bg-gray-100"
+                                :class="currentSelect == 0 ? 'bg-gray-100' : ''">题目描述</p>
+                            <p @click="currentSelect = 1, getSimpleSubmitRecord()" class="py-1 px-2 hover:bg-gray-100"
+                                :class="currentSelect == 1 ? 'bg-gray-100' : ''">提交记录</p>
+                        </div>
+                        <article v-show="currentSelect == 0" v-html="renderedContent" class="p-1" />
+                        <Table v-show="currentSelect == 1">
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead class="text-left">状态</TableHead>
+                                    <TableHead class="text-center">得分</TableHead>
+                                    <TableHead class="text-center">执行用时</TableHead>
+                                    <TableHead class="text-right">消耗内存</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                <TableRow v-for="simple in simpleSubmitRecords" :key="simple.id"
+                                    @click="getDetailSubmitRecord(simple.id)">
+                                    <TableCell class="text-left"
+                                        :class="simple.status == 0 ? 'text-green-500' : 'text-red-500'">
+                                        {{ simple.status == 0 ? '通过' : '未通过' }}
+                                    </TableCell>
+                                    <TableCell class="text-center">
+                                        {{ simple.score }}
+                                    </TableCell>
+                                    <TableCell class="text-center">
+                                        {{ simple.status == 0 ? simple.time : "N/A" }}
+                                    </TableCell>
+                                    <TableCell class="text-right">
+                                        {{ simple.status == 0 ? simple.memory : "N/A" }}
+                                    </TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
                     </div>
                 </div>
             </ResizablePanel>
@@ -37,9 +71,9 @@
                     <DialogHeader>
                         <DialogTitle :class="[
                             'text-3xl font-bold tracking-tight transition-colors',
-                            examStore.judgeLoading ? 'text-blue-600' : (examStore.judgeResult?.status === 'AC' ? 'text-emerald-600' : 'text-red-600')
+                            examStore.judgeResult?.status === 'AC' ? 'text-emerald-600' : 'text-red-600'
                         ]">
-                            {{ examStore.judgeLoading ? '提交中...' : examStore.judgeResult?.status }}
+                            {{ examStore.judgeResult?.status }}
                         </DialogTitle>
                         <DialogDescription v-if="!examStore.judgeLoading" class="text-lg font-medium mt-1">
                             {{ examStore.judgeResult?.msg }}
@@ -122,6 +156,7 @@
     import axios from "@/utils/myAxios"
     import { useRoute } from 'vue-router'
     import MarkdownIt from 'markdown-it'
+    import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from '@/components/ui/table'
     import { useExamStore } from "@/stores/ExamStore"
     const examStore = useExamStore()
 
@@ -132,8 +167,9 @@
         linkify: true  // 自动识别链接
     })
 
-    onMounted(() => {
-        getQuestions()
+    onMounted(async () => {
+        await getQuestions()
+        getSimpleSubmitRecord()
     })
 
     interface Questions {
@@ -168,4 +204,41 @@
         if (!content) return ''
         return md.render(content);
     })
+
+    const currentSelect = ref(0)
+
+    interface SimpleSubmitRecord {
+        id: number
+        status: number
+        score: number
+        time: string
+        memory: number
+    }
+
+    const simpleSubmitRecords = ref<SimpleSubmitRecord[]>([])
+    const getSimpleSubmitRecord = async () => {
+        try {
+            const res = await axios.get("/api/submit-record/simple", {
+                params: {
+                    examRecordId: examStore.recordId
+                }
+            })
+            simpleSubmitRecords.value = res.data.data
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    const getDetailSubmitRecord = async (submitRecordId: number) => {
+        try {
+            const res = await axios.get("/api/submit-record/detail", {
+                params: {
+                    submitRecordId: submitRecordId
+                }
+            })
+            simpleSubmitRecords.value = res.data.data
+        } catch (e) {
+            console.log(e);
+        }
+    }
 </script>
