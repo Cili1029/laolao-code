@@ -15,16 +15,26 @@ interface TestCase {
 }
 
 interface JudgeResult {
-    exitCode: number
+    status: number
     score: number
     stdout: string
     stderr: string
     msg: string
     testCase: TestCase
-    status: string
     time: number
     memory: number
 }
+
+const statusTextMap = new Map<number, string>([
+    [0, '通过'],
+    [1, '答案错误'],
+    [2, '内存超限'],
+    [3, '超时'],
+    [4, '运行时错误'],
+    [5, '编译错误'],
+    [6, '系统错误'],
+    [7, '未知错误']
+])
 
 export const useExamStore = defineStore('sidebar', {
     state: () => ({
@@ -36,6 +46,13 @@ export const useExamStore = defineStore('sidebar', {
         judgeLoading: false, // 判题加载状态
         judgeDialog: false
     }),
+
+    getters: {
+        statusText(): string {
+            if (!this.judgeResult) return '未判题'
+            return statusTextMap.get(this.judgeResult.status) || '未知状态'
+        }
+    },
 
     actions: {
         beginExam() {
@@ -72,6 +89,10 @@ export const useExamStore = defineStore('sidebar', {
             } finally {
                 this.judgeLoading = false
             }
-        }
+        },
+
+        getStatusTextByCode(statusCode: number): string {
+            return statusTextMap.get(statusCode) || '未知状态'
+        },
     }
 })

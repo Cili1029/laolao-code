@@ -2,8 +2,8 @@ package com.laolao.controller;
 
 import com.laolao.common.result.Result;
 import com.laolao.pojo.entity.JudgeResult;
-import com.laolao.pojo.vo.SimpleSubmitRecordVO;
-import com.laolao.service.SubmitRecordService;
+import com.laolao.pojo.vo.SimpleJudgeRecordVO;
+import com.laolao.service.JudgeRecordService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,17 +14,17 @@ import java.util.List;
 
 @RestController
 @RequestMapping("api/submit-record")
-public class SubmitRecordController {
+public class JudgeRecordController {
     @Resource
-    private SubmitRecordService submitRecordService;
+    private JudgeRecordService judgeRecordService;
 
     @GetMapping("/simple")
-    public Result<List<SimpleSubmitRecordVO>> getSimpleSubmitRecord(@RequestParam Integer examRecordId) {
-        return submitRecordService.getSimpleSubmitRecord(examRecordId);
+    public Result<List<SimpleJudgeRecordVO>> getSimpleSubmitRecord(@RequestParam Integer examRecordId, @RequestParam Integer questionId) {
+        return judgeRecordService.getSimpleJudgeRecord(examRecordId, questionId);
     }
 
     @GetMapping("/detail")
     public Result<List<JudgeResult>> getDetailSubmitRecord(@RequestParam Integer submitRecordId) {
-        return submitRecordService.getDetailSubmitRecord(submitRecordId);
+        return judgeRecordService.getDetailJudgeRecord(submitRecordId);
     }
 }

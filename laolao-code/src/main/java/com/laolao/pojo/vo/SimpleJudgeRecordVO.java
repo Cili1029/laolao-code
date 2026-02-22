@@ -8,7 +8,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class SimpleSubmitRecordVO implements Serializable {
+public class SimpleJudgeRecordVO implements Serializable {
 
     /**
      * 主键ID
@@ -16,7 +16,7 @@ public class SimpleSubmitRecordVO implements Serializable {
     private Integer id;
 
     /**
-     * 题目状态：0-通过(AC), 1-解答错误(WA)
+     * 状态
      */
     private Integer status;
 

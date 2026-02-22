@@ -4,12 +4,13 @@
             <ResizablePanel :default-size="40">
                 <div class="h-full flex border-t">
                     <div class="w-16 flex flex-col items-center py-4 gap-4 border-r bg-gray-50 overflow-y-auto">
-                        <div v-for="(q, index) in questions" :key="index" @click="examStore.currentQuestion = q" :class="[
-                            'w-10 h-10 flex items-center justify-center rounded-lg cursor-pointer text-lg font-semibold transition',
-                            examStore.currentQuestion === q
-                                ? 'bg-black text-white'
-                                : 'bg-white border text-gray-600 hover:bg-gray-200'
-                        ]">
+                        <div v-for="(q, index) in questions" :key="index"
+                            @click="examStore.currentQuestion = q, currentSelect = 0" :class="[
+                                'w-10 h-10 flex items-center justify-center rounded-lg cursor-pointer text-lg font-semibold transition',
+                                examStore.currentQuestion === q
+                                    ? 'bg-black text-white'
+                                    : 'bg-white border text-gray-600 hover:bg-gray-200'
+                            ]">
                             {{ index + 1 }}
                         </div>
                     </div>
@@ -35,17 +36,23 @@
                                 <TableRow v-for="simple in simpleSubmitRecords" :key="simple.id"
                                     @click="getDetailSubmitRecord(simple.id)">
                                     <TableCell class="text-left"
-                                        :class="simple.status == 0 ? 'text-green-500' : 'text-red-500'">
-                                        {{ simple.status == 0 ? '通过' : '未通过' }}
+                                        :class="simple.status === 0 ? 'text-green-500' : 'text-red-500'">
+                                        {{ examStore.getStatusTextByCode(simple.status) }}
                                     </TableCell>
                                     <TableCell class="text-center">
                                         {{ simple.score }}
                                     </TableCell>
                                     <TableCell class="text-center">
-                                        {{ simple.status == 0 ? simple.time : "N/A" }}
+                                        <p class="flex justify-center items-center">
+                                            <Timer class="pr-1"/>
+                                            {{ simple.status === 0 ? simple.time + "ms" : "N/A" }}
+                                        </p>
                                     </TableCell>
                                     <TableCell class="text-right">
-                                        {{ simple.status == 0 ? simple.memory : "N/A" }}
+                                        <p class="flex justify-end items-center">
+                                            <Cpu class="pr-1"/>
+                                            {{ simple.status === 0 ? simple.memory + "MB" : "N/A" }}
+                                        </p>
                                     </TableCell>
                                 </TableRow>
                             </TableBody>
@@ -66,14 +73,14 @@
                 <!-- 状态头部：大标题 -->
                 <div :class="[
                     'p-6 border-b',
-                    examStore.judgeLoading ? 'bg-blue-50' : (examStore.judgeResult?.status === 'AC' ? 'bg-emerald-50' : 'bg-red-50')
+                    examStore.judgeLoading ? 'bg-blue-50' : (examStore.judgeResult?.status === 0 ? 'bg-emerald-50' : 'bg-red-50')
                 ]">
                     <DialogHeader>
                         <DialogTitle :class="[
                             'text-3xl font-bold tracking-tight transition-colors',
-                            examStore.judgeResult?.status === 'AC' ? 'text-emerald-600' : 'text-red-600'
+                            examStore.judgeResult?.status === 0 ? 'text-emerald-600' : 'text-red-600'
                         ]">
-                            {{ examStore.judgeResult?.status }}
+                            {{ examStore.statusText }}
                         </DialogTitle>
                         <DialogDescription v-if="!examStore.judgeLoading" class="text-lg font-medium mt-1">
                             {{ examStore.judgeResult?.msg }}
@@ -83,7 +90,7 @@
 
                 <div class="p-6 space-y-6">
                     <!-- 1. 成功状态 (AC)：大字号显示统计 -->
-                    <div v-if="examStore.judgeResult?.status === 'AC'" class="grid grid-cols-2 gap-6">
+                    <div v-if="examStore.judgeResult?.status === 0" class="grid grid-cols-2 gap-6">
                         <div class="space-y-1">
                             <p class="text-sm text-gray-500 font-bold uppercase tracking-wider">执行用时</p>
                             <p class="text-3xl font-mono font-semibold text-gray-900">
@@ -101,7 +108,7 @@
                     </div>
 
                     <!-- 2. 答案错误 (WA)：清晰的对比 -->
-                    <div v-if="examStore.judgeResult?.status === 'WA'" class="space-y-4">
+                    <div v-if="examStore.judgeResult?.status === 1" class="space-y-4">
                         <div class="space-y-2">
                             <p class="text-sm font-bold">测试输入</p>
                             <pre
@@ -120,7 +127,7 @@
                     </div>
 
                     <!-- 3. 编译错误 (CE)：大字号终端感 -->
-                    <div v-if="examStore.judgeResult?.status === 'CE'" class="space-y-2">
+                    <div v-if="examStore.judgeResult?.status === 5" class="space-y-2">
                         <p class="text-sm font-bold text-red-600">错误信息</p>
                         <pre
                             class="w-full p-5 bg-red-50 text-red-400 rounded-lg font-mono text-sm leading-relaxed overflow-x-auto max-h-75">{{ examStore.judgeResult.stderr }}</pre>
@@ -158,6 +165,7 @@
     import MarkdownIt from 'markdown-it'
     import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from '@/components/ui/table'
     import { useExamStore } from "@/stores/ExamStore"
+    import { Cpu, Timer } from 'lucide-vue-next'
     const examStore = useExamStore()
 
     const route = useRoute()
@@ -220,7 +228,8 @@
         try {
             const res = await axios.get("/api/submit-record/simple", {
                 params: {
-                    examRecordId: examStore.recordId
+                    examRecordId: examStore.recordId,
+                    questionId: examStore.currentQuestion?.id
                 }
             })
             simpleSubmitRecords.value = res.data.data
@@ -236,7 +245,6 @@
                     submitRecordId: submitRecordId
                 }
             })
-            simpleSubmitRecords.value = res.data.data
         } catch (e) {
             console.log(e);
         }

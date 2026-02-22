@@ -1,7 +1,9 @@
 package com.laolao.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
 import java.io.Serializable;
@@ -16,7 +18,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @ToString
 @Builder
-public class QuestionSubmitRecord implements Serializable {
+public class JudgeRecord implements Serializable {
 
     /**
      * 主键ID
@@ -40,12 +42,12 @@ public class QuestionSubmitRecord implements Serializable {
     private Integer userId;
 
     /**
-     * 题目状态：0-通过(AC), 1-解答错误(WA)
+     * 退出状态码（0为成功，非0为失败）
      */
-    private Integer status;
+    private Integer exitCode;
 
     /**
-     * 该题得分
+     * 得分
      */
     private Integer score;
 
@@ -55,9 +57,25 @@ public class QuestionSubmitRecord implements Serializable {
     private String answerCode;
 
     /**
-     * 沙盒返回的原始错误信息
+     * 标准输出
      */
-    private String errorMessage;
+    private String stdout;
+
+    /**
+     * 错误输出（包括报错信息）
+     */
+    private String stderr;
+
+    /**
+     * 错误示例
+     */
+    @TableField(typeHandler = JacksonTypeHandler.class)
+    private TestCase testCase;
+
+    /**
+     * 判题状态
+     */
+    private String status;
 
     /**
      * 执行耗时(ms)
@@ -65,7 +83,7 @@ public class QuestionSubmitRecord implements Serializable {
     private Integer time;
 
     /**
-     * 内存消耗(KB)
+     * 内存消耗(MB)
      */
     private Integer memory;
 

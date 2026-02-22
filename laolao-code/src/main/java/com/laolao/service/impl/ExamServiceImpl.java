@@ -3,9 +3,10 @@ package com.laolao.service.impl;
 import com.laolao.common.context.UserContext;
 import com.laolao.common.docker.JudgeService;
 import com.laolao.common.result.Result;
+import com.laolao.common.util.MapStruct;
 import com.laolao.mapper.ExamMapper;
+import com.laolao.mapper.JudgeRecordMapper;
 import com.laolao.mapper.QuestionMapper;
-import com.laolao.mapper.QuestionSubmitRecordMapper;
 import com.laolao.pojo.dto.JudgeDTO;
 import com.laolao.pojo.entity.*;
 import com.laolao.pojo.vo.ExamBeginVO;
@@ -27,7 +28,9 @@ public class ExamServiceImpl implements ExamService {
     @Resource
     private QuestionMapper questionMapper;
     @Resource
-    private QuestionSubmitRecordMapper questionSubmitRecordMapper;
+    private JudgeRecordMapper judgeRecordMapper;
+    @Resource
+    private MapStruct mapStruct;
 
     @Override
     public Result<List<ExamVO>> getSimpleExam() {
@@ -79,23 +82,13 @@ public class ExamServiceImpl implements ExamService {
             // 获取这一题定的分值
             Integer score = examMapper.selectScoreByQuestionId(judgeDTO.getExamId(), judgeDTO.getQuestionId());
             JudgeResult judge = judgeService.judge(judgeDTO.getCode(), question.getTestCases(), score);
-            // 写入记录提交表
-            QuestionSubmitRecord submitRecord = QuestionSubmitRecord.builder()
-                    .examRecordId(judgeDTO.getRecordId())
-                    .questionId(judgeDTO.getQuestionId())
-                    .userId(UserContext.getCurrentId())
-                    .score(judge.getScore())
-                    .answerCode(judgeDTO.getCode())
-                    .build();
-            if (judge.getExitCode() == 0) {
-                submitRecord.setStatus(0);
-                submitRecord.setTime(judge.getTime());
-                submitRecord.setMemory(judge.getMemory());
-            } else {
-                submitRecord.setStatus(1);
-                submitRecord.setErrorMessage(judge.getStderr());
-            }
-            questionSubmitRecordMapper.insert(submitRecord);
+            // 转换写入记录提交表
+            JudgeRecord judgeRecord = mapStruct.JudgeResultToJudgeRecord(judge);
+            judgeRecord.setExamRecordId(judgeDTO.getRecordId());
+            judgeRecord.setQuestionId(judgeDTO.getQuestionId());
+            judgeRecord.setUserId(UserContext.getCurrentId());
+            judgeRecord.setAnswerCode(judgeDTO.getCode());
+            judgeRecordMapper.insert(judgeRecord);
             return Result.success(judge);
         } catch (Exception e) {
             e.printStackTrace();
