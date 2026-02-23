@@ -16,6 +16,11 @@ public class ExamRecordController {
     @Resource
     private ExamRecordService examRecordService;
 
+    /**
+     * 获取考试记录列表
+     *
+     * @return 考试记录列表
+     */
     @GetMapping
     public Result<List<ExamRecordVO>> getSimpleExamRecord() {
         return examRecordService.getSimpleExamRecord();

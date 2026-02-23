@@ -14,7 +14,7 @@ interface TestCase {
     output: string
 }
 
-interface JudgeResult {
+interface JudgeRecord {
     status: number
     score: number
     stdout: string
@@ -42,15 +42,15 @@ export const useExamStore = defineStore('sidebar', {
         examId: null as number | null,
         recordId: null as number | null,
         currentQuestion: null as Questions | null,
-        judgeResult: null as JudgeResult | null,
+        judgeRecord: null as JudgeRecord | null,
         judgeLoading: false, // 判题加载状态
         judgeDialog: false
     }),
 
     getters: {
         statusText(): string {
-            if (!this.judgeResult) return '未判题'
-            return statusTextMap.get(this.judgeResult.status) || '未知状态'
+            if (!this.judgeRecord) return '未判题'
+            return statusTextMap.get(this.judgeRecord.status) || '未知状态'
         }
     },
 
@@ -62,7 +62,7 @@ export const useExamStore = defineStore('sidebar', {
         endExam() {
             this.examBegin = false
             this.currentQuestion = null
-            this.judgeResult = null
+            this.judgeRecord = null
         },
 
         async judge() {
@@ -81,11 +81,11 @@ export const useExamStore = defineStore('sidebar', {
                     code: this.currentQuestion.templateCode
                 })
 
-                this.judgeResult = res.data.data
+                this.judgeRecord = res.data.data
                 this.judgeDialog = true
             } catch (e) {
                 console.error('判题失败：', e)
-                this.judgeResult = null
+                this.judgeRecord = null
             } finally {
                 this.judgeLoading = false
             }

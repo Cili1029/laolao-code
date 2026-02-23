@@ -2,7 +2,7 @@ package com.laolao.service.impl;
 
 import com.laolao.common.result.Result;
 import com.laolao.mapper.JudgeRecordMapper;
-import com.laolao.pojo.entity.JudgeResult;
+import com.laolao.pojo.vo.JudgeRecordVO;
 import com.laolao.pojo.vo.SimpleJudgeRecordVO;
 import com.laolao.service.JudgeRecordService;
 import jakarta.annotation.Resource;
@@ -17,12 +17,13 @@ public class JudgeRecordServiceImpl implements JudgeRecordService {
 
     @Override
     public Result<List<SimpleJudgeRecordVO>> getSimpleJudgeRecord(Integer examRecordId, Integer questionId) {
-        List<SimpleJudgeRecordVO> simpleJudgeRecordVOList = judgeRecordMapper.selectSimpleSubmitRecord(examRecordId, questionId);
+        List<SimpleJudgeRecordVO> simpleJudgeRecordVOList = judgeRecordMapper.selectSimpleJudgeRecord(examRecordId, questionId);
         return Result.success(simpleJudgeRecordVOList);
     }
 
     @Override
-    public Result<List<JudgeResult>> getDetailJudgeRecord(Integer submitRecordId) {
-        return null;
+    public Result<JudgeRecordVO> getDetailJudgeRecord(Integer judgeRecordId) {
+        JudgeRecordVO judgeRecordVO = judgeRecordMapper.selectDetailJudgeRecord(judgeRecordId);
+        return Result.success(judgeRecordVO);
     }
 }

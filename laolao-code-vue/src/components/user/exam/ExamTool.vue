@@ -2,7 +2,7 @@
     <div>
         <ResizablePanelGroup direction="horizontal">
             <ResizablePanel :default-size="40">
-                <div class="h-full flex border-t">
+                <div class=" max-h-max flex border-t">
                     <div class="w-16 flex flex-col items-center py-4 gap-4 border-r bg-gray-50 overflow-y-auto">
                         <div v-for="(q, index) in questions" :key="index"
                             @click="examStore.currentQuestion = q, currentSelect = 0" :class="[
@@ -15,48 +15,61 @@
                         </div>
                     </div>
 
-                    <div class="flex-1 flex flex-col overflow-y-auto bg-white">
+                    <div class="h-150 w-full flex flex-col bg-white border">
                         <div class="flex border-b">
-                            <p @click="currentSelect = 0" class="py-1 px-2 hover:bg-gray-100"
-                                :class="currentSelect == 0 ? 'bg-gray-100' : ''">题目描述</p>
-                            <p @click="currentSelect = 1, getSimpleSubmitRecord()" class="py-1 px-2 hover:bg-gray-100"
-                                :class="currentSelect == 1 ? 'bg-gray-100' : ''">提交记录</p>
+                            <p @click="currentSelect = 0" class="flex py-1 px-2 items-center hover:bg-gray-100"
+                                :class="currentSelect == 0 ? 'bg-gray-100' : ''">
+                                <ScrollText class="h-5 w-5 mr-2 text-blue-500" />
+                                题目描述
+                            </p>
+                            <p @click="currentSelect === 1 ? '' : getSimpleJudgeRecord(), currentSelect = 1"
+                                class="flex py-1 px-2 items-center hover:bg-gray-100"
+                                :class="currentSelect == 1 ? 'bg-gray-100' : ''">
+                                <TimerReset class="h-5 w-5 mr-2 text-blue-500" />
+                                提交记录
+                            </p>
                         </div>
-                        <article v-show="currentSelect == 0" v-html="renderedContent" class="p-1" />
-                        <Table v-show="currentSelect == 1">
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead class="text-left">状态</TableHead>
-                                    <TableHead class="text-center">得分</TableHead>
-                                    <TableHead class="text-center">执行用时</TableHead>
-                                    <TableHead class="text-right">消耗内存</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                <TableRow v-for="simple in simpleSubmitRecords" :key="simple.id"
-                                    @click="getDetailSubmitRecord(simple.id)">
-                                    <TableCell class="text-left"
-                                        :class="simple.status === 0 ? 'text-green-500' : 'text-red-500'">
-                                        {{ examStore.getStatusTextByCode(simple.status) }}
-                                    </TableCell>
-                                    <TableCell class="text-center">
-                                        {{ simple.score }}
-                                    </TableCell>
-                                    <TableCell class="text-center">
-                                        <p class="flex justify-center items-center">
-                                            <Timer class="pr-1"/>
-                                            {{ simple.status === 0 ? simple.time + "ms" : "N/A" }}
-                                        </p>
-                                    </TableCell>
-                                    <TableCell class="text-right">
-                                        <p class="flex justify-end items-center">
-                                            <Cpu class="pr-1"/>
-                                            {{ simple.status === 0 ? simple.memory + "MB" : "N/A" }}
-                                        </p>
-                                    </TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
+                        <div class="flex-1 overflow-y-auto">
+                            <article v-show="currentSelect == 0" v-html="renderedContent" class="p-1" />
+                            <Table v-show="currentSelect == 1">
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead></TableHead>
+                                        <TableHead class="text-left">状态</TableHead>
+                                        <TableHead class="text-center">得分</TableHead>
+                                        <TableHead class="text-center">执行用时</TableHead>
+                                        <TableHead class="text-right">消耗内存</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    <TableRow v-for="(simple, index) in simpleJudgeRecords" :key="simple.id"
+                                        @click="getJudgeRecord(simple.id)">
+                                        <TableCell>
+                                            {{ simpleJudgeRecords.length - index }}
+                                        </TableCell>
+                                        <TableCell class="text-left"
+                                            :class="simple.status === 0 ? 'text-green-500' : 'text-red-500'">
+                                            {{ examStore.getStatusTextByCode(simple.status) }}
+                                        </TableCell>
+                                        <TableCell class="text-center">
+                                            {{ simple.score }}
+                                        </TableCell>
+                                        <TableCell class="text-center">
+                                            <p class="flex justify-center items-center">
+                                                <Timer class="pr-1" />
+                                                {{ simple.status === 0 ? simple.time + "ms" : "N/A" }}
+                                            </p>
+                                        </TableCell>
+                                        <TableCell class="text-right">
+                                            <p class="flex justify-end items-center">
+                                                <Cpu class="pr-1" />
+                                                {{ simple.status === 0 ? simple.memory + "MB" : "N/A" }}
+                                            </p>
+                                        </TableCell>
+                                    </TableRow>
+                                </TableBody>
+                            </Table>
+                        </div>
                     </div>
                 </div>
             </ResizablePanel>
@@ -73,64 +86,64 @@
                 <!-- 状态头部：大标题 -->
                 <div :class="[
                     'p-6 border-b',
-                    examStore.judgeLoading ? 'bg-blue-50' : (examStore.judgeResult?.status === 0 ? 'bg-emerald-50' : 'bg-red-50')
+                    examStore.judgeLoading ? 'bg-blue-50' : (examStore.judgeRecord?.status === 0 ? 'bg-emerald-50' : 'bg-red-50')
                 ]">
                     <DialogHeader>
                         <DialogTitle :class="[
                             'text-3xl font-bold tracking-tight transition-colors',
-                            examStore.judgeResult?.status === 0 ? 'text-emerald-600' : 'text-red-600'
+                            examStore.judgeRecord?.status === 0 ? 'text-emerald-600' : 'text-red-600'
                         ]">
                             {{ examStore.statusText }}
                         </DialogTitle>
                         <DialogDescription v-if="!examStore.judgeLoading" class="text-lg font-medium mt-1">
-                            {{ examStore.judgeResult?.msg }}
+                            {{ examStore.judgeRecord?.msg }}
                         </DialogDescription>
                     </DialogHeader>
                 </div>
 
                 <div class="p-6 space-y-6">
                     <!-- 1. 成功状态 (AC)：大字号显示统计 -->
-                    <div v-if="examStore.judgeResult?.status === 0" class="grid grid-cols-2 gap-6">
+                    <div v-if="examStore.judgeRecord?.status === 0" class="grid grid-cols-2 gap-6">
                         <div class="space-y-1">
                             <p class="text-sm text-gray-500 font-bold uppercase tracking-wider">执行用时</p>
                             <p class="text-3xl font-mono font-semibold text-gray-900">
-                                {{ examStore.judgeResult.time }} <span
+                                {{ examStore.judgeRecord.time }} <span
                                     class="text-lg font-normal text-gray-500">ms</span>
                             </p>
                         </div>
                         <div class="space-y-1">
                             <p class="text-sm text-gray-500 font-bold uppercase tracking-wider">消耗内存</p>
                             <p class="text-3xl font-mono font-semibold text-gray-900">
-                                {{ examStore.judgeResult.memory }} <span
+                                {{ examStore.judgeRecord.memory }} <span
                                     class="text-lg font-normal text-gray-500">MB</span>
                             </p>
                         </div>
                     </div>
 
                     <!-- 2. 答案错误 (WA)：清晰的对比 -->
-                    <div v-if="examStore.judgeResult?.status === 1" class="space-y-4">
+                    <div v-if="examStore.judgeRecord?.status === 1" class="space-y-4">
                         <div class="space-y-2">
                             <p class="text-sm font-bold">测试输入</p>
                             <pre
-                                class="w-full p-4 bg-gray-100 rounded-lg font-mono text-gray-800">{{ examStore.judgeResult.testCase?.input }}</pre>
+                                class="w-full p-4 bg-gray-100 rounded-lg font-mono text-gray-800">{{ examStore.judgeRecord.testCase?.input }}</pre>
                         </div>
                         <div class="space-y-2">
                             <p class="text-sm font-bold">预期输出</p>
                             <pre
-                                class="w-full p-4 bg-gray-100 rounded-lg font-mono text-gray-800">{{ examStore.judgeResult.testCase?.output }}</pre>
+                                class="w-full p-4 bg-gray-100 rounded-lg font-mono text-gray-800">{{ examStore.judgeRecord.testCase?.output }}</pre>
                         </div>
                         <div class="space-y-2">
                             <p class="text-sm font-bold">你的输出</p>
                             <pre
-                                class="w-full p-4 bg-gray-100 rounded-lg font-mono text-gray-800">{{ examStore.judgeResult.stdout }}</pre>
+                                class="w-full p-4 bg-gray-100 rounded-lg font-mono text-gray-800">{{ examStore.judgeRecord.stdout }}</pre>
                         </div>
                     </div>
 
                     <!-- 3. 编译错误 (CE)：大字号终端感 -->
-                    <div v-if="examStore.judgeResult?.status === 5" class="space-y-2">
+                    <div v-if="examStore.judgeRecord?.status === 5" class="space-y-2">
                         <p class="text-sm font-bold text-red-600">错误信息</p>
                         <pre
-                            class="w-full p-5 bg-red-50 text-red-400 rounded-lg font-mono text-sm leading-relaxed overflow-x-auto max-h-75">{{ examStore.judgeResult.stderr }}</pre>
+                            class="w-full p-5 bg-red-50 text-red-400 rounded-lg font-mono text-sm leading-relaxed overflow-x-auto max-h-75">{{ examStore.judgeRecord.stderr }}</pre>
                     </div>
 
                     <!-- 加载中占位 -->
@@ -165,8 +178,9 @@
     import MarkdownIt from 'markdown-it'
     import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from '@/components/ui/table'
     import { useExamStore } from "@/stores/ExamStore"
-    import { Cpu, Timer } from 'lucide-vue-next'
     const examStore = useExamStore()
+    import { Cpu, ScrollText, Timer, TimerReset } from 'lucide-vue-next'
+
 
     const route = useRoute()
     const md = new MarkdownIt({
@@ -177,7 +191,7 @@
 
     onMounted(async () => {
         await getQuestions()
-        getSimpleSubmitRecord()
+        getSimpleJudgeRecord()
     })
 
     interface Questions {
@@ -215,7 +229,7 @@
 
     const currentSelect = ref(0)
 
-    interface SimpleSubmitRecord {
+    interface SimpleJudgeRecord {
         id: number
         status: number
         score: number
@@ -223,28 +237,30 @@
         memory: number
     }
 
-    const simpleSubmitRecords = ref<SimpleSubmitRecord[]>([])
-    const getSimpleSubmitRecord = async () => {
+    const simpleJudgeRecords = ref<SimpleJudgeRecord[]>([])
+    const getSimpleJudgeRecord = async () => {
         try {
-            const res = await axios.get("/api/submit-record/simple", {
+            const res = await axios.get("/api/judge-record/simple", {
                 params: {
                     examRecordId: examStore.recordId,
                     questionId: examStore.currentQuestion?.id
                 }
             })
-            simpleSubmitRecords.value = res.data.data
+            simpleJudgeRecords.value = res.data.data
         } catch (e) {
             console.log(e);
         }
     }
 
-    const getDetailSubmitRecord = async (submitRecordId: number) => {
+    const getJudgeRecord = async (JudgeRecordId: number) => {
         try {
-            const res = await axios.get("/api/submit-record/detail", {
+            const res = await axios.get("/api/judge-record", {
                 params: {
-                    submitRecordId: submitRecordId
+                    judgeRecordId: JudgeRecordId
                 }
             })
+            examStore.judgeRecord = res.data.data
+            examStore.judgeDialog = true
         } catch (e) {
             console.log(e);
         }

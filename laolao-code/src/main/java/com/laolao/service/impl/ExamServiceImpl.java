@@ -9,10 +9,7 @@ import com.laolao.mapper.JudgeRecordMapper;
 import com.laolao.mapper.QuestionMapper;
 import com.laolao.pojo.dto.JudgeDTO;
 import com.laolao.pojo.entity.*;
-import com.laolao.pojo.vo.ExamBeginVO;
-import com.laolao.pojo.vo.ExamInfoVO;
-import com.laolao.pojo.vo.ExamQuestionVO;
-import com.laolao.pojo.vo.ExamVO;
+import com.laolao.pojo.vo.*;
 import com.laolao.service.ExamService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -75,7 +72,7 @@ public class ExamServiceImpl implements ExamService {
     }
 
     @Override
-    public Result<JudgeResult> judge(JudgeDTO judgeDTO) {
+    public Result<JudgeRecordVO> judge(JudgeDTO judgeDTO) {
         try {
             // 获取测试用例
             Question question = questionMapper.selectTestCaseById(judgeDTO.getQuestionId());
@@ -89,7 +86,9 @@ public class ExamServiceImpl implements ExamService {
             judgeRecord.setUserId(UserContext.getCurrentId());
             judgeRecord.setAnswerCode(judgeDTO.getCode());
             judgeRecordMapper.insert(judgeRecord);
-            return Result.success(judge);
+            // 转VO返回
+            JudgeRecordVO judgeRecordVO = mapStruct.JudgeResultToJudgeRecordVO(judge);
+            return Result.success(judgeRecordVO);
         } catch (Exception e) {
             e.printStackTrace();
             return Result.error("判题失败！练习管理员！");
