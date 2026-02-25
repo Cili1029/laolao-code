@@ -18,6 +18,16 @@ public class ExamQuestionVO implements Serializable {
     private Integer id;
 
     /**
+     * 题目值
+     */
+    private Integer questionScore;
+
+    /**
+     * 学生得分
+     */
+    private Integer userScore;
+
+    /**
      * 题目标题
      */
     private String title;

@@ -11,7 +11,7 @@
  Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 22/02/2026 21:48:39
+ Date: 25/02/2026 19:46:18
 */
 
 SET NAMES utf8mb4;
@@ -26,7 +26,6 @@ CREATE TABLE `exam`  (
   `title` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '考试标题',
   `description` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL DEFAULT NULL COMMENT '考试说明',
   `group_id` int NOT NULL COMMENT '所属组ID',
-  `questions` json NOT NULL COMMENT '题目ID列表，例如 [1, 12, 33]',
   `start_time` datetime NOT NULL COMMENT '开始时间',
   `end_time` datetime NOT NULL COMMENT '结束时间',
   `advisor_id` int NOT NULL COMMENT '导师ID',
@@ -36,8 +35,33 @@ CREATE TABLE `exam`  (
 -- ----------------------------
 -- Records of exam
 -- ----------------------------
-INSERT INTO `exam` VALUES (1, '2024年春季 Java 核心技术月考', '本次考试涵盖多线程、JVM、集合类。请在规定时间内独立完成，AI助教将进行逻辑审查。', 1, '[{\"score\": 25, \"question\": 1}, {\"score\": 20, \"question\": 2}, {\"score\": 20, \"question\": 3}, {\"score\": 15, \"question\": 4}, {\"score\": 20, \"question\": 5}]', '2030-03-20 09:00:00', '2030-03-20 11:00:00', 1);
-INSERT INTO `exam` VALUES (2, '【AI生成】动态规划专题练习', '由 Spring AI 根据近期大家的薄弱点自动选取的题目，主要针对背包问题和区间DP。', 2, '[{\"score\": 35, \"question\": 2}, {\"score\": 35, \"question\": 4}, {\"score\": 30, \"question\": 5}]', '2025-03-01 00:00:00', '2027-03-31 23:59:59', 1);
+INSERT INTO `exam` VALUES (1, '2024年春季 Java 核心技术月考', '本次考试涵盖多线程、JVM、集合类。请在规定时间内独立完成，AI助教将进行逻辑审查。', 1, '2030-03-20 09:00:00', '2030-03-20 11:00:00', 1);
+INSERT INTO `exam` VALUES (2, '【AI生成】动态规划专题练习', '由 Spring AI 根据近期大家的薄弱点自动选取的题目，主要针对背包问题和区间DP。', 2, '2025-03-01 00:00:00', '2027-03-31 23:59:59', 1);
+
+-- ----------------------------
+-- Table structure for exam_question_config
+-- ----------------------------
+DROP TABLE IF EXISTS `exam_question_config`;
+CREATE TABLE `exam_question_config`  (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `exam_id` int NOT NULL COMMENT '所属考试ID',
+  `question_id` int NOT NULL COMMENT '题目ID',
+  `score` int NOT NULL DEFAULT 0 COMMENT '该题在该场考试中的分值',
+  `sort_order` int NOT NULL DEFAULT 0 COMMENT '题目在试卷中的显示顺序',
+  PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 9 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '考试题目分值配置表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of exam_question_config
+-- ----------------------------
+INSERT INTO `exam_question_config` VALUES (1, 1, 1, 25, 1);
+INSERT INTO `exam_question_config` VALUES (2, 1, 2, 20, 2);
+INSERT INTO `exam_question_config` VALUES (3, 1, 3, 20, 3);
+INSERT INTO `exam_question_config` VALUES (4, 1, 4, 15, 4);
+INSERT INTO `exam_question_config` VALUES (5, 1, 5, 20, 5);
+INSERT INTO `exam_question_config` VALUES (6, 2, 2, 35, 1);
+INSERT INTO `exam_question_config` VALUES (7, 2, 4, 35, 2);
+INSERT INTO `exam_question_config` VALUES (8, 2, 5, 30, 3);
 
 -- ----------------------------
 -- Table structure for exam_record
@@ -119,7 +143,7 @@ CREATE TABLE `judge_record`  (
   `memory` int NULL DEFAULT NULL COMMENT '内存消耗(MB)',
   `submit_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '提交时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '判题记录' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 22 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '判题记录' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of judge_record
@@ -131,6 +155,19 @@ INSERT INTO `judge_record` VALUES (4, 2, 2, 2, 1, 0, 'import java.util.Scanner;\
 INSERT INTO `judge_record` VALUES (5, 2, 4, 2, 0, 35, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        \n        // Kadane 算法核心逻辑\n        // 1. 初始化：当前子数组和、最大子数组和都从第一个元素开始\n        int currentSum = nums[0];\n        int maxSum = nums[0];\n        \n        // 2. 从第二个元素开始遍历数组\n        for (int i = 1; i < n; i++) {\n            // 关键逻辑：要么将当前元素加入前一个子数组，要么以当前元素为新子数组起点\n            currentSum = Math.max(nums[i], currentSum + nums[i]);\n            // 更新最大和\n            maxSum = Math.max(maxSum, currentSum);\n        }\n        \n        // 3. 输出结果\n        System.out.println(maxSum);\n        sc.close();\n    }\n}', NULL, NULL, NULL, 110, 34, '2026-02-22 21:19:43');
 INSERT INTO `judge_record` VALUES (6, 2, 4, 2, 0, 35, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        \n        // Kadane 算法核心逻辑\n        // 1. 初始化：当前子数组和、最大子数组和都从第一个元素开始\n        int currentSum = nums[0];\n        int maxSum = nums[0];\n        \n        // 2. 从第二个元素开始遍历数组\n        for (int i = 1; i < n; i++) {\n            // 关键逻辑：要么将当前元素加入前一个子数组，要么以当前元素为新子数组起点\n            currentSum = Math.max(nums[i], currentSum + nums[i]);\n            // 更新最大和\n            maxSum = Math.max(maxSum, currentSum);\n        }\n        \n        // 3. 输出结果\n        System.out.println(maxSum);\n        sc.close();\n    }\n}', NULL, NULL, NULL, 110, 33, '2026-02-22 21:25:48');
 INSERT INTO `judge_record` VALUES (7, 2, 2, 2, 5, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();123\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', NULL, 'Main.java:13: error: not a statement\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();123\n                                                      ^\nMain.java:13: error: \';\' expected\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();123\n                                                         ^\n2 errors\n', NULL, NULL, NULL, '2026-02-22 21:27:11');
+INSERT INTO `judge_record` VALUES (8, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, '{\"input\": \"4\\n2 7 11 15\\n9\", \"output\": \"0 1\"}', NULL, NULL, '2026-02-23 16:41:06');
+INSERT INTO `judge_record` VALUES (9, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, '{\"input\": \"4\\n2 7 11 15\\n9\", \"output\": \"0 1\"}', NULL, NULL, '2026-02-23 16:41:40');
+INSERT INTO `judge_record` VALUES (10, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, '{\"input\": \"4\\n2 7 11 15\\n9\", \"output\": \"0 1\"}', NULL, NULL, '2026-02-23 16:42:02');
+INSERT INTO `judge_record` VALUES (11, 2, 2, 2, 5, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];1\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', NULL, 'Main.java:12: error: not a statement\n        int[] nums = new int[n];1\n                                ^\nMain.java:12: error: \';\' expected\n        int[] nums = new int[n];1\n                                 ^\n2 errors\n', NULL, NULL, NULL, '2026-02-23 16:56:51');
+INSERT INTO `judge_record` VALUES (12, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, '{\"input\": \"4\\n2 7 11 15\\n9\", \"output\": \"0 1\"}', NULL, NULL, '2026-02-23 17:32:09');
+INSERT INTO `judge_record` VALUES (13, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, '{\"input\": \"4\\n2 7 11 15\\n9\", \"output\": \"0 1\"}', NULL, NULL, '2026-02-23 17:32:26');
+INSERT INTO `judge_record` VALUES (14, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, '{\"input\": \"4\\n2 7 11 15\\n9\", \"output\": \"0 1\"}', NULL, NULL, '2026-02-23 17:33:11');
+INSERT INTO `judge_record` VALUES (15, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, '{\"input\": \"4\\n2 7 11 15\\n9\", \"output\": \"0 1\"}', NULL, NULL, '2026-02-23 17:33:12');
+INSERT INTO `judge_record` VALUES (16, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, '{\"input\": \"4\\n2 7 11 15\\n9\", \"output\": \"0 1\"}', NULL, NULL, '2026-02-23 17:33:12');
+INSERT INTO `judge_record` VALUES (17, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, '{\"input\": \"4\\n2 7 11 15\\n9\", \"output\": \"0 1\"}', NULL, NULL, '2026-02-23 17:35:03');
+INSERT INTO `judge_record` VALUES (18, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, '{\"input\": \"4\\n2 7 11 15\\n9\", \"output\": \"0 1\"}', NULL, NULL, '2026-02-23 17:55:49');
+INSERT INTO `judge_record` VALUES (19, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, '{\"input\": \"4\\n2 7 11 15\\n9\", \"output\": \"0 1\"}', NULL, NULL, '2026-02-23 19:14:24');
+INSERT INTO `judge_record` VALUES (21, 2, 5, 2, 0, 30, 'import java.util.Scanner;\n\npublic class Main {\n    // 定义取模的常量，方便维护\n    private static final int MOD = 1000000007;\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        // 调用斐波那契计算函数并输出结果\n        System.out.println(fib(n));\n        sc.close();\n    }\n\n    // 计算斐波那契第n项，取模1e9+7\n    public static int fib(int n) {\n        // 边界条件处理\n        if (n == 0) {\n            return 0;\n        }\n        if (n == 1) {\n            return 1;\n        }\n        // 用两个变量保存前两项，避免数组占用空间\n        long prevPrev = 0; // F(n-2)\n        long prev = 1;     // F(n-1)\n        long current = 0;  // F(n)\n        // 从2开始迭代到n\n        for (int i = 2; i <= n; i++) {\n            current = (prevPrev + prev) % MOD; // 每一步都取模，防止溢出\n            // 迭代更新前两项\n            prevPrev = prev;\n            prev = current;\n        }\n        // 转成int返回（因为取模后结果一定在int范围内）\n        return (int) current;\n    }\n}', NULL, NULL, NULL, 120, 34, '2026-02-25 19:44:32');
 
 -- ----------------------------
 -- Table structure for question

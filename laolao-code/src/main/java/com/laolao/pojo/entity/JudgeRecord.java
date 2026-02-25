@@ -70,7 +70,7 @@ public class JudgeRecord implements Serializable {
      * 错误示例
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private TestCase testCase;
+    private QuestionTestCase questionTestCase;
 
     /**
      * 判题状态

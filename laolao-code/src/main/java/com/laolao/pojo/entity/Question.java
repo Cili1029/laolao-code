@@ -61,7 +61,7 @@ public class Question implements Serializable {
      * 测试用例 [ {"input": "1 2", "output": "3"}, {"input": "2 2", "output": "4"} ]
      */
     @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<TestCase> testCases;
+    private List<QuestionTestCase> questionTestCases;
 
     /**
      * 初始化模板代码 (如 public class Main...)

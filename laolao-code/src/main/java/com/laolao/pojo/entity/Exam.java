@@ -42,12 +42,6 @@ public class Exam implements Serializable {
     private Integer groupId;
 
     /**
-     * 题目ID列表
-     */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<QuestionScore> questions;
-
-    /**
      * 开始时间
      */
     private LocalDateTime startTime;

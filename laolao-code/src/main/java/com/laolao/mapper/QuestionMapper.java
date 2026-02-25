@@ -13,6 +13,6 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface QuestionMapper extends BaseMapper<Question> {
     @Select("select test_cases from question where id = #{questionId}")
-    @Results({@Result(column = "test_cases", property = "testCases", typeHandler = JacksonTypeHandler.class)})
+    @Results({@Result(column = "test_cases", property = "questionTestCases", typeHandler = JacksonTypeHandler.class)})
     Question selectTestCaseById(Integer questionId);
 }

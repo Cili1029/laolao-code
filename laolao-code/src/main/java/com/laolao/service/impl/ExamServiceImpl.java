@@ -61,12 +61,12 @@ public class ExamServiceImpl implements ExamService {
 
     @Override
     public Result<ExamBeginVO> getExamQuestion(Integer recordId) {
-        // 获取这个记录的考试的题目Id
-        Exam exam = examMapper.selectExamByRecordId(recordId);
-        List<Integer> questionIdList = exam.getQuestions().stream().map(QuestionScore::getQuestion).toList();
-        List<ExamQuestionVO> examQuestionVOList = examMapper.selectQuestionById(questionIdList);
+        // 获取这个记录所在的考试Id
+        Integer examId = examMapper.selectExamIdByRecordId(recordId);
+        // 获取其题目以及当前学生每道题的分数
+        List<ExamQuestionVO> examQuestionVOList = examMapper.selectQuestionById(examId, recordId, UserContext.getCurrentId());
         ExamBeginVO examBeginVO = new ExamBeginVO();
-        examBeginVO.setExamId(exam.getId());
+        examBeginVO.setExamId(examId);
         examBeginVO.setQuestions(examQuestionVOList);
         return Result.success(examBeginVO);
     }
@@ -78,7 +78,7 @@ public class ExamServiceImpl implements ExamService {
             Question question = questionMapper.selectTestCaseById(judgeDTO.getQuestionId());
             // 获取这一题定的分值
             Integer score = examMapper.selectScoreByQuestionId(judgeDTO.getExamId(), judgeDTO.getQuestionId());
-            JudgeResult judge = judgeService.judge(judgeDTO.getCode(), question.getTestCases(), score);
+            JudgeResult judge = judgeService.judge(judgeDTO.getCode(), question.getQuestionTestCases(), score);
             // 转换写入记录提交表
             JudgeRecord judgeRecord = mapStruct.JudgeResultToJudgeRecord(judge);
             judgeRecord.setExamRecordId(judgeDTO.getRecordId());

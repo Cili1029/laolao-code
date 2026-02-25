@@ -3,6 +3,8 @@ import axios from "@/utils/myAxios"
 
 interface Questions {
     id: number
+    questionScore: number
+    userScore: number
     title: string
     content: string
     difficulty: number
@@ -41,6 +43,7 @@ export const useExamStore = defineStore('sidebar', {
         examBegin: false,
         examId: null as number | null,
         recordId: null as number | null,
+        questions: null as Questions[] | null,
         currentQuestion: null as Questions | null,
         judgeRecord: null as JudgeRecord | null,
         judgeLoading: false, // 判题加载状态
@@ -74,15 +77,22 @@ export const useExamStore = defineStore('sidebar', {
             try {
                 this.judgeLoading = true
 
+                const questionId = this.currentQuestion.id
+
                 const res = await axios.post("/api/exam/judge", {
                     examId: this.examId,
                     recordId: this.recordId,
-                    questionId: this.currentQuestion.id,
+                    questionId: questionId,
                     code: this.currentQuestion.templateCode
                 })
 
                 this.judgeRecord = res.data.data
                 this.judgeDialog = true
+
+                const targetQuestion = this.questions?.find(q => q.id === questionId)
+                if (targetQuestion) {
+                    targetQuestion.userScore = this.judgeRecord!.score!
+                }
             } catch (e) {
                 console.error('判题失败：', e)
                 this.judgeRecord = null

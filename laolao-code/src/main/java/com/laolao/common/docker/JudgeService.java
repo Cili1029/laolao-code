@@ -8,7 +8,7 @@ import com.github.dockerjava.api.model.Frame;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.StreamType;
 import com.laolao.pojo.entity.JudgeResult;
-import com.laolao.pojo.entity.TestCase;
+import com.laolao.pojo.entity.QuestionTestCase;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
@@ -109,11 +109,11 @@ public class JudgeService {
      * 判题服务核心代码
      *
      * @param userCode  用户提交的 Java 代码字符串
-     * @param testCases 示例
+     * @param questionTestCases 示例
      * @param score 此题分值
      * @return 判题结果
      */
-    public JudgeResult judge(String userCode, List<TestCase> testCases, Integer score) throws Exception {
+    public JudgeResult judge(String userCode, List<QuestionTestCase> questionTestCases, Integer score) throws Exception {
         // 从池中取出一个容器（如果池子空了，最多等 5 秒）
         String containerId = containerQueue.poll(5, TimeUnit.SECONDS);
         if (containerId == null) throw new RuntimeException("当前无可用容器（判题繁忙）");
@@ -133,7 +133,7 @@ public class JudgeService {
             int maxTime = 0;
             int passTestCaseCount = 0;
 
-            for (TestCase tc : testCases) {
+            for (QuestionTestCase tc : questionTestCases) {
                 // 将当前输入写入 input.txt
                 uploadFile(containerId, tc.getInput(), "input.txt");
 
@@ -148,7 +148,7 @@ public class JudgeService {
                 // 比对输出结果，同时根据示例通过数给分
                 boolean isPassed = tc.getOutput().trim().equals(response.getStdout().trim());
                 if (!isPassed) {
-                    return JudgeResult.testCaseError(response.getStdout(), tc, passTestCaseCount, testCases.size(), score * passTestCaseCount / testCases.size());
+                    return JudgeResult.testCaseError(response.getStdout(), tc, passTestCaseCount, questionTestCases.size(), score * passTestCaseCount / questionTestCases.size());
                 }
 
                 // 记录最大消耗

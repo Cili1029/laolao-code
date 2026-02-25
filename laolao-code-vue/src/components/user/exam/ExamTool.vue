@@ -4,7 +4,7 @@
             <ResizablePanel :default-size="40">
                 <div class=" max-h-max flex border-t">
                     <div class="w-16 flex flex-col items-center py-4 gap-4 border-r bg-gray-50 overflow-y-auto">
-                        <div v-for="(q, index) in questions" :key="index"
+                        <div v-for="(q, index) in examStore.questions" :key="index"
                             @click="examStore.currentQuestion = q, currentSelect = 0" :class="[
                                 'w-10 h-10 flex items-center justify-center rounded-lg cursor-pointer text-lg font-semibold transition',
                                 examStore.currentQuestion === q
@@ -30,7 +30,21 @@
                             </p>
                         </div>
                         <div class="flex-1 overflow-y-auto">
-                            <article v-show="currentSelect == 0" v-html="renderedContent" class="p-1" />
+                            <div v-show="currentSelect == 0" class="flex flex-col p-1">
+                                <div class="flex justify-between">
+                                    <p>
+                                        分值：
+                                        <span>{{ examStore.currentQuestion?.userScore }}</span>
+                                        /
+                                        <span>{{ examStore.currentQuestion?.questionScore }}</span>
+                                    </p>
+                                    <p>{{ examStore.currentQuestion?.difficulty === 0 ? '简单' :
+                                        examStore.currentQuestion?.difficulty === 1 ? '中等' : '困难' }}</p>
+                                </div>
+
+                                <article v-html="renderedContent" class="" />
+                            </div>
+
                             <Table v-show="currentSelect == 1">
                                 <TableHeader>
                                     <TableRow>
@@ -191,18 +205,7 @@
 
     onMounted(async () => {
         await getQuestions()
-        getSimpleJudgeRecord()
     })
-
-    interface Questions {
-        id: number
-        title: string
-        content: string
-        difficulty: number
-        templateCode: string
-    }
-
-    const questions = ref<Questions[]>([])
 
     const getQuestions = async () => {
         try {
@@ -213,8 +216,8 @@
             })
             examStore.examId = res.data.data.examId
             examStore.recordId = Number(route.params.id)
-            questions.value = res.data.data.questions
-            examStore.currentQuestion = questions.value[0]!
+            examStore.questions = res.data.data.questions
+            examStore.currentQuestion = examStore.questions?.[0] ?? null
         } catch (e) {
             console.error("Fetch error:", e)
         }

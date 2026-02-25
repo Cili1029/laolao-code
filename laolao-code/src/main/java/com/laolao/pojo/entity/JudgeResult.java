@@ -42,7 +42,7 @@ public class JudgeResult {
     /**
      * 错误示例
      */
-    private TestCase testCase;
+    private QuestionTestCase questionTestCase;
 
     /**
      * 消耗时间 (ms)
@@ -86,12 +86,12 @@ public class JudgeResult {
     }
 
     // 示例错误返回结果，可以按示例给分
-    public static JudgeResult testCaseError(String stdout, TestCase testCase, int passTestCaseCount, int totalTestCaseCount, Integer obtainedScore) {
+    public static JudgeResult testCaseError(String stdout, QuestionTestCase questionTestCase, int passTestCaseCount, int totalTestCaseCount, Integer obtainedScore) {
         JudgeResult result = new JudgeResult();
         result.status = JudgeConstant.STATUS_WA;
         result.score = obtainedScore;
         result.stdout = stdout;
-        result.testCase = testCase;
+        result.questionTestCase = questionTestCase;
         result.msg = passTestCaseCount + " / " + totalTestCaseCount +" 个通过的测试用例";
         return result;
     }

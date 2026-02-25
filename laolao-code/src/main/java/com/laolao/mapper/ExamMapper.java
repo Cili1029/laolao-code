@@ -1,7 +1,5 @@
 package com.laolao.mapper;
 
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
-import com.laolao.pojo.entity.Exam;
 import com.laolao.pojo.entity.ExamRecord;
 import com.laolao.pojo.vo.ExamInfoVO;
 import com.laolao.pojo.vo.ExamQuestionVO;
@@ -23,10 +21,22 @@ public interface ExamMapper {
             """)
     List<ExamVO> selectSimpleExam(Integer userId);
 
+    @Select("select exam_id from exam_record where id = #{recordId}")
+    Integer selectExamIdByRecordId(Integer recordId);
+
     @Select("""
-            select e.id, e.title, e.description, g.name as `group`, JSON_LENGTH(e.questions) as questions, e.start_time, e.end_time
+            select e.id,
+                   e.title,
+                   e.description,
+                   g.name              as `group`,
+                   (select count(*)
+                    from exam_question_config
+                    where exam_id = #{examId}) as questions,
+                   e.start_time,
+                   e.end_time
             from exam e
-                     join `group` g on g.id = e.group_id
+                     join `group` g
+                          on g.id = e.group_id
             where e.id = #{examId};
             """)
     ExamInfoVO selectExamInfo(Integer examId);
@@ -39,28 +49,25 @@ public interface ExamMapper {
     void insertRecord(ExamRecord record);
 
     @Select("""
-            select e.id, e.questions
-            from exam e
-                    join exam_record r on r.exam_id = e.id
-            where r.id = #{recordId}
+            select q.id,
+                   e.score                 as question_score,
+                   ifnull(max(j.score), 0) as user_score,
+                   q.title,
+                   q.content,
+                   q.difficulty,
+                   q.template_code
+            from question q
+                     join exam_question_config e on q.id = e.question_id
+                     left join judge_record j on j.question_id = q.id and j.user_id = #{userId} and j.exam_record_id = #{recordId}
+            where e.exam_id = #{examId}
+            group by q.id, question_score, q.title, q.content, q.difficulty, q.template_code;
             """)
-    @Results({@Result(column = "questions", property = "questions", typeHandler = JacksonTypeHandler.class)})
-    Exam selectExamByRecordId(Integer recordId);
-
-    List<ExamQuestionVO> selectQuestionById(List<Integer> questionIds);
+    List<ExamQuestionVO> selectQuestionById(Integer examId, Integer recordId, Integer userId);
 
     @Select("""
-            select jt.score
-            from exam e,
-                 JSON_TABLE(
-                         e.questions,
-                         '$[*]' columns (
-                             question int path '$.question',
-                             score int path '$.score'
-                             )
-                 ) jt
-            where e.id = #{examId}
-              and jt.question = #{questionId};
+            select score
+            from exam_question_config
+            where exam_id = #{examId} and question_id = #{questionId};
             """)
     Integer selectScoreByQuestionId(Integer examId, Integer questionId);
 }

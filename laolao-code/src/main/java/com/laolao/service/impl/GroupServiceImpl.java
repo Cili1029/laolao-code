@@ -34,7 +34,7 @@ public class GroupServiceImpl implements GroupService {
 
         joinGroupDTO.setGroupId(id);
         joinGroupDTO.setMemberId(UserContext.getCurrentId());
-        int count = groupMapper.selectCountBymemberId(joinGroupDTO);
+        int count = groupMapper.selectCountByMemberId(joinGroupDTO);
 
         if (count > 0) {
             return Result.error("已加入学习组！");

@@ -26,7 +26,7 @@ public interface GroupMapper {
     Integer selectGroupByInviteCode(String inviteCode);
 
     @Select("select count(id) from group_member where group_id = #{groupId} and member_id = #{memberId}")
-    int selectCountBymemberId(JoinGroupDTO joinGroupDTO);
+    int selectCountByMemberId(JoinGroupDTO joinGroupDTO);
 
     @Insert("insert into group_member(group_id, member_id) value (#{groupId}, #{memberId})")
     void insertGroupMember(JoinGroupDTO joinGroupDTO);

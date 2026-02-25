@@ -1,6 +1,6 @@
 package com.laolao.pojo.vo;
 
-import com.laolao.pojo.entity.TestCase;
+import com.laolao.pojo.entity.QuestionTestCase;
 import lombok.*;
 
 @Getter
@@ -38,7 +38,7 @@ public class JudgeRecordVO {
     /**
      * 错误示例
      */
-    private TestCase testCase;
+    private QuestionTestCase questionTestCase;
 
     /**
      * 消耗时间 (ms)

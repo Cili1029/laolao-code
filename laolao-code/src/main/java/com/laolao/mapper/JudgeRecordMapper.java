@@ -18,6 +18,6 @@ public interface JudgeRecordMapper extends BaseMapper<JudgeRecord> {
     List<SimpleJudgeRecordVO> selectSimpleJudgeRecord(Integer examRecordId, Integer questionId);
 
     @Select("select status, score, stdout, stderr, test_case, time, memory from judge_record where id = #{judgeRecordId}")
-    @Results({@Result(column = "test_case", property = "testCase", typeHandler = JacksonTypeHandler.class)})
+    @Results({@Result(column = "test_case", property = "questionTestCases", typeHandler = JacksonTypeHandler.class)})
     JudgeRecordVO selectDetailJudgeRecord(Integer judgeRecordId);
 }
