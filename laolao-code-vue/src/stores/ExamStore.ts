@@ -11,7 +11,9 @@ interface Questions {
     templateCode: string
 }
 
-interface TestCase {
+interface QuestionTestCase {
+    id: number
+    questionId: number
     input: string
     output: string
 }
@@ -22,7 +24,7 @@ interface JudgeRecord {
     stdout: string
     stderr: string
     msg: string
-    testCase: TestCase
+    questionTestCase: QuestionTestCase
     time: number
     memory: number
 }

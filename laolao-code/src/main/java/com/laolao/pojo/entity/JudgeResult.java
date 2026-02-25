@@ -40,7 +40,12 @@ public class JudgeResult {
     private String msg;
 
     /**
-     * 错误示例
+     * 错误示例Id（数据库存储）
+     */
+    private Integer questionTestCaseId;
+
+    /**
+     * 错误示例（前端展示用）
      */
     private QuestionTestCase questionTestCase;
 
@@ -92,6 +97,7 @@ public class JudgeResult {
         result.score = obtainedScore;
         result.stdout = stdout;
         result.questionTestCase = questionTestCase;
+        result.questionTestCaseId =  questionTestCase.getId();
         result.msg = passTestCaseCount + " / " + totalTestCaseCount +" 个通过的测试用例";
         return result;
     }

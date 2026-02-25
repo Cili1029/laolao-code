@@ -1,7 +1,6 @@
 package com.laolao.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableName;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import lombok.*;
 
@@ -18,7 +17,6 @@ import java.util.List;
 @AllArgsConstructor
 @ToString
 @Builder
-@TableName(autoResultMap = true)
 public class Question implements Serializable {
 
     /**
@@ -56,12 +54,6 @@ public class Question implements Serializable {
      * 内存限制 (MB)
      */
     private Integer memoryLimit;
-
-    /**
-     * 测试用例 [ {"input": "1 2", "output": "3"}, {"input": "2 2", "output": "4"} ]
-     */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<QuestionTestCase> questionTestCases;
 
     /**
      * 初始化模板代码 (如 public class Main...)

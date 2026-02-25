@@ -1,12 +1,13 @@
 package com.laolao.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.laolao.common.context.UserContext;
 import com.laolao.common.docker.JudgeService;
 import com.laolao.common.result.Result;
 import com.laolao.common.util.MapStruct;
 import com.laolao.mapper.ExamMapper;
 import com.laolao.mapper.JudgeRecordMapper;
-import com.laolao.mapper.QuestionMapper;
+import com.laolao.mapper.QuestionTestCaseMapper;
 import com.laolao.pojo.dto.JudgeDTO;
 import com.laolao.pojo.entity.*;
 import com.laolao.pojo.vo.*;
@@ -23,11 +24,11 @@ public class ExamServiceImpl implements ExamService {
     @Resource
     private JudgeService judgeService;
     @Resource
-    private QuestionMapper questionMapper;
-    @Resource
     private JudgeRecordMapper judgeRecordMapper;
     @Resource
     private MapStruct mapStruct;
+    @Resource
+    private QuestionTestCaseMapper questionTestCaseMapper;
 
     @Override
     public Result<List<ExamVO>> getSimpleExam() {
@@ -75,10 +76,12 @@ public class ExamServiceImpl implements ExamService {
     public Result<JudgeRecordVO> judge(JudgeDTO judgeDTO) {
         try {
             // 获取测试用例
-            Question question = questionMapper.selectTestCaseById(judgeDTO.getQuestionId());
+            List<QuestionTestCase> questionTestCases = questionTestCaseMapper.selectList(
+                    Wrappers.lambdaQuery(QuestionTestCase.class)
+                    .eq(QuestionTestCase::getQuestionId, judgeDTO.getQuestionId()));
             // 获取这一题定的分值
             Integer score = examMapper.selectScoreByQuestionId(judgeDTO.getExamId(), judgeDTO.getQuestionId());
-            JudgeResult judge = judgeService.judge(judgeDTO.getCode(), question.getQuestionTestCases(), score);
+            JudgeResult judge = judgeService.judge(judgeDTO.getCode(), questionTestCases, score);
             // 转换写入记录提交表
             JudgeRecord judgeRecord = mapStruct.JudgeResultToJudgeRecord(judge);
             judgeRecord.setExamRecordId(judgeDTO.getRecordId());

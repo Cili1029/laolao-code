@@ -67,10 +67,9 @@ public class JudgeRecord implements Serializable {
     private String stderr;
 
     /**
-     * 错误示例
+     * 错误示例Id
      */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private QuestionTestCase questionTestCase;
+    private Integer questionTestCaseId;
 
     /**
      * 判题状态

@@ -36,7 +36,12 @@ public class JudgeRecordVO {
     private String msg;
 
     /**
-     * 错误示例
+     * 错误示例Id
+     */
+    private Integer questionTestCaseId;
+
+    /**
+     * 错误示例（用于给前端看）
      */
     private QuestionTestCase questionTestCase;
 

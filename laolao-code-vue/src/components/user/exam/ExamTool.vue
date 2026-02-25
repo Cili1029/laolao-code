@@ -6,10 +6,12 @@
                     <div class="w-16 flex flex-col items-center py-4 gap-4 border-r bg-gray-50 overflow-y-auto">
                         <div v-for="(q, index) in examStore.questions" :key="index"
                             @click="examStore.currentQuestion = q, currentSelect = 0" :class="[
-                                'w-10 h-10 flex items-center justify-center rounded-lg cursor-pointer text-lg font-semibold transition',
+                                'w-10 h-10 flex items-center justify-center rounded-lg cursor-pointer text-lg border-dashed border-3 font-semibold transition',
+                                'text-gray-400 border-gray-300 hover:border-gray-400 hover:text-gray-600',
+                                q.userScore === q.questionScore
+                                    ? 'bg-emerald-50 border-emerald-400 text-emerald-600' : '',
                                 examStore.currentQuestion === q
-                                    ? 'bg-black text-white'
-                                    : 'bg-white border text-gray-600 hover:bg-gray-200'
+                                    ? 'border-zinc-800 text-zinc-900' : ''
                             ]">
                             {{ index + 1 }}
                         </div>
@@ -38,8 +40,13 @@
                                         /
                                         <span>{{ examStore.currentQuestion?.questionScore }}</span>
                                     </p>
-                                    <p>{{ examStore.currentQuestion?.difficulty === 0 ? '简单' :
-                                        examStore.currentQuestion?.difficulty === 1 ? '中等' : '困难' }}</p>
+                                    <Badge variant="secondary" :class="['mb-2',
+                                        examStore.currentQuestion?.difficulty === 0 ? 'bg-green-50 border-green-300 text-green-700' :
+                                            examStore.currentQuestion?.difficulty === 1 ? 'bg-amber-50 border-amber-300 text-amber-700' :
+                                                'bg-rose-50 border-rose-300 text-rose-700']">
+                                        {{ examStore.currentQuestion?.difficulty === 0 ? '简单' :
+                                            examStore.currentQuestion?.difficulty === 1 ? '中等' : '困难' }}
+                                    </Badge>
                                 </div>
 
                                 <article v-html="renderedContent" class="" />
@@ -139,12 +146,12 @@
                         <div class="space-y-2">
                             <p class="text-sm font-bold">测试输入</p>
                             <pre
-                                class="w-full p-4 bg-gray-100 rounded-lg font-mono text-gray-800">{{ examStore.judgeRecord.testCase?.input }}</pre>
+                                class="w-full p-4 bg-gray-100 rounded-lg font-mono text-gray-800">{{ examStore.judgeRecord.questionTestCase?.input }}</pre>
                         </div>
                         <div class="space-y-2">
                             <p class="text-sm font-bold">预期输出</p>
                             <pre
-                                class="w-full p-4 bg-gray-100 rounded-lg font-mono text-gray-800">{{ examStore.judgeRecord.testCase?.output }}</pre>
+                                class="w-full p-4 bg-gray-100 rounded-lg font-mono text-gray-800">{{ examStore.judgeRecord.questionTestCase?.output }}</pre>
                         </div>
                         <div class="space-y-2">
                             <p class="text-sm font-bold">你的输出</p>
@@ -194,6 +201,7 @@
     import { useExamStore } from "@/stores/ExamStore"
     const examStore = useExamStore()
     import { Cpu, ScrollText, Timer, TimerReset } from 'lucide-vue-next'
+    import { Badge } from '@/components/ui/badge'
 
 
     const route = useRoute()
