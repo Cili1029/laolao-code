@@ -47,12 +47,12 @@ public class ExamRecord implements Serializable {
     private String report;
 
     /**
-     * 学生开始答题时间
+     * 考生进入时间
      */
-    private LocalDateTime startTime;
+    private LocalDateTime enterTime;
 
     /**
-     * 学生结束答题时间
+     * 学生提交时间
      */
-    private LocalDateTime endTime;
+    private LocalDateTime submitTime;
 }

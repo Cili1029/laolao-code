@@ -14,7 +14,11 @@
                         <Spinner class="mr-1" v-else />
                         提交答案
                     </div>
-                    <p></p>
+                    <div v-if="examStore.examBegin" @click="examStore.judgeLoading ? '' : examStore.judge()"
+                        class="flex text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
+                        <CheckSquare v-if="!examStore.judgeLoading" class="h-4 w-4 mr-1" />
+                        交卷
+                    </div>
                 </div>
             </header>
             <RouterView class="flex flex-1"></RouterView>
@@ -28,7 +32,7 @@
     import { SidebarInset, SidebarProvider, SidebarTrigger, } from "@/components/ui/sidebar"
     import { RouterView } from "vue-router"
     import { Spinner } from '@/components/ui/spinner'
-    import { CloudUpload } from "lucide-vue-next"
+    import { CheckSquare, CloudUpload } from "lucide-vue-next"
     import { useExamStore } from "@/stores/ExamStore"
     const examStore = useExamStore()
 

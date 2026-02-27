@@ -1,6 +1,6 @@
 package com.laolao.service.impl;
 
-import com.laolao.common.docker.JudgeConstant;
+import com.laolao.common.constant.JudgeConstant;
 import com.laolao.common.result.Result;
 import com.laolao.mapper.JudgeRecordMapper;
 import com.laolao.mapper.QuestionTestCaseMapper;

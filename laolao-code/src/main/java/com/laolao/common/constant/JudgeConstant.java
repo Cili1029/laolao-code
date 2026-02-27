@@ -1,4 +1,4 @@
-package com.laolao.common.docker;
+package com.laolao.common.constant;
 
 public class JudgeConstant {
     public static final String commonImports =

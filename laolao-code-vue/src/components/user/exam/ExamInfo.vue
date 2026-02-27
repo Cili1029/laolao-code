@@ -25,9 +25,8 @@
                         </div>
                         <div class="flex flex-1 items-center justify-center">
                             <Button @click="startExam()" variant="outline"
-                                :disabled="!dayjs().isBetween(exam?.startTime, exam?.endTime, null, '[]')">
-                                {{ dayjs().isBetween(exam?.startTime, exam?.endTime, null, '[]') ? '开始答题' :
-                                    dayjs().isAfter(exam?.startTime) ? "已结束" : "未开始" }}
+                                :disabled="!(exam?.status === 1) && !(exam?.status === 2)">
+                                {{ statusTextMap.get(exam?.status ?? 0) }}
                             </Button>
                         </div>
                     </div>
@@ -64,7 +63,7 @@
                     <div class="relative border-l border-slate-200 ml-3 space-y-8">
                         <div class="relative pl-8">
                             <div class="absolute -left-1.5 mt-1.5 h-3 w-3 rounded-full border border-white"
-                                :class="dayjs().isAfter(exam?.startTime) ? 'bg-blue-500 ring-4 ring-blue-50' : 'bg-slate-300'">
+                                :class="(exam?.status ?? 0) >= 1 ? 'bg-blue-500 ring-4 ring-blue-50' : 'bg-slate-300'">
                             </div>
                             <time class="mb-1 text-xs font-mono text-slate-600 uppercase tracking-wide">{{
                                 dayjs(exam?.startTime).format('YYYY/MM/DD HH:mm') }}</time>
@@ -72,23 +71,23 @@
                         </div>
                         <div class="relative pl-8">
                             <div class="absolute -left-1.5 mt-1.5 h-3 w-3 rounded-full border border-white "
-                                :class="dayjs().isAfter(exam?.startTime) ? 'bg-blue-500 ring-4 ring-blue-50' : 'bg-slate-300'">
+                                :class="(exam?.status ?? 0) >= 2 ? 'bg-blue-500 ring-4 ring-blue-50' : 'bg-slate-300'">
                             </div>
                             <time class="mb-1 text-xs font-mono text-slate-600 uppercase tracking-wide">{{
-                                dayjs(exam?.startTime).format('YYYY/MM/DD HH:mm') }}</time>
+                                dayjs(exam?.enterTime).format('YYYY/MM/DD HH:mm') }}</time>
                             <h3 class="text-sm font-semibold text-slate-700">考生开始答题时间</h3>
                         </div>
                         <div class="relative pl-8">
                             <div class="absolute -left-1.5 mt-1.5 h-3 w-3 rounded-full border border-white"
-                                :class="dayjs().isAfter(exam?.endTime) ? 'bg-blue-500 ring-4 ring-blue-50' : 'bg-slate-300'">
+                                :class="(exam?.status ?? 0) >= 3 ? 'bg-blue-500 ring-4 ring-blue-50' : 'bg-slate-300'">
                             </div>
                             <time class="mb-1 text-xs font-mono text-slate-600 uppercase tracking-wide">{{
-                                dayjs(exam?.endTime).format('YYYY/MM/DD HH:mm') }}</time>
+                                dayjs(exam?.submitTime).format('YYYY/MM/DD HH:mm') }}</time>
                             <h3 class="text-sm font-semibold text-slate-700">考生结束答题时间</h3>
                         </div>
                         <div class="relative pl-8">
                             <div class="absolute -left-1.5 mt-1.5 h-3 w-3 rounded-full border border-white"
-                                :class="dayjs().isAfter(exam?.endTime) ? 'bg-blue-500 ring-4 ring-blue-50' : 'bg-slate-300'">
+                                :class="(exam?.status ?? 0) >= 4 ? 'bg-blue-500 ring-4 ring-blue-50' : 'bg-slate-300'">
                             </div>
                             <time class="mb-1 text-xs font-mono text-slate-600 uppercase tracking-wide">{{
                                 dayjs(exam?.endTime).format('YYYY/MM/DD HH:mm') }}</time>
@@ -127,11 +126,14 @@
     interface ExamInfo {
         id: number
         title: string
+        status: number
         description: string
         group: string
         questions: number
-        startTime: string,
+        startTime: string
         endTime: string
+        enterTime: string
+        submitTime: string
     }
 
     const exam = ref<ExamInfo>()
@@ -156,10 +158,18 @@
                     examId: route.params.id
                 }
             })
-            
+
             router.push(`/exam/start/${res.data.data}`);
         } catch (e) {
             console.log(e)
         }
     }
+
+    const statusTextMap = new Map<number, string>([
+        [0, '未开始'],
+        [1, '进行中'],
+        [2, '继续答题'],
+        [3, '已提交'],
+        [4, '已结束'],
+    ])
 </script>

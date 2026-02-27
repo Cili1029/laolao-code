@@ -23,6 +23,11 @@ public class ExamInfoVO implements Serializable {
     private String title;
 
     /**
+     * 状态
+     */
+    private Integer status;
+
+    /**
      * 考试说明
      */
     private String description;
@@ -46,5 +51,15 @@ public class ExamInfoVO implements Serializable {
      * 结束时间
      */
     private LocalDateTime endTime;
+
+    /**
+     * 考生进入时间
+     */
+    private LocalDateTime enterTime;
+
+    /**
+     * 学生提交时间
+     */
+    private LocalDateTime submitTime;
 }
 

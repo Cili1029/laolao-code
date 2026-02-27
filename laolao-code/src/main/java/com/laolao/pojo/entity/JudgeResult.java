@@ -1,6 +1,6 @@
 package com.laolao.pojo.entity;
 
-import com.laolao.common.docker.JudgeConstant;
+import com.laolao.common.constant.JudgeConstant;
 import lombok.*;
 
 @Getter
