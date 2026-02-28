@@ -1,6 +1,5 @@
 package com.laolao.mapper;
 
-import com.laolao.pojo.entity.ExamRecord;
 import com.laolao.pojo.vo.ExamInfoVO;
 import com.laolao.pojo.vo.ExamQuestionVO;
 import com.laolao.pojo.vo.ExamVO;
@@ -21,8 +20,6 @@ public interface ExamMapper {
             """)
     List<ExamVO> selectSimpleExam(Integer userId);
 
-    @Select("select exam_id from exam_record where id = #{recordId}")
-    Integer selectExamIdByRecordId(Integer recordId);
 
     @Select("""
             select e.id,
@@ -41,12 +38,6 @@ public interface ExamMapper {
             """)
     ExamInfoVO selectExamInfo(Integer examId);
 
-    @Select("select id, status from exam_record where user_id = #{userId} and exam_id = #{examId}")
-    ExamRecord selectExamRecord(Integer userId, Integer examId);
-
-    @Options(useGeneratedKeys = true, keyProperty = "id")
-    @Insert("insert into exam_record(exam_id, user_id) value (#{examId}, #{userId})")
-    void insertRecord(ExamRecord record);
 
     @Select("""
             select q.id,

@@ -1,8 +1,8 @@
 package com.laolao.service.impl;
 
-import com.laolao.common.context.UserContext;
 import com.laolao.common.result.Result;
 import com.laolao.common.security.MyPasswordEncoder;
+import com.laolao.common.util.SecurityUtils;
 import com.laolao.mapper.UserMapper;
 import com.laolao.pojo.entity.User;
 import com.laolao.pojo.vo.UserInfoVO;
@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result<UserInfoVO> getInfo() {
-        Integer userId = UserContext.getCurrentId();
+        Integer userId = SecurityUtils.getUserId();
         UserInfoVO user = userMapper.selectInfoById(userId);
         return Result.success(user);
     }

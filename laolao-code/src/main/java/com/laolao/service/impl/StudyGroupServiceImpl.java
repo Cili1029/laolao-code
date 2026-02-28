@@ -1,8 +1,7 @@
 package com.laolao.service.impl;
 
-import com.laolao.common.context.UserContext;
 import com.laolao.common.result.Result;
-import com.laolao.common.util.RoleTool;
+import com.laolao.common.util.SecurityUtils;
 import com.laolao.mapper.StudyGroupMapper;
 import com.laolao.pojo.dto.CreateStudyGroupDTO;
 import com.laolao.pojo.dto.JoinStudyGroupDTO;
@@ -24,8 +23,8 @@ public class StudyGroupServiceImpl implements StudyGroupService {
 
     @Override
     public Result<List<StudyGroupVO>> getSimpleGroup() {
-        Integer userId = UserContext.getCurrentId();
-        List<StudyGroupVO> studyGroupVOList = RoleTool.hasAuthority("ROLE_ADVISOR") ?
+        Integer userId = SecurityUtils.getUserId();
+        List<StudyGroupVO> studyGroupVOList = SecurityUtils.hasAuthority("ROLE_ADVISOR") ?
                 studyGroupMapper.selectAdvisorSimpleGroup(userId) :
                 studyGroupMapper.selectStudentSimpleGroup(userId);
         return Result.success(studyGroupVOList);
@@ -39,7 +38,7 @@ public class StudyGroupServiceImpl implements StudyGroupService {
         }
 
         joinStudyGroupDTO.setStudyGroupId(id);
-        joinStudyGroupDTO.setMemberId(UserContext.getCurrentId());
+        joinStudyGroupDTO.setMemberId(SecurityUtils.getUserId());
         int count = studyGroupMapper.selectCountByMemberId(joinStudyGroupDTO);
 
         if (count > 0) {
@@ -69,7 +68,7 @@ public class StudyGroupServiceImpl implements StudyGroupService {
     @Override
     public Result<String> createGroup(CreateStudyGroupDTO createStudyGroupDTO) {
         StudyGroup studyGroup = StudyGroup.builder()
-                .advisorId(UserContext.getCurrentId())
+                .advisorId(SecurityUtils.getUserId())
                 .inviteCode(UUID.randomUUID().toString().replace("-", "").substring(0, 8))
                 .name(createStudyGroupDTO.getName())
                 .description(createStudyGroupDTO.getDescription()).build();

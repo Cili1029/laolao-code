@@ -1,6 +1,5 @@
 package com.laolao.common.security;
 
-import com.laolao.common.context.UserContext;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.annotation.Resource;
@@ -56,20 +55,22 @@ public class JwtFilter extends OncePerRequestFilter {
             Integer userId = Integer.parseInt(claims.get("userId").toString());
             String username = claims.get("username").toString();
             String role = "ROLE_" + claims.get("role").toString();
-            // 存入Security和线程
+            // 创建 MyUserDetail 对象存入Security和线程
+            MyUserDetail userDetail = new MyUserDetail(
+                    userId,
+                    username,
+                    null, // JWT 场景下不需要密码
+                    Collections.singletonList(new SimpleGrantedAuthority(role))
+            );
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    username, null, Collections.singletonList(new SimpleGrantedAuthority(role))
+                    userDetail, null, Collections.singletonList(new SimpleGrantedAuthority(role))
             );
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            UserContext.setCurrentId(userId);
 
             filterChain.doFilter(request, response);
         } catch (JwtException e) {
             // jwt无效
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        } finally {
-            // 无论请求是否成功，最终都清理线程上下文，避免泄露
-            UserContext.removeCurrentId();
         }
     }
 

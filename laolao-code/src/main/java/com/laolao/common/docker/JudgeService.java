@@ -8,7 +8,7 @@ import com.github.dockerjava.api.model.Frame;
 import com.github.dockerjava.api.model.HostConfig;
 import com.github.dockerjava.api.model.StreamType;
 import com.laolao.common.constant.JudgeConstant;
-import com.laolao.pojo.entity.JudgeResult;
+import com.laolao.common.result.JudgeResult;
 import com.laolao.pojo.entity.QuestionTestCase;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;

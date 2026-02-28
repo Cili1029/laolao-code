@@ -20,7 +20,7 @@ public class StudyGroup implements Serializable {
     /**
      * 主键ID
      */
-    @TableId(value = "id", type = IdType.AUTO)
+    @TableId(type = IdType.AUTO)
     private Integer id;
 
     /**

@@ -1,6 +1,7 @@
-package com.laolao.pojo.entity;
+package com.laolao.common.result;
 
 import com.laolao.common.constant.JudgeConstant;
+import com.laolao.pojo.entity.QuestionTestCase;
 import lombok.*;
 
 @Getter

@@ -2,10 +2,11 @@ package com.laolao.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.laolao.common.constant.ExamConstant;
-import com.laolao.common.context.UserContext;
 import com.laolao.common.docker.JudgeService;
+import com.laolao.common.result.JudgeResult;
 import com.laolao.common.result.Result;
 import com.laolao.common.util.MapStruct;
+import com.laolao.common.util.SecurityUtils;
 import com.laolao.mapper.ExamMapper;
 import com.laolao.mapper.ExamRecordMapper;
 import com.laolao.mapper.JudgeRecordMapper;
@@ -37,7 +38,7 @@ public class ExamServiceImpl implements ExamService {
 
     @Override
     public Result<List<ExamVO>> getSimpleExam() {
-        Integer userId = UserContext.getCurrentId();
+        Integer userId = SecurityUtils.getUserId();
         List<ExamVO> examVOList = examMapper.selectSimpleExam(userId);
         return Result.success(examVOList);
     }
@@ -46,7 +47,7 @@ public class ExamServiceImpl implements ExamService {
     public Result<ExamInfoVO> getExamInfo(Integer examId) {
         ExamInfoVO examInfoVO = examMapper.selectExamInfo(examId);
         // 查询考生是否已经进入，顺便获取进入时间和交卷时间
-        ExamRecord examRecord = examRecordMapper.selectStatusByExamId(examId, UserContext.getCurrentId());
+        ExamRecord examRecord = examRecordMapper.selectStatusByExamId(examId, SecurityUtils.getUserId());
         if (examRecord != null) {
             examInfoVO.setEnterTime(examRecord.getEnterTime());
             examInfoVO.setSubmitTime(examRecord.getSubmitTime());
@@ -74,8 +75,8 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public Result<Integer> startExam(Integer examId) {
         // 查看记录里是否有正在考试的记录
-        Integer userId = UserContext.getCurrentId();
-        ExamRecord examRecord = examMapper.selectExamRecord(userId, examId);
+        Integer userId = SecurityUtils.getUserId();
+        ExamRecord examRecord = examRecordMapper.selectExamRecord(userId, examId);
         if (examRecord != null && examRecord.getStatus() == 0) {
             // 考试进行中，不用创建新记录，直接返回所记录的记录Id
             return Result.success(examRecord.getId());
@@ -84,16 +85,16 @@ public class ExamServiceImpl implements ExamService {
                 .examId(examId)
                 .userId(userId)
                 .build();
-        examMapper.insertRecord(record);
+        examRecordMapper.insert(record);
         return Result.success(record.getId());
     }
 
     @Override
     public Result<ExamBeginVO> getExamQuestion(Integer recordId) {
         // 获取这个记录所在的考试Id
-        Integer examId = examMapper.selectExamIdByRecordId(recordId);
+        Integer examId = examRecordMapper.selectExamIdByRecordId(recordId);
         // 获取其题目以及当前学生每道题的分数
-        List<ExamQuestionVO> examQuestionVOList = examMapper.selectQuestionById(examId, recordId, UserContext.getCurrentId());
+        List<ExamQuestionVO> examQuestionVOList = examMapper.selectQuestionById(examId, recordId, SecurityUtils.getUserId());
         ExamBeginVO examBeginVO = new ExamBeginVO();
         examBeginVO.setExamId(examId);
         examBeginVO.setQuestions(examQuestionVOList);
@@ -114,7 +115,7 @@ public class ExamServiceImpl implements ExamService {
             JudgeRecord judgeRecord = mapStruct.JudgeResultToJudgeRecord(judge);
             judgeRecord.setExamRecordId(judgeDTO.getRecordId());
             judgeRecord.setQuestionId(judgeDTO.getQuestionId());
-            judgeRecord.setUserId(UserContext.getCurrentId());
+            judgeRecord.setUserId(SecurityUtils.getUserId());
             judgeRecord.setAnswerCode(judgeDTO.getCode());
             judgeRecordMapper.insert(judgeRecord);
             // 转VO返回
