@@ -9,7 +9,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class JoinGroupDTO implements Serializable {
+public class JoinStudyGroupDTO implements Serializable {
 
     /**
      * 成员ID
@@ -24,5 +24,5 @@ public class JoinGroupDTO implements Serializable {
     /**
      * 组ID
      */
-    private Integer groupId;
+    private Integer studyGroupId;
 }

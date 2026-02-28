@@ -35,7 +35,7 @@ public class ExamInfoVO implements Serializable {
     /**
      * 所属组
      */
-    private String group;
+    private String studyGroup;
 
     /**
      * 题目数量

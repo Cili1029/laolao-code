@@ -36,7 +36,7 @@ public class Exam implements Serializable {
     /**
      * 所属组ID
      */
-    private Integer groupId;
+    private Integer studyGroupId;
 
     /**
      * 开始时间

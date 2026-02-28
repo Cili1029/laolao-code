@@ -3,13 +3,14 @@ package com.laolao.pojo.vo;
 import lombok.*;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class GroupVO implements Serializable {
+public class DetailExamStudyGroupVO implements Serializable {
 
     /**
      * 主键ID
@@ -17,18 +18,18 @@ public class GroupVO implements Serializable {
     private Integer id;
 
     /**
-     * 组名
+     * 考试标题
      */
-    private String name;
+    private String title;
 
     /**
-     * 创建老师
+     * 开始时间
      */
-    private String advisor;
+    private LocalDateTime startTime;
 
     /**
-     * 组描述
+     * 结束时间
      */
-    private String description;
+    private LocalDateTime endTime;
 }
 

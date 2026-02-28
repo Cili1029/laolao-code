@@ -11,11 +11,11 @@ import java.util.List;
 public interface ExamRecordMapper {
 
     @Select("""
-            select er.id, concat(e.title,'考试报告') as name, g.name `group`, er.enter_time time, left(er.report, 50) as description
+            select er.id, concat(e.title,'考试报告') as name, g.name as studyGroup, er.enter_time as time
             from exam_record er
                      join exam e on e.id = er.exam_id
-                     join `group` g on g.id = e.group_id
-            where er.user_id = 2
+                     join study_group g on g.id = e.study_group_id
+            where er.user_id = #{userId}
             """)
     List<ExamRecordVO> selectSimpleExamRecord(Integer userId);
 

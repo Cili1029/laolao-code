@@ -49,20 +49,21 @@
           <div class="text-base font-medium text-foreground">
             {{ activeItem?.title }}
           </div>
-          <JoinGroup />
+          <groupDialog v-if="activeItem.url === '/group'" />
         </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup class="px-0">
           <SidebarGroupContent>
-            <RouterLink :to="activeItem.url + '/' + result.id" v-for="result in results" :key="result.id" @click="setOpen(false)"
+            <RouterLink :to="activeItem.url + '/' + result.id" v-for="result in results" :key="result.id"
+              @click="setOpen(false)"
               class="hover:bg-sidebar-accent hover:text-sidebar-accent-foreground flex flex-col items-start gap-2 border-b p-4 text-sm leading-tight whitespace-nowrap last:border-b-0">
               <p class="flex w-full items-center justify-between">
                 <span class="w-50 overflow-hidden text-ellipsis whitespace-nowrap">{{ result.name }}</span>
                 <span v-show="result.time" class="text-xs">{{ dayjs(result.time).fromNow() }}</span>
               </p>
               <p v-show="result.advisor" class="font-medium">导师：{{ result.advisor }}</p>
-              <p v-show="result.group" class="font-medium">所属组：{{ result.group }}</p>
+              <p v-show="result.studyGroup" class="font-medium">所属组：{{ result.studyGroup }}</p>
               <p class="line-clamp-2 whitespace-break-spaces text-xs">
                 {{ result.description }}
               </p>
@@ -83,7 +84,7 @@
   import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar, } from '@/components/ui/sidebar'
   import axios from "@/utils/myAxios"
   import dayjs from 'dayjs'
-  import JoinGroup from '../JoinGroup.vue'
+  import groupDialog from '../GroupDialog.vue'
   import { useRoute } from 'vue-router'
   import { useExamStore } from "@/stores/ExamStore"
   const examStore = useExamStore()
@@ -127,7 +128,7 @@
     name: string
     advisor: String
     description: String
-    group: string
+    studyGroup: string
     time: string
   }
 

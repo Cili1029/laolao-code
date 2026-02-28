@@ -1,24 +1,15 @@
-package com.laolao.pojo.entity;
+package com.laolao.pojo.vo;
 
 import lombok.*;
 
 import java.io.Serializable;
 
-/**
- * 组表
- */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Builder
-public class Group implements Serializable {
-
-    /**
-     * 主键ID
-     */
-    private Integer id;
+public class DetailBaseStudyGroupVO implements Serializable {
 
     /**
      * 组名
@@ -31,12 +22,17 @@ public class Group implements Serializable {
     private String description;
 
     /**
-     * 创建老师的ID
+     * 组员数
      */
-    private Integer advisorId;
+    private Integer memberCount;
 
     /**
-     * 组邀请码
+     * 导师账号
      */
-    private String inviteCode;
+    private String username;
+
+    /**
+     * 导师名字
+     */
+    private String advisorName;
 }

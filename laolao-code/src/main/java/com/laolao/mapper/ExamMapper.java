@@ -12,10 +12,10 @@ import java.util.List;
 public interface ExamMapper {
 
     @Select("""
-            select e.id, e.title as name, e.description, g.name `group`, e.start_time time
+            select e.id, e.title as name, e.description, g.name study_group, e.start_time time
             from exam e
-                     join group_member gm on gm.group_id = e.group_id
-                     join `group` g on gm.group_id = g.id
+                     join study_group_member gm on gm.study_group_id = e.study_group_id
+                     join study_group g on gm.study_group_id = g.id
                      join user u on u.id = g.advisor_id
             where gm.member_id = #{userId};
             """)
@@ -28,15 +28,15 @@ public interface ExamMapper {
             select e.id,
                    e.title,
                    e.description,
-                   g.name              as `group`,
+                   g.name              as study_group,
                    (select count(*)
                     from exam_question_config
                     where exam_id = #{examId}) as questions,
                    e.start_time,
                    e.end_time
             from exam e
-                     join `group` g
-                          on g.id = e.group_id
+                     join study_group g
+                          on g.id = e.study_group_id
             where e.id = #{examId};
             """)
     ExamInfoVO selectExamInfo(Integer examId);
@@ -60,7 +60,7 @@ public interface ExamMapper {
                      join exam_question_config e on q.id = e.question_id
                      left join judge_record j on j.question_id = q.id and j.user_id = #{userId} and j.exam_record_id = #{recordId}
             where e.exam_id = #{examId}
-            group by q.id, question_score, q.title, q.content, q.difficulty, q.template_code;
+            Group by q.id, question_score, q.title, q.content, q.difficulty, q.template_code;
             """)
     List<ExamQuestionVO> selectQuestionById(Integer examId, Integer recordId, Integer userId);
 

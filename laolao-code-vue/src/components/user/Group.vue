@@ -123,7 +123,7 @@
         try {
             const res = await axios.get("/api/group/detail-base", {
                 params: {
-                    groupId: route.params.id
+                    studyGroupId: route.params.id
                 }
             })
             group.value = res.data.data
@@ -144,7 +144,7 @@
         try {
             const res = await axios.get("/api/group/detail-exam", {
                 params: {
-                    groupId: route.params.id
+                    studyGroupId: route.params.id
                 }
             })
             exams.value = res.data.data

@@ -4,7 +4,6 @@ import lombok.*;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -31,7 +30,7 @@ public class ExamVO implements Serializable {
     /**
      * 所属组
      */
-    private String group;
+    private String studyGroup;
 
     /**
      * 开始时间

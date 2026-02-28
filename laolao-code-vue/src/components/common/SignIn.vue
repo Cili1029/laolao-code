@@ -58,7 +58,10 @@
   import { Card, CardContent } from '@/components/ui/card'
   import { Field, FieldDescription, FieldGroup, FieldLabel } from '@/components/ui/field'
   import { Input } from '@/components/ui/input'
-   import axios from "@/utils/myAxios"
+  import axios from "@/utils/myAxios"
+  import router from "@/router"
+  import { useUserStore } from "@/stores/UserStore"
+  const userStore = useUserStore()
 
   const props = defineProps<{
     class?: HTMLAttributes["class"]
@@ -69,12 +72,16 @@
 
   const signIn = async () => {
     try {
-      await axios.postForm("/api/user/sign-in", {
+      const res = await axios.postForm("/api/user/sign-in", {
         username: username.value,
         password: password.value
       }, {
         withCredentials: true
       })
+      if (res.data.code === 1) {
+        userStore.getInfo()
+        router.push("/")
+      }
     } catch (e) {
       console.log(e);
     }

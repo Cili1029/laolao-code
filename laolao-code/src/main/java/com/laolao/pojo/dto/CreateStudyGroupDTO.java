@@ -1,4 +1,4 @@
-package com.laolao.pojo.vo;
+package com.laolao.pojo.dto;
 
 import lombok.*;
 
@@ -9,7 +9,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class DetailBaseGroupVO implements Serializable {
+public class CreateStudyGroupDTO implements Serializable {
 
     /**
      * 组名
@@ -22,17 +22,12 @@ public class DetailBaseGroupVO implements Serializable {
     private String description;
 
     /**
-     * 组员数
+     * 创建导师的ID
      */
-    private Integer memberCount;
+    private Integer advisorId;
 
     /**
-     * 导师账号
+     * 组邀请码
      */
-    private String username;
-
-    /**
-     * 导师名字
-     */
-    private String advisorName;
+    private String inviteCode;
 }

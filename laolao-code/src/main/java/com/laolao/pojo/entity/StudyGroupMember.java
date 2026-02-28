@@ -13,7 +13,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @ToString
 @Builder
-public class GroupMember implements Serializable {
+public class StudyGroupMember implements Serializable {
 
     /**
      * 主键ID
@@ -23,7 +23,7 @@ public class GroupMember implements Serializable {
     /**
      * 组ID
      */
-    private Integer groupId;
+    private Integer studyGroupId;
 
     /**
      * 成员ID
