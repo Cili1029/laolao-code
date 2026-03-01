@@ -11,6 +11,7 @@ import com.laolao.mapper.ExamMapper;
 import com.laolao.mapper.ExamRecordMapper;
 import com.laolao.mapper.JudgeRecordMapper;
 import com.laolao.mapper.QuestionTestCaseMapper;
+import com.laolao.pojo.dto.CreateExamDTO;
 import com.laolao.pojo.dto.JudgeDTO;
 import com.laolao.pojo.entity.*;
 import com.laolao.pojo.vo.*;
@@ -125,5 +126,22 @@ public class ExamServiceImpl implements ExamService {
             e.printStackTrace();
             return Result.error("判题失败！练习管理员！");
         }
+    }
+
+    @Override
+    public Result<Integer> createExam(CreateExamDTO createExamDTO) {
+        if (createExamDTO.getStartTime().isAfter(createExamDTO.getEndTime())) {
+            return Result.error("开始时间应该在考试时间之前！");
+        }
+        Exam exam = Exam.builder()
+                .title(createExamDTO.getTitle())
+                .description(createExamDTO.getDescription())
+                .advisorId(SecurityUtils.getUserId())
+                .studyGroupId(createExamDTO.getStudyGroupId())
+                .startTime(createExamDTO.getStartTime())
+                .endTime(createExamDTO.getEndTime())
+                .build();
+        examMapper.insert(exam);
+        return Result.success("创建成功", exam.getId());
     }
 }

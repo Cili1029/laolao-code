@@ -42,7 +42,7 @@ public interface StudyGroupMapper extends BaseMapper<StudyGroup> {
     void insertGroupMember(JoinStudyGroupDTO joinStudyGroupDTO);
 
     @Select("""
-            select g.name, g.description, u.username, u.name as advisorName
+            select g.name, g.description, g.invite_code, u.username, u.name as advisorName
             from study_group g
                      join user u on u.id = g.advisor_id
             where g.id = #{studyGroupId}

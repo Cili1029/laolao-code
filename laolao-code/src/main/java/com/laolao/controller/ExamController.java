@@ -2,12 +2,14 @@ package com.laolao.controller;
 
 import com.laolao.common.result.Result;
 import com.laolao.pojo.dto.JudgeDTO;
+import com.laolao.pojo.dto.CreateExamDTO;
 import com.laolao.pojo.vo.ExamBeginVO;
 import com.laolao.pojo.vo.ExamInfoVO;
 import com.laolao.pojo.vo.ExamVO;
 import com.laolao.pojo.vo.JudgeRecordVO;
 import com.laolao.service.ExamService;
 import jakarta.annotation.Resource;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -70,5 +72,17 @@ public class ExamController {
     @PostMapping("/judge")
     public Result<JudgeRecordVO> judge(@RequestBody JudgeDTO judgeDTO) {
         return examService.judge(judgeDTO);
+    }
+
+    /**
+     * 导师创建考试
+     *
+     * @param createExamDTO 考试参数
+     * @return 考试Id
+     */
+    @PostMapping("/create")
+    @PreAuthorize("hasRole('ADVISOR')")
+    public Result<Integer> createExam(@RequestBody CreateExamDTO createExamDTO) {
+        return examService.createExam(createExamDTO);
     }
 }

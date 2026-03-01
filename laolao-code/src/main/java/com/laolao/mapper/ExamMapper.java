@@ -1,5 +1,7 @@
 package com.laolao.mapper;
 
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.laolao.pojo.entity.Exam;
 import com.laolao.pojo.vo.ExamInfoVO;
 import com.laolao.pojo.vo.ExamQuestionVO;
 import com.laolao.pojo.vo.ExamVO;
@@ -8,7 +10,7 @@ import org.apache.ibatis.annotations.*;
 import java.util.List;
 
 @Mapper
-public interface ExamMapper {
+public interface ExamMapper extends BaseMapper<Exam> {
 
     @Select("""
             select e.id, e.title as name, e.description, g.name study_group, e.start_time time

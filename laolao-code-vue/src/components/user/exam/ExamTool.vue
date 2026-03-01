@@ -166,12 +166,6 @@
                         <pre
                             class="w-full p-5 bg-red-50 text-red-400 rounded-lg font-mono text-sm leading-relaxed overflow-x-auto max-h-75">{{ examStore.judgeRecord.stderr }}</pre>
                     </div>
-
-                    <!-- 加载中占位 -->
-                    <div v-if="examStore.judgeLoading" class="flex flex-col items-center py-12 space-y-4">
-                        <Spinner class="w-12 h-12 text-blue-500" />
-                        <p class="text-xl font-medium text-gray-500 italic">正在评测代码，请稍后...</p>
-                    </div>
                 </div>
 
                 <!-- 底部按钮 -->
@@ -189,7 +183,6 @@
 
 <script setup lang="ts">
     import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-    import { Spinner } from '@/components/ui/spinner'
     import { Button } from '@/components/ui/button'
     import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
     import MonacoEditor from '@/components/common/MonacoEditor.vue'

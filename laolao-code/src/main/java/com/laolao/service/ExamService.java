@@ -1,6 +1,7 @@
 package com.laolao.service;
 
 import com.laolao.common.result.Result;
+import com.laolao.pojo.dto.CreateExamDTO;
 import com.laolao.pojo.dto.JudgeDTO;
 import com.laolao.pojo.vo.ExamBeginVO;
 import com.laolao.pojo.vo.ExamInfoVO;
@@ -19,4 +20,6 @@ public interface ExamService {
     Result<ExamBeginVO> getExamQuestion(Integer recordId);
 
     Result<JudgeRecordVO> judge(JudgeDTO judgeDTO);
+
+    Result<Integer> createExam(CreateExamDTO createExamDTO);
 }

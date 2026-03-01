@@ -22,6 +22,11 @@ public class DetailBaseStudyGroupVO implements Serializable {
     private String description;
 
     /**
+     * 组邀请码
+     */
+    private String inviteCode;
+
+    /**
      * 组员数
      */
     private Integer memberCount;

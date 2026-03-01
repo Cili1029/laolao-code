@@ -4,6 +4,7 @@
             <div>
                 <p class="text-xl font-bold">{{ group?.name }}</p>
                 <p class="text-gray-500">{{ group?.description }}</p>
+                <p class="text-sm text-gray-500">邀请码：{{ group?.inviteCode }}</p>
             </div>
             <div class="grid grid-cols-3 gap-x-4 justify-end items-baseline">
                 <HoverCard>
@@ -49,7 +50,11 @@
             </div>
         </div>
         <div class="space-y-2">
-            <p class="text-lg pb-2">考试列表</p>
+            <div class="flex justify-between pb-2">
+                <p class="text-lg">考试列表</p>
+                <CreateExamDialog v-if="userStore.user.role === 1 && group?.advisorName === userStore.user.name" />
+            </div>
+
             <RouterLink :to="'/exam/' + exam.id" v-for="exam in exams" :key="exam.id"
                 class="flex justify-between border shadow rounded-lg p-3.5 cursor-pointer hover:bg-gray-100">
                 <div class="flex items-center space-x-2">
@@ -92,6 +97,9 @@
     import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
     import { Badge } from '@/components/ui/badge'
     import dayjs from 'dayjs'
+    import { useUserStore } from '@/stores/UserStore'
+    import CreateExamDialog from './CreateExamDialog.vue';
+    const userStore = useUserStore()
 
     const route = useRoute()
 
@@ -112,6 +120,7 @@
         avatar: string
         name: string
         description: string
+        inviteCode: string
         memberCount: number
         username: string
         advisorName: string
