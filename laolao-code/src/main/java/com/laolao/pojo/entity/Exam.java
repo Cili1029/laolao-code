@@ -37,6 +37,16 @@ public class Exam implements Serializable {
     private String description;
 
     /**
+     * 导师ID
+     */
+    private Integer advisorId;
+
+    /**
+     * 状态（0-草稿，1-已发布）
+     */
+    private Integer status;
+
+    /**
      * 所属组ID
      */
     private Integer studyGroupId;
@@ -50,10 +60,5 @@ public class Exam implements Serializable {
      * 结束时间
      */
     private LocalDateTime endTime;
-
-    /**
-     * 导师ID
-     */
-    private Integer advisorId;
 }
 

@@ -1,12 +1,12 @@
 package com.laolao.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.laolao.common.constant.ExamConstant;
 import com.laolao.common.docker.JudgeService;
 import com.laolao.common.result.JudgeResult;
 import com.laolao.common.result.Result;
 import com.laolao.common.util.MapStruct;
 import com.laolao.common.util.SecurityUtils;
+import com.laolao.common.util.StudentExamStatusCalculator;
 import com.laolao.mapper.ExamMapper;
 import com.laolao.mapper.ExamRecordMapper;
 import com.laolao.mapper.JudgeRecordMapper;
@@ -19,7 +19,6 @@ import com.laolao.service.ExamService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -47,29 +46,20 @@ public class ExamServiceImpl implements ExamService {
     @Override
     public Result<ExamInfoVO> getExamInfo(Integer examId) {
         ExamInfoVO examInfoVO = examMapper.selectExamInfo(examId);
+        // 如果是导师
+        if (SecurityUtils.hasAuthority("ADVISOR")) {
+            // 不用填写时间和学生状态，直接返回
+            return Result.success(examInfoVO);
+        }
         // 查询考生是否已经进入，顺便获取进入时间和交卷时间
         ExamRecord examRecord = examRecordMapper.selectStatusByExamId(examId, SecurityUtils.getUserId());
         if (examRecord != null) {
             examInfoVO.setEnterTime(examRecord.getEnterTime());
             examInfoVO.setSubmitTime(examRecord.getSubmitTime());
         }
-        LocalDateTime now = LocalDateTime.now();
-        if (now.isAfter(examInfoVO.getEndTime()) || now.isEqual(examInfoVO.getEndTime())) {
-            // 当前时间 >= 考试结束时间 → 已结束
-            examInfoVO.setStatus(ExamConstant.ENDED);
-        } else if (examInfoVO.getSubmitTime() != null && (now.isAfter(examInfoVO.getSubmitTime()) || now.isEqual(examInfoVO.getSubmitTime()))) {
-            // 当前时间 >= 学生交卷时间 且 < 考试结束时间 → 已提交
-            examInfoVO.setStatus(ExamConstant.SUBMITTED);
-        } else if (examInfoVO.getEnterTime() != null && (now.isAfter(examInfoVO.getEnterTime()) || now.isEqual(examInfoVO.getEnterTime()))) {
-            // 当前时间 >= 学生进入时间 且 < 学生交卷时间 → 已进入
-            examInfoVO.setStatus(ExamConstant.ENTERED);
-        } else if (now.isAfter(examInfoVO.getStartTime()) || now.isEqual(examInfoVO.getStartTime())) {
-            // 当前时间 >= 考试开始时间 且 < 学生进入时间 → 已开始
-            examInfoVO.setStatus(ExamConstant.STARTED);
-        } else {
-            // 当前时间 < 考试开始时间 → 未开始
-            examInfoVO.setStatus(ExamConstant.NOT_STARTED);
-        }
+        // 设置当前状态
+        examInfoVO.setStudentStatus(StudentExamStatusCalculator.calculate(examInfoVO.getStartTime(), examInfoVO.getEndTime(),
+                examInfoVO.getEnterTime(), examInfoVO.getSubmitTime()));
         return Result.success(examInfoVO);
     }
 

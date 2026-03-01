@@ -1,9 +1,7 @@
 package com.laolao.common.constant;
 
 public class ExamConstant {
-    public static final int NOT_STARTED = 0;   // 未开始（考试尚未启动，学生无法进入）
-    public static final int STARTED = 1;       // 已开始（考试已启动，学生可进入答题）
-    public static final int ENTERED = 2;       // 已进入（学生进入答题页面，正在作答）
-    public static final int SUBMITTED = 3;     // 已提交（学生正常交卷，不可再作答）
-    public static final int ENDED = 4;         // 已结束（考试时间截止，系统自动结束）
+    public static final int DRAFT = 0;         // 草稿状态（考试创建后未发布，仅创建者可编辑/查看）
+    public static final int PUBLISHED = 1;     // 已发布状态：（考试对外可见，可参与）
+    public static final int CANCELED = 2;      // 已取消状态：（发布后因特殊原因取消，不可参与）
 }

@@ -66,12 +66,20 @@
                 </div>
                 <div>
                     <div class="flex justify-end mb-1">
-                        <Badge variant="secondary"
+                        <Badge v-if="userStore.user.role === 2" variant="secondary"
                             :class="['mb-2',
                                 dayjs().isBetween(exam.startTime, exam.endTime, null, '[]') ?
                                     'text-white bg-blue-500 dark:bg-blue-600' : 'bg-gray-200 dark:bg-gray-800 dark:text-white']">
                             {{ dayjs().isBetween(exam.startTime, exam.endTime, null, '[]') ? '进行中' :
                                 dayjs().isAfter(exam.startTime) ? "已结束" : "未开始" }}
+                        </Badge>
+                        <Badge v-else-if="userStore.user.role === 1" variant="secondary" :class="['mb-2',
+                            exam?.status === 0 ?
+                                'text-white bg-orange-500 dark:bg-orange-600' :
+                                exam?.status === 1 ? 'text-white bg-blue-500 dark:bg-blue-600' : 'bg-gray-200 dark:bg-gray-800 dark:text-white'
+                        ]">
+                            {{ exam?.status === 0 ? '草稿' :
+                                exam?.status === 1 ? "已发布" : "已结束" }}
                         </Badge>
                     </div>
 
@@ -143,6 +151,7 @@
 
     interface GroupExam {
         id: number,
+        status: number,
         title: string,
         startTime: string,
         endTime: string

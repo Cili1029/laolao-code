@@ -4,16 +4,15 @@
             <ResizablePanel :default-size="40">
                 <div class="h-full flex border-t">
                     <div class="w-16 flex flex-col items-center py-4 gap-4 border-r bg-gray-50 overflow-y-auto">
-                        <div v-for="(q, index) in questions" :key="index"
-                            @click="currentQuestion = q, currentSelect = 0" :class="[
-                                'w-10 h-10 flex items-center justify-center rounded-lg cursor-pointer text-lg border-dashed border-3 font-semibold transition',
-                                'text-gray-400 border-gray-300 hover:border-gray-400 hover:text-gray-600',
-                                currentQuestion === q
-                                    ? 'border-zinc-800 text-zinc-900' : ''
-                            ]">
+                        <div v-for="(q, index) in questions" :key="index" @click="currentQuestion = q" :class="[
+                            'w-10 h-10 flex items-center justify-center rounded-lg cursor-pointer text-lg border-dashed border-3 font-semibold transition',
+                            'text-gray-400 border-gray-300 hover:border-gray-400 hover:text-gray-600',
+                            currentQuestion === q
+                                ? 'border-zinc-800 text-zinc-900' : ''
+                        ]">
                             {{ index + 1 }}
                         </div>
-                        <div @click="" :class="[
+                        <div @click="addQuestion()" :class="[
                             'w-10 h-10 flex items-center justify-center rounded-lg cursor-pointer text-lg border-dashed border-3 font-semibold transition',
                             'text-gray-400 border-gray-300 hover:border-gray-400 hover:text-gray-600'
                         ]">
@@ -21,31 +20,56 @@
                         </div>
                     </div>
 
-                    <div class="h-full w-full flex flex-col bg-white border overflow-y-auto">
-                        <div class="flex justify-between">
-                            <p>
-                                分值：
-                                <span>{{ currentQuestion?.questionScore }}</span>
-                            </p>
-                            <Badge variant="secondary" :class="['mb-2',
-                                currentQuestion?.difficulty === 0 ? 'bg-green-50 border-green-300 text-green-700' :
-                                    currentQuestion?.difficulty === 1 ? 'bg-amber-50 border-amber-300 text-amber-700' :
-                                        'bg-rose-50 border-rose-300 text-rose-700']">
-                                {{ currentQuestion?.difficulty === 0 ? '简单' :
-                                    currentQuestion?.difficulty === 1 ? '中等' : '困难' }}
-                            </Badge>
+                    <div class="h-full w-full flex flex-col bg-white border overflow-y-auto p-2 space-y-2">
+                        <div class="flex space-x-2 justify-between">
+                            <div class="grid w-1/2 max-w-sm items-center gap-1.5">
+                                <Label>分值</Label>
+                                <Input type="number" v-model="currentQuestion!.questionScore" />
+                            </div>
+
+                            <div class="grid w-1/2 max-w-sm items-center gap-1.5">
+                                <Label>难度</Label>
+                                <Select v-model="difficultyProxy">
+                                    <SelectTrigger class="">
+                                        <SelectValue placeholder="请选择难度" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <!-- value 对应后端需要的 0, 1, 2 -->
+                                        <SelectItem value="0">
+                                            简单
+                                        </SelectItem>
+                                        <SelectItem value="1">
+                                            中等
+                                        </SelectItem>
+                                        <SelectItem value="2">
+                                            困难
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
 
-                        <!-- 替换原来的单行 textarea -->
-                        <div class="flex-1 flex flex-col  border rounded-md overflow-hidden">
-                            <!-- 编辑区：输入 Markdown 原文本 -->
-                            <textarea v-model="currentQuestionContent"
-                                class="w-full h-1/2 p-4 font-mono text-sm resize-none border-b focus:outline-none"
-                                placeholder="请输入 Markdown 内容..." />
-                            <!-- 预览区：实时显示渲染后的格式 -->
-                            <div class="w-full h-1/2 p-4 overflow-auto bg-gray-50">
-                                <article v-html="renderedContent" />
+                        <div class="flex space-x-2 justify-between">
+                            <div class="grid w-1/2 max-w-sm items-center gap-1.5">
+                                <Label>时间限制（ms）</Label>
+                                <Input type="number" v-model="currentQuestion!.timeLimit" />
                             </div>
+
+                            <div class="grid w-1/2 max-w-sm items-center gap-1.5">
+                                <Label>内存限制（mb）</Label>
+                                <Input type="number" v-model="currentQuestion!.memoryLimit" />
+                            </div>
+                        </div>
+
+                        <div class="grid w-full max-w-sm items-center gap-1.5">
+                            <Label>标题与描述</Label>
+                            <Input type="text" v-model="currentQuestion!.title" class="w-full" />
+                        </div>
+
+                        <div class="flex-1 flex flex-col border rounded-md overflow-hidden">
+                            <textarea v-model="currentQuestionContent"
+                                class="flex-1 p-2 font-mono text-sm resize-none border-b focus:outline-none"
+                                placeholder="请输入 Markdown 内容..." />
                         </div>
                     </div>
                 </div>
@@ -54,8 +78,18 @@
             <ResizableHandle />
 
             <ResizablePanel :default-size="60">
-                <MonacoEditor v-if="currentQuestion" v-model="currentQuestion.templateCode" language="java"
-                    theme="vs" />
+                <ResizablePanelGroup direction="vertical">
+                    <ResizablePanel :default-size="75">
+                        <MonacoEditor v-if="currentQuestion" v-model="currentQuestion.templateCode" language="java"
+                            theme="vs" />
+                    </ResizablePanel>
+                    <ResizableHandle />
+                    <ResizablePanel :default-size="25">
+                        <div class="flex h-full items-center justify-center p-6">
+                            <span class="font-semibold">Three</span>
+                        </div>
+                    </ResizablePanel>
+                </ResizablePanelGroup>
             </ResizablePanel>
         </ResizablePanelGroup>
     </div>
@@ -69,17 +103,12 @@
     import { onMounted, ref, computed } from 'vue'
     import axios from "@/utils/myAxios"
     import { useRoute } from 'vue-router'
-    import MarkdownIt from 'markdown-it'
-    import { Badge } from '@/components/ui/badge'
-    import { Plus } from 'lucide-vue-next'
-
-
     const route = useRoute()
-    const md = new MarkdownIt({
-        html: true,    // 允许 HTML 标签
-        breaks: true,  // 转化换行符
-        linkify: true  // 自动识别链接
-    })
+    import MarkdownIt from 'markdown-it'
+    import { Plus } from 'lucide-vue-next'
+    import { Input } from '@/components/ui/input'
+    import { Label } from '@/components/ui/label'
+    import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from '@/components/ui/select'
 
     onMounted(async () => {
         // await getQuestions()
@@ -95,7 +124,6 @@
         memoryLimit: number
         templateCode: string
         standardSolution: string
-        explanation: string
     }
 
     const questions = ref<Question[]>([
@@ -110,11 +138,10 @@
             memoryLimit: 128,
             templateCode: 'public class Main {\n    public static void main(String[] args) {\n        // 请编写你的代码\n    }\n}',
             standardSolution: 'public class Main { ... }',
-            explanation: '本题可以使用哈希表将时间复杂度优化到 O(n)'
         }
     ])
 
-    const currentQuestion = questions.value[0]
+    const currentQuestion = ref(questions.value[0])
 
     // const getQuestions = async () => {
     //     try {
@@ -132,23 +159,45 @@
     //     }
     // }
 
+    const addQuestion = () => {
+        const newQuestion = {
+            title: '',
+            content: '',
+            questionScore: 0,
+            tags: [],
+            difficulty: 0,
+            timeLimit: 0,
+            memoryLimit: 0,
+            templateCode: '',
+            standardSolution: '',
+        } as Question
+        questions.value.push(newQuestion)
+        currentQuestion.value = newQuestion
+    }
+
+    const difficultyProxy = computed({
+        get() {
+            // 将数字转为字符串给组件显示 ( 0 -> "0" )
+            // 注意：如果是 null 或 undefined 要处理一下
+            return currentQuestion.value!.difficulty !== undefined ? String(currentQuestion.value!.difficulty) : undefined
+        },
+        set(val) {
+            // 当用户选择后，将字符串转回数字存入对象 ( "0" -> 0 )
+            currentQuestion.value!.difficulty = Number(val)
+        }
+    })
+
     const currentQuestionContent = computed({
         get() {
-            return currentQuestion?.content || ''
+            return currentQuestion.value!.content || ''
         },
         set(val) {
             if (currentQuestion) {
-                currentQuestion.content = val
+                currentQuestion.value!.content = val
             }
         }
     })
 
-
-    const renderedContent = computed(() => {
-        return md.render(currentQuestionContent.value)
-    })
-
-    const currentSelect = ref(0)
 
     interface SimpleJudgeRecord {
         id: number

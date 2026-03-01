@@ -23,7 +23,12 @@ public class ExamInfoVO implements Serializable {
     private String title;
 
     /**
-     * 状态
+     * 考试状态（给老师看）
+     */
+    private Integer studentStatus;
+
+    /**
+     * 学生状态
      */
     private Integer status;
 

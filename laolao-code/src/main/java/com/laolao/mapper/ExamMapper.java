@@ -15,16 +15,22 @@ public interface ExamMapper extends BaseMapper<Exam> {
     @Select("""
             select e.id, e.title as name, e.description, g.name study_group, e.start_time time
             from exam e
-                     join study_group_member gm on gm.study_group_id = e.study_group_id
-                     join study_group g on gm.study_group_id = g.id
-                     join user u on u.id = g.advisor_id
-            where gm.member_id = #{userId};
+                     join study_group g on g.id = e.study_group_id
+            where
+               -- 条件1：成员且状态为已发布
+                exists (select 1
+                        from study_group_member gm
+                        where gm.study_group_id = e.study_group_id
+                          and gm.member_id = #{userId}) and e.status = 1
+               -- 条件2：导师，全部其创建的考试
+               or e.advisor_id = #{userId};
             """)
     List<ExamVO> selectSimpleExam(Integer userId);
 
 
     @Select("""
             select e.id,
+                   e.status,
                    e.title,
                    e.description,
                    g.name              as study_group,

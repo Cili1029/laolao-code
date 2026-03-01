@@ -24,7 +24,7 @@ public class StudyGroupServiceImpl implements StudyGroupService {
     @Override
     public Result<List<StudyGroupVO>> getSimpleGroup() {
         Integer userId = SecurityUtils.getUserId();
-        List<StudyGroupVO> studyGroupVOList = SecurityUtils.hasAuthority("ROLE_ADVISOR") ?
+        List<StudyGroupVO> studyGroupVOList = SecurityUtils.hasAuthority("ADVISOR") ?
                 studyGroupMapper.selectAdvisorSimpleGroup(userId) :
                 studyGroupMapper.selectStudentSimpleGroup(userId);
         return Result.success(studyGroupVOList);
@@ -61,7 +61,7 @@ public class StudyGroupServiceImpl implements StudyGroupService {
     @Override
     public Result<List<DetailExamStudyGroupVO>> getDetailGroupExam(Integer studyGroupId) {
         // 班级考试数据
-        List<DetailExamStudyGroupVO> detailExamStudyGroupVOList = studyGroupMapper.selectDetailExam(studyGroupId);
+        List<DetailExamStudyGroupVO> detailExamStudyGroupVOList = studyGroupMapper.selectDetailExam(studyGroupId, SecurityUtils.getUserId());
         return Result.success(detailExamStudyGroupVOList);
     }
 

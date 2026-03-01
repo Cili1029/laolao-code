@@ -52,8 +52,12 @@ public interface StudyGroupMapper extends BaseMapper<StudyGroup> {
     @Select("select count(id) from study_group_member where study_group_id = #{studyGroupId}")
     Integer selectMemberCount(Integer studyGroupId);
 
-    @Select("select id, title, start_time, end_time from exam where study_group_id = #{studyGroupId} order by start_time desc")
-    List<DetailExamStudyGroupVO> selectDetailExam(Integer studyGroupId);
-
-
+    @Select("""
+            select distinct id, title, start_time, end_time, status
+            from exam
+            where study_group_id = #{studyGroupId}
+              and (status = 1 or advisor_id = #{userId})
+            order by start_time desc;
+            """)
+    List<DetailExamStudyGroupVO> selectDetailExam(Integer studyGroupId, Integer userId);
 }

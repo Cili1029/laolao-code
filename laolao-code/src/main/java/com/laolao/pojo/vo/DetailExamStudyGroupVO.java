@@ -23,6 +23,11 @@ public class DetailExamStudyGroupVO implements Serializable {
     private String title;
 
     /**
+     * 考试状态
+     */
+    private Integer status;
+
+    /**
      * 开始时间
      */
     private LocalDateTime startTime;

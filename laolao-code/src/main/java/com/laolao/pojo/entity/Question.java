@@ -69,11 +69,6 @@ public class Question implements Serializable {
     private String standardSolution;
 
     /**
-     * 题目解析 (由老师编写或 AI 生成)
-     */
-    private String explanation;
-
-    /**
      * 创建者ID（导师ID）
      */
     private Integer advisorId;

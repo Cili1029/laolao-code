@@ -10,12 +10,13 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class SecurityUtils {
     // 判断是否是某个权限
     public static boolean hasAuthority(String authority) {
+        final String targetAuthority = "ROLE_" + authority;
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated()) {
             return false;
         }
         return authentication.getAuthorities().stream()
-                .anyMatch(auth -> authority.equals(auth.getAuthority()));
+                .anyMatch(auth -> targetAuthority.equals(auth.getAuthority()));
     }
 
     // 获取用户Id
