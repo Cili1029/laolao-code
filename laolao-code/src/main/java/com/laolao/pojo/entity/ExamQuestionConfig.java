@@ -39,9 +39,4 @@ public class ExamQuestionConfig implements Serializable {
      * 该题在该场考试中的分值
      */
     private Integer score;
-
-    /**
-     * 题目在试卷中的显示顺序
-     */
-    private Integer sortOrder;
 }

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.laolao.mapper.QuestionTestCaseMapper">
+    <insert id="insertBatch">
+        INSERT INTO question_test_case (question_id, input, output)
+        VALUES
+        <foreach collection="testCases" item="item" separator=",">
+            (#{item.questionId}, #{item.input}, #{item.output})
+        </foreach>
+    </insert>
+</mapper>

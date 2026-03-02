@@ -1,8 +1,7 @@
 package com.laolao.controller;
 
 import com.laolao.common.result.Result;
-import com.laolao.pojo.dto.JudgeDTO;
-import com.laolao.pojo.dto.CreateExamDTO;
+import com.laolao.pojo.dto.*;
 import com.laolao.pojo.vo.ExamBeginVO;
 import com.laolao.pojo.vo.ExamInfoVO;
 import com.laolao.pojo.vo.ExamVO;
@@ -84,5 +83,29 @@ public class ExamController {
     @PreAuthorize("hasRole('ADVISOR')")
     public Result<Integer> createExam(@RequestBody CreateExamDTO createExamDTO) {
         return examService.createExam(createExamDTO);
+    }
+
+    /**
+     * 导师运行测试用例
+     *
+     * @param judgeTestCaseDTO 测试参数
+     * @return 判题结果
+     */
+    @PostMapping("/create/judge")
+    @PreAuthorize("hasRole('ADVISOR')")
+    public Result<JudgeRecordVO> judgeTestCase(@RequestBody JudgeTestCaseDTO judgeTestCaseDTO) {
+        return examService.judgeTestCase(judgeTestCaseDTO);
+    }
+
+    /**
+     * 添加题目到考试
+     *
+     * @param saveAndAddToExamDTO 添加的题目
+     * @return 题目Id
+     */
+    @PostMapping("/create/add")
+    @PreAuthorize("hasRole('ADVISOR')")
+    public Result<Integer> saveAndAddToExam(@RequestBody SaveAndAddToExamDTO saveAndAddToExamDTO) {
+        return examService.saveAndAddToExam(saveAndAddToExamDTO);
     }
 }

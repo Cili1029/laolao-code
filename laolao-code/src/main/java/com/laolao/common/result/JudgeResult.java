@@ -36,6 +36,11 @@ public class JudgeResult {
     private String stderr;
 
     /**
+     * 通过的案例数
+     */
+    private Integer passTestCaseCount;
+
+    /**
      * 提示
      */
     private String msg;
@@ -61,9 +66,8 @@ public class JudgeResult {
     private Integer memory;
 
     // 最终的评判结果，用于返回前端
-    public static JudgeResult success(Integer time, Integer memory, Integer score) {
+    public static JudgeResult success(Integer time, Integer memory) {
         JudgeResult result = new JudgeResult();
-        result.score = score;
         result.msg = "全部通过";
         result.status = JudgeConstant.STATUS_AC;
         result.time = time;
@@ -92,13 +96,13 @@ public class JudgeResult {
     }
 
     // 示例错误返回结果，可以按示例给分
-    public static JudgeResult testCaseError(String stdout, QuestionTestCase questionTestCase, int passTestCaseCount, int totalTestCaseCount, Integer obtainedScore) {
+    public static JudgeResult testCaseError(String stdout, QuestionTestCase questionTestCase, int passTestCaseCount, int totalTestCaseCount) {
         JudgeResult result = new JudgeResult();
         result.status = JudgeConstant.STATUS_WA;
-        result.score = obtainedScore;
         result.stdout = stdout;
         result.questionTestCase = questionTestCase;
         result.questionTestCaseId =  questionTestCase.getId();
+        result.passTestCaseCount = passTestCaseCount;
         result.msg = passTestCaseCount + " / " + totalTestCaseCount +" 个通过的测试用例";
         return result;
     }

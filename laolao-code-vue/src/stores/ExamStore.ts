@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import axios from "@/utils/myAxios"
 
-interface Questions {
+export interface Questions {
     id: number
     questionScore: number
     userScore: number
@@ -11,14 +11,14 @@ interface Questions {
     templateCode: string
 }
 
-interface QuestionTestCase {
+export interface QuestionTestCase {
     id: number
     questionId: number
     input: string
     output: string
 }
 
-interface JudgeRecord {
+export interface JudgeRecord {
     status: number
     score: number
     stdout: string
@@ -49,13 +49,18 @@ export const useExamStore = defineStore('sidebar', {
         currentQuestion: null as Questions | null,
         judgeRecord: null as JudgeRecord | null,
         judgeLoading: false, // 判题加载状态
-        judgeDialog: false
+        judgeDialog: false,
+
+        // 老师的判题结果
+        advisorJudgeRecord: null as JudgeRecord | null,
     }),
 
     getters: {
         statusText(): string {
-            if (!this.judgeRecord) return '未判题'
-            return statusTextMap.get(this.judgeRecord.status) || '未知状态'
+            const targetRecord = this.judgeRecord ?? this.advisorJudgeRecord;
+
+            if (!targetRecord) return '未判题';
+            return statusTextMap.get(targetRecord.status) || '未知状态';
         }
     },
 

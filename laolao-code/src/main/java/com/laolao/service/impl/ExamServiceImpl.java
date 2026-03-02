@@ -1,6 +1,7 @@
 package com.laolao.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.laolao.common.constant.JudgeConstant;
 import com.laolao.common.docker.JudgeService;
 import com.laolao.common.result.JudgeResult;
 import com.laolao.common.result.Result;
@@ -11,13 +12,14 @@ import com.laolao.mapper.ExamMapper;
 import com.laolao.mapper.ExamRecordMapper;
 import com.laolao.mapper.JudgeRecordMapper;
 import com.laolao.mapper.QuestionTestCaseMapper;
-import com.laolao.pojo.dto.CreateExamDTO;
-import com.laolao.pojo.dto.JudgeDTO;
+import com.laolao.pojo.dto.*;
 import com.laolao.pojo.entity.*;
 import com.laolao.pojo.vo.*;
 import com.laolao.service.ExamService;
+import com.laolao.service.QuestionService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -35,6 +37,8 @@ public class ExamServiceImpl implements ExamService {
     private QuestionTestCaseMapper questionTestCaseMapper;
     @Resource
     private ExamRecordMapper examRecordMapper;
+    @Resource
+    private QuestionService questionService;
 
     @Override
     public Result<List<ExamVO>> getSimpleExam() {
@@ -101,7 +105,15 @@ public class ExamServiceImpl implements ExamService {
                             .eq(QuestionTestCase::getQuestionId, judgeDTO.getQuestionId()));
             // 获取这一题定的分值
             Integer score = examMapper.selectScoreByQuestionId(judgeDTO.getExamId(), judgeDTO.getQuestionId());
-            JudgeResult judge = judgeService.judge(judgeDTO.getCode(), questionTestCases, score);
+            JudgeResult judge = judgeService.judge(judgeDTO.getCode(), questionTestCases);
+            // 填写分数
+            if (judge.getStatus() == JudgeConstant.STATUS_AC) {
+                judge.setScore(score);
+            } else if (judge.getStatus() == JudgeConstant.STATUS_WA) {
+                judge.setScore((score * judge.getPassTestCaseCount() / questionTestCases.size()));
+            } else {
+                judge.setScore(0);
+            }
             // 转换写入记录提交表
             JudgeRecord judgeRecord = mapStruct.JudgeResultToJudgeRecord(judge);
             judgeRecord.setExamRecordId(judgeDTO.getRecordId());
@@ -133,5 +145,32 @@ public class ExamServiceImpl implements ExamService {
                 .build();
         examMapper.insert(exam);
         return Result.success("创建成功", exam.getId());
+    }
+
+    @Override
+    public Result<JudgeRecordVO> judgeTestCase(JudgeTestCaseDTO judgeTestCaseDTO) {
+        try {
+            JudgeResult judge = judgeService.judge(judgeTestCaseDTO.getCode(), List.of(judgeTestCaseDTO.getTestCase()));
+            JudgeRecordVO judgeRecordVO = mapStruct.JudgeResultToJudgeRecordVO(judge);
+            return Result.success(judgeRecordVO);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("判题失败！练习管理员！");
+        }
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Result<Integer> saveAndAddToExam(SaveAndAddToExamDTO saveAndAddToExamDTO) {
+        // 保存/更新题目
+        Result<Integer> questionIdResult = questionService.addQuestion(saveAndAddToExamDTO.getQuestion());
+        Integer questionId = questionIdResult.getData();
+        // 有则更新，无则插入
+        examMapper.insertOrUpdateQConfig(
+                saveAndAddToExamDTO.getExamId(),
+                questionId,
+                saveAndAddToExamDTO.getQuestion().getQuestionScore()
+        );
+        return Result.success("保存并写入成功！",questionId);
     }
 }
