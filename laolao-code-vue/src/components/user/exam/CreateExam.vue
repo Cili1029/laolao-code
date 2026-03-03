@@ -1,32 +1,34 @@
 <template>
-    <div>
+    <div v-if="currentQuestion">
         <ResizablePanelGroup direction="horizontal">
             <ResizablePanel :default-size="30">
                 <div class="h-full flex border-t">
-                    <div class="w-16 flex flex-col items-center py-4 gap-4 border-r bg-gray-50 overflow-y-auto">
+                    <div
+                        class="w-14 shrink-0 flex flex-col items-center py-4 gap-4 border-r bg-gray-50 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                         <div v-for="(q, index) in questions" :key="index" @click="currentQuestion = q" :class="[
-                            'w-10 h-10 flex items-center justify-center rounded-lg cursor-pointer text-lg border-dashed border-3 font-semibold transition',
+                            'w-10 h-10 shrink-0 flex items-center justify-center rounded-lg cursor-pointer text-lg border-dashed border-3 font-semibold transition',
                             'text-gray-400 border-gray-300 hover:border-gray-400 hover:text-gray-600',
-                            currentQuestion === q
-                                ? 'border-zinc-800 text-zinc-900' : ''
+                            currentQuestion === q ? 'border-zinc-800 text-zinc-900' : ''
                         ]">
                             {{ index + 1 }}
                         </div>
+
                         <div @click="addQuestion()" :class="[
-                            'w-10 h-10 flex items-center justify-center rounded-lg cursor-pointer text-lg border-dashed border-3 font-semibold transition',
+                            'w-10 h-10 shrink-0 flex items-center justify-center rounded-lg cursor-pointer text-lg border-dashed border-3 font-semibold transition',
                             'text-gray-400 border-gray-300 hover:border-gray-400 hover:text-gray-600'
                         ]">
                             <Plus />
                         </div>
+                        <QuestionBank />
                     </div>
 
-                    <div class="h-full w-full flex flex-col bg-white border overflow-y-auto space-y-2">
+                    <div class="h-full w-full flex flex-col bg-white border space-y-2">
                         <div class="flex px-2 pt-2 justify-between">
                             <div @click="saveAndAddToExam()"
                                 class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
                                 <Save class="h-4 w-4 mr-1" />
                                 <Spinner v-if="false" class="mr-1" />
-                                保存并写入考试
+                                写入考试
                             </div>
                             <div @click="deleteQuestion()"
                                 class="flex cursor-pointer text-red-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
@@ -48,7 +50,6 @@
                                         <SelectValue placeholder="请选择难度" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        <!-- value 对应后端需要的 0, 1, 2 -->
                                         <SelectItem value="0">
                                             简单
                                         </SelectItem>
@@ -120,7 +121,7 @@
                     <ResizableHandle />
                     <ResizablePanel :default-size="35">
                         <div class="h-full p-2 space-y-2 overflow-y-auto">
-                            <div v-for="(testCase, index) in currentQuestion?.testCases"
+                            <div v-for="(testCase, index) in currentQuestion?.testCases || []"
                                 class="flex border p-2 justify-between rounded">
                                 <div class="flex">
                                     <p>输入：</p>
@@ -206,10 +207,12 @@
     import JudgeDialog from '../JudgeDialog.vue'
     import Spinner from '@/components/ui/spinner/Spinner.vue'
     import { useRoute } from 'vue-router'
+    import { toast } from 'vue-sonner'
+import QuestionBank from './QuestionBank.vue'
     const route = useRoute()
 
     onMounted(async () => {
-        // await getQuestions()
+        getQuestions()
     })
 
     interface TestCase {
@@ -233,48 +236,29 @@
         testCases: TestCase[]
     }
 
-    const questions = ref<Question[]>([
-        // 初始示例数据
-        {
-            id: null,
-            title: '两数之和',
-            content: '给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出和为目标值 target 的那两个整数，并返回它们的数组下标。',
-            questionScore: 20,
-            tags: ['数组', '哈希表', '简单'],
-            difficulty: 0,
-            timeLimit: 1000,
-            memoryLimit: 128,
-            templateCode: 'public class Main {\n    public static void main(String[] args) {\n        // 请编写你的代码\n    }\n}',
-            standardSolution: 'public class Main { ... }',
-            testCases: [{
-                id: null,
-                questionId: null,
-                input: '1',
-                output: '23'
-            }]
+    const questions = ref<Question[]>([])
+    const currentQuestion = ref<Question | undefined>(undefined)
+
+    const getQuestions = async () => {
+        try {
+            const res = await axios.get("/api/exam/create", {
+                params: { examId: route.params.id }
+            })
+            if (!res.data.data || res.data.data.length === 0) {
+                questions.value = [createDefaultQuestion()]
+            } else {
+                questions.value = res.data.data
+            }
+            currentQuestion.value = questions.value[0]
+        } catch (e) {
+            console.error('获取题目失败：', e)
+            questions.value = [createDefaultQuestion()]
+            currentQuestion.value = questions.value[0]
         }
-    ])
+    }
 
-    const currentQuestion = ref(questions.value[0])
-
-    // const getQuestions = async () => {
-    //     try {
-    //         const res = await axios.get("/api/exam/create", {
-    //             params: {
-    //                 recordId: route.params.id
-    //             }
-    //         })
-    //         // 存在就赋值
-    //         if (res.data.data !== null) {
-    //             questions.value = res.data.data
-    //         }
-    //     } catch (e) {
-    //         console.log(e)
-    //     }
-    // }
-
-    const addQuestion = () => {
-        const newQuestion = {
+    const createDefaultQuestion = (): Question => {
+        return {
             id: null,
             title: '',
             content: '',
@@ -291,12 +275,35 @@
                 input: '',
                 output: ''
             }]
-        } as Question
+        }
+    }
+
+    const addQuestion = () => {
+        const newQuestion = createDefaultQuestion()
         questions.value.push(newQuestion)
         currentQuestion.value = newQuestion
     }
 
-    const deleteQuestion = () => {
+    const deleteQuestion = async () => {
+        if (questions.value.length === 1) {
+            toast.info("至少要有一题！")
+            return
+        }
+        // 后端删除 如果有Id就是保存过的，需要后端也进行删除
+        if (currentQuestion.value?.id) {
+            try {
+                await axios.delete("/api/exam/create/remove-question", {
+                    params: {
+                        examId: Number(route.params.id),
+                        questionId: currentQuestion.value?.id
+                    }
+                })
+            } catch (e) {
+                console.log(e);
+            }
+        }
+
+        // 前端删除
         const index = questions.value.findIndex(q => q === currentQuestion.value);
         questions.value.splice(index, 1);
         if (index > 0) {
@@ -320,10 +327,9 @@
 
     const difficultyProxy = computed({
         get() {
-            // 将数字转为字符串给组件显示 ( 0 -> "0" )
-            // 注意：如果是 null 或 undefined 要处理一下
-            return currentQuestion.value!.difficulty !== undefined ? String(currentQuestion.value!.difficulty) : undefined
+            return currentQuestion.value ? String(currentQuestion.value.difficulty) : '0'
         },
+
         set(val) {
             // 当用户选择后，将字符串转回数字存入对象 ( "0" -> 0 )
             currentQuestion.value!.difficulty = Number(val)
@@ -353,6 +359,10 @@
 
     // 删除测试用例方法
     const deleteTestCase = (question: Question, index: number) => {
+        if (question.testCases.length === 1) {
+            toast.info("至少要有一个测试用例！")
+            return
+        }
         question.testCases.splice(index, 1);
     };
 

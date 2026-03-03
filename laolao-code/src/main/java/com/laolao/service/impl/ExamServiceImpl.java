@@ -1,5 +1,6 @@
 package com.laolao.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.laolao.common.constant.JudgeConstant;
 import com.laolao.common.docker.JudgeService;
@@ -8,10 +9,7 @@ import com.laolao.common.result.Result;
 import com.laolao.common.util.MapStruct;
 import com.laolao.common.util.SecurityUtils;
 import com.laolao.common.util.StudentExamStatusCalculator;
-import com.laolao.mapper.ExamMapper;
-import com.laolao.mapper.ExamRecordMapper;
-import com.laolao.mapper.JudgeRecordMapper;
-import com.laolao.mapper.QuestionTestCaseMapper;
+import com.laolao.mapper.*;
 import com.laolao.pojo.dto.*;
 import com.laolao.pojo.entity.*;
 import com.laolao.pojo.vo.*;
@@ -21,7 +19,10 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class ExamServiceImpl implements ExamService {
@@ -39,6 +40,10 @@ public class ExamServiceImpl implements ExamService {
     private ExamRecordMapper examRecordMapper;
     @Resource
     private QuestionService questionService;
+    @Resource
+    private QuestionMapper questionMapper;
+    @Resource
+    private ExamQuestionConfigMapper examQuestionConfigMapper;
 
     @Override
     public Result<List<ExamVO>> getSimpleExam() {
@@ -162,15 +167,79 @@ public class ExamServiceImpl implements ExamService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Result<Integer> saveAndAddToExam(SaveAndAddToExamDTO saveAndAddToExamDTO) {
-        // 保存/更新题目
-        Result<Integer> questionIdResult = questionService.addQuestion(saveAndAddToExamDTO.getQuestion());
-        Integer questionId = questionIdResult.getData();
-        // 有则更新，无则插入
+        AddQuestionDTO question = saveAndAddToExamDTO.getQuestion();
+        Integer finalQuestionId; // 最终要绑定到考试里的题目ID（一定是一个子题ID）
+
+        // 情况A：老师在考试界面点击了“新建题目”
+        if (question.getId() == null) {
+            // 先建祖宗
+            question.setParentId(0);
+            Result<Integer> ancestorResult = questionService.addOrUpdateQuestion(question);
+            Integer ancestorId = ancestorResult.getData();
+
+            // 繁衍子题（专供本次考试）
+            question.setId(null); // 清空ID，让底层方法走insert
+            question.setParentId(ancestorId); // 认祖宗
+            Result<Integer> childResult = questionService.addOrUpdateQuestion(question);
+            finalQuestionId = childResult.getData();
+        } else {
+            // 传了ID，需要去数据库查一下它的身份
+            Question existingQuestion = questionMapper.selectById(question.getId());
+            if (existingQuestion.getParentId() == 0) {
+                // 情况B：老师从公共题库选了一道“祖宗题”加到考试里
+                // 需要生成子题
+                question.setId(null); // 清空原ID，强制走 insert 生成新题
+                question.setParentId(existingQuestion.getId()); // 认祖宗
+                Result<Integer> copyResult = questionService.addOrUpdateQuestion(question);
+                finalQuestionId = copyResult.getData();
+            } else {
+                // 情况C：老师正在修改当前试卷里已经存在的“子题”
+                // 直接更新
+                Result<Integer> updateResult = questionService.addOrUpdateQuestion(question);
+                finalQuestionId = updateResult.getData();
+            }
+        }
+
+        // 把最终生成的子题ID（finalQuestionId）绑定到这场考试中
+        // 有则更新分数，无则插入关联
+        Integer examId = saveAndAddToExamDTO.getExamId();
         examMapper.insertOrUpdateQConfig(
-                saveAndAddToExamDTO.getExamId(),
-                questionId,
-                saveAndAddToExamDTO.getQuestion().getQuestionScore()
+                examId,
+                finalQuestionId,
+                question.getQuestionScore()
         );
-        return Result.success("保存并写入成功！",questionId);
+
+        return Result.success("保存并写入考试成功！", finalQuestionId);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Result<String> removeQuestion(Integer examId, Integer questionId) {
+        // 删除题目，题目测试示例，考试题目配置
+        questionMapper.deleteById(questionId);
+        questionTestCaseMapper.delete(
+                new LambdaQueryWrapper<QuestionTestCase>()
+                        .eq(QuestionTestCase::getQuestionId, questionId));
+        examQuestionConfigMapper.delete(
+                new LambdaQueryWrapper<ExamQuestionConfig>()
+                        .eq(ExamQuestionConfig::getQuestionId, questionId));
+        return Result.success("移除成功！");
+    }
+
+    @Override
+    public Result<List<DraftQuestionVO>> getDraftQuestion(Integer examId) {
+        List<DraftQuestionVO> draftQuestionVOS = examQuestionConfigMapper.selectDraftQuestion(examId);
+        if (draftQuestionVOS == null || draftQuestionVOS.isEmpty()) {
+            return Result.success(draftQuestionVOS);
+        }
+        // 提取 ID 并批量获取测试用例
+        List<Integer> questionIdList = draftQuestionVOS.stream().map(DraftQuestionVO::getId).toList();
+        List<QuestionTestCase> testCases = questionTestCaseMapper.selectBatchByQuestionIds(questionIdList);
+        // 按questionId分组
+        Map<Integer, List<QuestionTestCase>> testCaseMap = testCases.stream()
+                .collect(Collectors.groupingBy(QuestionTestCase::getQuestionId));
+        // 遍历题目列表，整合
+        draftQuestionVOS.forEach(vo -> vo.setTestCases(testCaseMap.getOrDefault(vo.getId(), new ArrayList<>())));
+        return Result.success(draftQuestionVOS);
     }
 }

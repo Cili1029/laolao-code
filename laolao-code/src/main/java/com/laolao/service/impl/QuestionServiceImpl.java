@@ -1,6 +1,7 @@
 package com.laolao.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.laolao.common.result.Result;
 import com.laolao.common.util.MapStruct;
 import com.laolao.common.util.SecurityUtils;
@@ -9,6 +10,7 @@ import com.laolao.mapper.QuestionTestCaseMapper;
 import com.laolao.pojo.dto.AddQuestionDTO;
 import com.laolao.pojo.entity.Question;
 import com.laolao.pojo.entity.QuestionTestCase;
+import com.laolao.pojo.vo.QuestionBankVO;
 import com.laolao.service.QuestionService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -27,11 +29,11 @@ public class QuestionServiceImpl implements QuestionService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Result<Integer> addQuestion(AddQuestionDTO addQuestionDTO) {
+    public Result<Integer> addOrUpdateQuestion(AddQuestionDTO addQuestionDTO) {
         Question question = mapStruct.addQuestionDTOtoQuestion(addQuestionDTO);
         question.setAdvisorId(SecurityUtils.getUserId());
         if (question.getId() != null) {
-            // 这是旧题，做更新
+            // 这是旧题（可能是修改祖宗，也可能是修改子题），做更新
             questionMapper.updateById(question);
             // 测试示例直接全量删除
             questionTestCaseMapper.delete(new LambdaQueryWrapper<QuestionTestCase>()
@@ -46,13 +48,27 @@ public class QuestionServiceImpl implements QuestionService {
         // 统一插入测试用例
         List<QuestionTestCase> testCases = addQuestionDTO.getTestCases();
         if (testCases != null && !testCases.isEmpty()) {
-            // 遍历一遍绑定questionId，并清空旧的用例Id
             for (QuestionTestCase testCase : testCases) {
-                testCase.setQuestionId(question.getId()); // 绑定题目ID
+                testCase.setQuestionId(question.getId()); // 绑定新的题目ID
             }
             // 批量插入测试用例
             questionTestCaseMapper.insertBatch(testCases);
         }
-        return Result.success("保存成功！",question.getId());
+
+        return Result.success("保存成功！", question.getId());
+    }
+
+    @Override
+    public Result<Page<QuestionBankVO>> getPrivateQuestions(Integer pageNum, Integer pageSize) {
+        Page<QuestionBankVO> page = new Page<>(pageNum, pageSize);
+        Page<QuestionBankVO> res = questionMapper.selectPrivateBank(page, SecurityUtils.getUserId());
+        return Result.success(res);
+    }
+
+    @Override
+    public Result<Page<QuestionBankVO>> getPublicQuestions(Integer pageNum, Integer pageSize) {
+        Page<QuestionBankVO> page = new Page<>(pageNum, pageSize);
+        Page<QuestionBankVO> res = questionMapper.selectPublicBank(page);
+        return Result.success(res);
     }
 }

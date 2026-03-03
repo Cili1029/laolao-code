@@ -1,30 +1,23 @@
-package com.laolao.pojo.entity;
+package com.laolao.pojo.vo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
+import com.laolao.pojo.entity.QuestionTestCase;
 import lombok.*;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.List;
 
-/**
- * 题目表
- */
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Builder
-public class Question implements Serializable {
+public class DraftQuestionVO implements Serializable {
 
     /**
      * 主键ID
      */
-    @TableId(type = IdType.AUTO)
     private Integer id;
 
     /**
@@ -36,6 +29,11 @@ public class Question implements Serializable {
      * 题目内容 (Markdown格式)
      */
     private String content;
+
+    /**
+     *  这一题的分数
+     */
+    private Integer questionScore;
 
     /**
      * 标签列表 [ "栈", "简单", "Java" ]
@@ -69,27 +67,7 @@ public class Question implements Serializable {
     private String standardSolution;
 
     /**
-     * 创建者ID（导师ID）
+     * 测试示例
      */
-    private Integer advisorId;
-
-    /**
-     * 父题目ID(0-祖宗模板题，非0-考试属子题快照)
-     */
-    private Integer parentId;
-
-    /**
-     * 是否公开(0-私有, 1-公开)
-     */
-    private Integer isPublic;
-
-    /**
-     * 创建时间
-     */
-    private LocalDateTime createTime;
-
-    /**
-     * 更新时间（自动更新）
-     */
-    private LocalDateTime updateTime;
+    private List<QuestionTestCase> testCases;
 }

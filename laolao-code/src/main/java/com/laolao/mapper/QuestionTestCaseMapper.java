@@ -9,4 +9,6 @@ import java.util.List;
 @Mapper
 public interface QuestionTestCaseMapper extends BaseMapper<QuestionTestCase> {
     void insertBatch(List<QuestionTestCase> testCases);
+
+    List<QuestionTestCase> selectBatchByQuestionIds(List<Integer> questionIds);
 }

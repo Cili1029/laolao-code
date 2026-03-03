@@ -8,4 +8,12 @@
             (#{item.questionId}, #{item.input}, #{item.output})
         </foreach>
     </insert>
+    <select id="selectBatchByQuestionIds" resultType="com.laolao.pojo.entity.QuestionTestCase">
+        select id, question_id, input, output
+        from question_test_case
+        where question_id in
+        <foreach collection="questionIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
 </mapper>

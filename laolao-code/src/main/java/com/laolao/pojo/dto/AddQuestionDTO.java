@@ -66,6 +66,11 @@ public class AddQuestionDTO implements Serializable {
     private String standardSolution;
 
     /**
+     * 父题目ID(0-祖宗模板题，非0-考试属子题快照)
+     */
+    private Integer parentId;
+
+    /**
      * 测试示例
      */
     private List<QuestionTestCase> testCases;

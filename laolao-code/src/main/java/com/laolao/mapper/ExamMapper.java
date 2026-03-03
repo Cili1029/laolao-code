@@ -2,7 +2,6 @@ package com.laolao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.laolao.pojo.entity.Exam;
-import com.laolao.pojo.entity.ExamQuestionConfig;
 import com.laolao.pojo.vo.ExamInfoVO;
 import com.laolao.pojo.vo.ExamQuestionVO;
 import com.laolao.pojo.vo.ExamVO;
@@ -70,9 +69,6 @@ public interface ExamMapper extends BaseMapper<Exam> {
             where exam_id = #{examId} and question_id = #{questionId};
             """)
     Integer selectScoreByQuestionId(Integer examId, Integer questionId);
-
-    @Update("update exam_question_config set score = #{score} where exam_id = #{examId} and question_id = #{questionId}")
-    void updateScore(Integer examId, Integer questionId, Integer score);
 
     @Insert("""
             INSERT INTO exam_question_config (exam_id, question_id, score)

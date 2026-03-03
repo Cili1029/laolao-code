@@ -2,11 +2,12 @@
     <div>
         <ResizablePanelGroup direction="horizontal">
             <ResizablePanel :default-size="40">
-                <div class=" max-h-max flex border-t">
-                    <div class="w-16 flex flex-col items-center py-4 gap-4 border-r bg-gray-50 overflow-y-auto">
+                <div class="h-full flex border-t">
+                    <div
+                        class="w-14 shrink-0 flex flex-col items-center py-4 gap-4 border-r bg-gray-50 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                         <div v-for="(q, index) in examStore.questions" :key="index"
                             @click="examStore.currentQuestion = q, currentSelect = 0" :class="[
-                                'w-10 h-10 flex items-center justify-center rounded-lg cursor-pointer text-lg border-dashed border-3 font-semibold transition',
+                                'w-10 h-10 shrink-0 flex items-center justify-center rounded-lg cursor-pointer text-lg border-dashed border-3 font-semibold transition',
                                 'text-gray-400 border-gray-300 hover:border-gray-400 hover:text-gray-600',
                                 q.userScore === q.questionScore
                                     ? 'bg-emerald-50 border-emerald-400 text-emerald-600' : '',
@@ -17,7 +18,7 @@
                         </div>
                     </div>
 
-                    <div class="h-150 w-full flex flex-col bg-white border">
+                    <div class="flex-1 flex flex-col bg-white border">
                         <div class="flex border-b">
                             <p @click="currentSelect = 0" class="flex py-1 px-2 items-center hover:bg-gray-100"
                                 :class="currentSelect == 0 ? 'bg-gray-100' : ''">
@@ -102,6 +103,7 @@
                     language="java" theme="vs" />
             </ResizablePanel>
         </ResizablePanelGroup>
+        <JudgeDialog />
     </div>
 </template>
 
@@ -117,6 +119,7 @@
     const examStore = useExamStore()
     import { Cpu, ScrollText, Timer, TimerReset } from 'lucide-vue-next'
     import { Badge } from '@/components/ui/badge'
+import JudgeDialog from '../JudgeDialog.vue'
 
 
     const route = useRoute()

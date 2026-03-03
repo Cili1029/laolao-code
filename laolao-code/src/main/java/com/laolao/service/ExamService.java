@@ -2,10 +2,7 @@ package com.laolao.service;
 
 import com.laolao.common.result.Result;
 import com.laolao.pojo.dto.*;
-import com.laolao.pojo.vo.ExamBeginVO;
-import com.laolao.pojo.vo.ExamInfoVO;
-import com.laolao.pojo.vo.ExamVO;
-import com.laolao.pojo.vo.JudgeRecordVO;
+import com.laolao.pojo.vo.*;
 
 import java.util.List;
 
@@ -25,4 +22,8 @@ public interface ExamService {
     Result<JudgeRecordVO> judgeTestCase(JudgeTestCaseDTO judgeTestCaseDTO);
 
     Result<Integer> saveAndAddToExam(SaveAndAddToExamDTO saveAndAddToExamDTO);
+
+    Result<String> removeQuestion(Integer examId, Integer questionId);
+
+    Result<List<DraftQuestionVO>> getDraftQuestion(Integer examId);
 }

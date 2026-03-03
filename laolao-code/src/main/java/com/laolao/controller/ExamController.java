@@ -2,10 +2,7 @@ package com.laolao.controller;
 
 import com.laolao.common.result.Result;
 import com.laolao.pojo.dto.*;
-import com.laolao.pojo.vo.ExamBeginVO;
-import com.laolao.pojo.vo.ExamInfoVO;
-import com.laolao.pojo.vo.ExamVO;
-import com.laolao.pojo.vo.JudgeRecordVO;
+import com.laolao.pojo.vo.*;
 import com.laolao.service.ExamService;
 import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -98,6 +95,18 @@ public class ExamController {
     }
 
     /**
+     * 获取草稿中的题目
+     *
+     * @param examId 考试Id
+     * @return 题目数据
+     */
+    @GetMapping("/create")
+    @PreAuthorize("hasRole('ADVISOR')")
+    public Result<List<DraftQuestionVO>> getQuestion(@RequestParam Integer examId) {
+        return examService.getDraftQuestion(examId);
+    }
+
+    /**
      * 添加题目到考试
      *
      * @param saveAndAddToExamDTO 添加的题目
@@ -107,5 +116,18 @@ public class ExamController {
     @PreAuthorize("hasRole('ADVISOR')")
     public Result<Integer> saveAndAddToExam(@RequestBody SaveAndAddToExamDTO saveAndAddToExamDTO) {
         return examService.saveAndAddToExam(saveAndAddToExamDTO);
+    }
+
+    /**
+     * 从草稿中移除题目
+     *
+     * @param examId 考试id
+     * @param questionId 题目id
+     * @return 结果信息
+     */
+    @DeleteMapping("/create/remove-question")
+    @PreAuthorize("hasRole('ADVISOR')")
+    public Result<String> removeQuestion(@RequestParam Integer examId, @RequestParam Integer questionId) {
+        return examService.removeQuestion(examId, questionId);
     }
 }
