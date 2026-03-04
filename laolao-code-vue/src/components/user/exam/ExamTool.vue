@@ -119,7 +119,7 @@
     const examStore = useExamStore()
     import { Cpu, ScrollText, Timer, TimerReset } from 'lucide-vue-next'
     import { Badge } from '@/components/ui/badge'
-import JudgeDialog from '../JudgeDialog.vue'
+    import JudgeDialog from '../JudgeDialog.vue'
 
 
     const route = useRoute()

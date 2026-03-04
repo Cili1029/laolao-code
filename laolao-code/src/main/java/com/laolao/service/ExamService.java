@@ -26,4 +26,6 @@ public interface ExamService {
     Result<String> removeQuestion(Integer examId, Integer questionId);
 
     Result<List<DraftQuestionVO>> getDraftQuestion(Integer examId);
+
+    Result<Integer> releaseExam(Integer examId);
 }

@@ -15,7 +15,6 @@ public interface ExamQuestionConfigMapper extends BaseMapper<ExamQuestionConfig>
                    q.title,
                    q.content,
                    eqc.score as question_score,
-                   q.tags,
                    q.difficulty,
                    q.time_limit,
                    q.memory_limit,

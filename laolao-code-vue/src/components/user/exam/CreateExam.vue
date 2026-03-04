@@ -19,7 +19,7 @@
                         ]">
                             <Plus />
                         </div>
-                        <QuestionBank />
+                        <QuestionBank @question-data="getBankQuestion" />
                     </div>
 
                     <div class="h-full w-full flex flex-col bg-white border space-y-2">
@@ -208,7 +208,7 @@
     import Spinner from '@/components/ui/spinner/Spinner.vue'
     import { useRoute } from 'vue-router'
     import { toast } from 'vue-sonner'
-import QuestionBank from './QuestionBank.vue'
+    import QuestionBank from './QuestionBankDialog.vue'
     const route = useRoute()
 
     onMounted(async () => {
@@ -379,6 +379,11 @@ import QuestionBank from './QuestionBank.vue'
         } catch (e) {
             console.log(e);
         }
+    }
+
+    const getBankQuestion = (question: Question) => {
+        questions.value.push(question)
+        currentQuestion.value = question
     }
 
 </script>

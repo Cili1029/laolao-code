@@ -3,25 +3,28 @@ package com.laolao.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.laolao.pojo.entity.Question;
+import com.laolao.pojo.vo.DraftQuestionVO;
 import com.laolao.pojo.vo.QuestionBankVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 @Mapper
 public interface QuestionMapper extends BaseMapper<Question> {
-    @Select("""
-            select q.id, q.title, u.name as advisor
-            from question q
-                     join user u on u.id = q.advisor_id
-            where q.advisor_id = #{userId} and q.parent_id = 0
-            """)
-    Page<QuestionBankVO> selectPrivateBank(Page<QuestionBankVO> page, Integer userId);
+    Page<QuestionBankVO> selectPrivateBank(Page<QuestionBankVO> page, Integer userId, String content);
+
+    Page<QuestionBankVO> selectPublicBank(Page<QuestionBankVO> page, String content);
+
+    @Update("update question set is_public = 1 - is_public where advisor_id = #{userId} and id = #{questionId}")
+    void updateStatus(Integer userId, Integer questionId);
+
+    @Update("update question set is_deleted = 1 where advisor_id = #{userId} and id = #{questionId}")
+    void deleteQuestion(Integer userId, Integer questionId);
 
     @Select("""
-            select q.id, q.title, u.name as advisor
-            from question q
-                     join user u on u.id = q.advisor_id
-            where q.is_public = 1 and q.parent_id = 0
+            select id, title, content, difficulty, time_limit, memory_limit, template_code, standard_solution
+            from question
+            where id = #{questionId};
             """)
-    Page<QuestionBankVO> selectPublicBank(Page<QuestionBankVO> page);
+    DraftQuestionVO selectQuestionById(Integer questionId);
 }

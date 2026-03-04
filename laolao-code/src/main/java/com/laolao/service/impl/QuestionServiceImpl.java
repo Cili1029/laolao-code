@@ -8,8 +8,10 @@ import com.laolao.common.util.SecurityUtils;
 import com.laolao.mapper.QuestionMapper;
 import com.laolao.mapper.QuestionTestCaseMapper;
 import com.laolao.pojo.dto.AddQuestionDTO;
+import com.laolao.pojo.dto.QuestionIdDTO;
 import com.laolao.pojo.entity.Question;
 import com.laolao.pojo.entity.QuestionTestCase;
+import com.laolao.pojo.vo.DraftQuestionVO;
 import com.laolao.pojo.vo.QuestionBankVO;
 import com.laolao.service.QuestionService;
 import jakarta.annotation.Resource;
@@ -26,6 +28,8 @@ public class QuestionServiceImpl implements QuestionService {
     private QuestionTestCaseMapper questionTestCaseMapper;
     @Resource
     private MapStruct mapStruct;
+    @Resource
+    private QuestionTestCaseMapper questionTestCaseDao;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -59,16 +63,37 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Result<Page<QuestionBankVO>> getPrivateQuestions(Integer pageNum, Integer pageSize) {
+    public Result<Page<QuestionBankVO>> getPrivateQuestions(Integer pageNum, Integer pageSize, String content) {
         Page<QuestionBankVO> page = new Page<>(pageNum, pageSize);
-        Page<QuestionBankVO> res = questionMapper.selectPrivateBank(page, SecurityUtils.getUserId());
+        Page<QuestionBankVO> res = questionMapper.selectPrivateBank(page, SecurityUtils.getUserId(), content);
         return Result.success(res);
     }
 
     @Override
-    public Result<Page<QuestionBankVO>> getPublicQuestions(Integer pageNum, Integer pageSize) {
+    public Result<Page<QuestionBankVO>> getPublicQuestions(Integer pageNum, Integer pageSize, String content) {
         Page<QuestionBankVO> page = new Page<>(pageNum, pageSize);
-        Page<QuestionBankVO> res = questionMapper.selectPublicBank(page);
+        Page<QuestionBankVO> res = questionMapper.selectPublicBank(page, content);
         return Result.success(res);
+    }
+
+    @Override
+    public Result<String> changeStatus(QuestionIdDTO questionIdDTO) {
+        questionMapper.updateStatus(SecurityUtils.getUserId(), questionIdDTO.getQuestionId());
+        return Result.success("更新状态成功！");
+    }
+
+    @Override
+    public Result<String> delete(Integer questionId) {
+        questionMapper.deleteQuestion(SecurityUtils.getUserId(), questionId);
+        return Result.success("删除成功！");
+    }
+
+    @Override
+    public Result<DraftQuestionVO> copyQuestion(Integer questionId) {
+        DraftQuestionVO questionVO = questionMapper.selectQuestionById(questionId);
+        questionVO.setQuestionScore(0);
+        // 测试示例
+        questionVO.setTestCases(questionTestCaseMapper.selectBatchByQuestionIds(List.of(questionId)));
+        return Result.success(questionVO);
     }
 }

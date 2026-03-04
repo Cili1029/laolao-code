@@ -130,4 +130,16 @@ public class ExamController {
     public Result<String> removeQuestion(@RequestParam Integer examId, @RequestParam Integer questionId) {
         return examService.removeQuestion(examId, questionId);
     }
+
+    /**
+     * 发布考试
+     *
+     * @param examId 考试ID
+     * @return 消息结果
+     */
+    @PostMapping("/release")
+    @PreAuthorize("hasRole('ADVISOR')")
+    public Result<Integer> releaseExam(@RequestParam Integer examId) {
+        return examService.releaseExam(examId);
+    }
 }

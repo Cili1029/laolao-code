@@ -1,4 +1,4 @@
-package com.laolao.common.docker;
+package com.laolao.common.config;
 
 import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.core.DefaultDockerClientConfig;

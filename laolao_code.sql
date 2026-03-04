@@ -11,7 +11,7 @@
  Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 03/03/2026 21:35:11
+ Date: 04/03/2026 19:40:22
 */
 
 SET NAMES utf8mb4;
@@ -51,7 +51,7 @@ CREATE TABLE `exam_question_config`  (
   `score` int NOT NULL DEFAULT 0 COMMENT '该题在该场考试中的分值',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `idx_exam_question`(`exam_id` ASC, `question_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 21 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '考试题目分值配置表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 24 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '考试题目分值配置表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of exam_question_config
@@ -64,6 +64,7 @@ INSERT INTO `exam_question_config` VALUES (5, 1, 5, 20);
 INSERT INTO `exam_question_config` VALUES (6, 2, 2, 35);
 INSERT INTO `exam_question_config` VALUES (7, 2, 4, 35);
 INSERT INTO `exam_question_config` VALUES (8, 2, 5, 30);
+INSERT INTO `exam_question_config` VALUES (21, 10, 16, 100);
 
 -- ----------------------------
 -- Table structure for exam_record
@@ -138,7 +139,6 @@ CREATE TABLE `question`  (
   `id` int NOT NULL AUTO_INCREMENT,
   `title` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '题目标题',
   `content` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '题目内容 (Markdown格式)',
-  `tags` json NULL COMMENT '标签列表 [ \"栈\", \"简单\", \"Java\" ]',
   `difficulty` tinyint NULL DEFAULT 0 COMMENT '难度：0-简单, 1-中等, 2-困难',
   `time_limit` int NULL DEFAULT 1000 COMMENT '时间限制 (ms)',
   `memory_limit` int NULL DEFAULT 128 COMMENT '内存限制 (MB)',
@@ -147,20 +147,21 @@ CREATE TABLE `question`  (
   `advisor_id` int NOT NULL COMMENT '创建者ID',
   `parent_id` int NULL DEFAULT 0 COMMENT '父题目ID(0-祖宗模板题，非0-考试属子题快照)',
   `is_public` tinyint(1) NULL DEFAULT 0 COMMENT '是否公开(0-私有, 1-公开)',
+  `is_deleted` tinyint(1) NULL DEFAULT 0 COMMENT '是否被删除(0-否, 1-是)',
   `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '题目表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '题目表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of question
 -- ----------------------------
-INSERT INTO `question` VALUES (1, '回文串判断', '### 题目描述\n请编写一个程序，判断输入的字符串是否为**回文串**。回文串是指正读和反读都一样的字符串（不考虑大小写）。\n\n### 输入描述\n输入一个字符串。\n\n### 输出描述\n如果是回文串输出 `true`，否则输出 `false`。\n\n### 示例\n**输入**：`Level`  \n**输出**：`true`', '[\"字符串\", \"入门\"]', 0, 1000, 128, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine();\n        // 请在此处编写逻辑\n    }\n}', 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine().toLowerCase();\n        String rev = new StringBuilder(s).reverse().toString();\n        System.out.print(s.equals(rev));\n    }\n}', 1, 0, 0, '2026-02-11 15:41:16', '2026-02-25 21:39:36');
-INSERT INTO `question` VALUES (2, '两数之和', '### 题目描述\n给定一个整数数组 `nums` 和一个目标值 `target`，请在数组中找出和为目标值的那**两个**整数，并输出它们的下标。\n\n### 输入描述\n第一行输入数组长度 n。  \n第二行输入 n 个整数。  \n第三行输入目标值 target。\n\n### 输出描述\n输出这两个数的下标（空格分隔）。\n\n### 示例\n**输入**：\n3\n3 2 4\n6\n**输出**：\n1 2', '[\"数组\", \"基础\"]', 0, 1000, 128, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', 'import java.util.Scanner;\nimport java.util.HashMap;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        HashMap<Integer, Integer> map = new HashMap<>();\n        for(int i=0; i<n; i++) {\n            if(map.containsKey(target - nums[i])) {\n                System.out.print(map.get(target - nums[i]) + \" \" + i);\n                return;\n            }\n            map.put(nums[i], i);\n        }\n    }\n}', 1, 0, 0, '2026-02-11 15:41:26', '2026-02-25 21:39:42');
-INSERT INTO `question` VALUES (3, '有效的括号', '### 题目描述\n给定一个只包括 `(`，`)`，`{`，`}`，`[`，`]` 的字符串，判断字符串是否有效。\n有效字符串需满足：左括号必须用相同类型的右括号闭合；左括号必须以正确的顺序闭合。\n\n### 输入描述\n输入一个括号字符串。\n\n### 输出描述\n输出 `true` 或 `false`。\n\n### 示例\n**输入**：`()[]{}`  \n**输出**：`true`', '[\"栈\", \"数据结构\"]', 1, 1000, 128, 'import java.util.Scanner;\nimport java.util.Stack;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine();\n        // 编写逻辑\n    }\n}', 'import java.util.Scanner;\nimport java.util.Stack;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.next();\n        Stack<Character> stack = new Stack<>();\n        for(char c : s.toCharArray()) {\n            if(c==\'(\') stack.push(\')\');\n            else if(c==\'[\') stack.push(\']\');\n            else if(c==\'{\') stack.push(\'}\');\n            else if(stack.isEmpty() || stack.pop() != c) {\n                System.out.print(\"false\"); return;\n            }\n        }\n        System.out.print(stack.isEmpty());\n    }\n}', 1, 0, 1, '2026-02-11 15:41:37', '2026-03-03 21:25:30');
-INSERT INTO `question` VALUES (4, '最大子数组和', '### 题目描述\n给定一个整数数组 `nums`，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。\n\n### 示例\n**输入**：\n9\n-2 1 -3 4 -1 2 1 -5 4\n**输出**：\n6  \n(解释：连续子数组 [4,-1,2,1] 的和最大)', '[\"数组\", \"动态规划\"]', 1, 1000, 128, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        // 编写逻辑\n    }\n}', 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int currentMax = 0, globalMax = Integer.MIN_VALUE;\n        for(int i=0; i<n; i++) {\n            int x = sc.nextInt();\n            currentMax = Math.max(x, currentMax + x);\n            globalMax = Math.max(globalMax, currentMax);\n        }\n        System.out.print(globalMax);\n    }\n}', 1, 0, 0, '2026-02-11 15:41:46', '2026-02-25 21:39:42');
-INSERT INTO `question` VALUES (5, '斐波那契数列（取模）', '### 题目描述\n写一个函数，输入 n ，求斐波那契（Fibonacci）数列的第 n 项。答案需要取模 1000000007 (1e9+7)。\n\n### 示例\n**输入**：45  \n**输出**：134903163', '[\"数学\", \"动态规划\"]', 1, 1000, 128, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        // 编写逻辑\n    }\n}', 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        if(n < 2) { System.out.print(n); return; }\n        int a = 0, b = 1, sum = 0;\n        for(int i = 2; i <= n; i++) {\n            sum = (a + b) % 1000000007;\n            a = b;\n            b = sum;\n        }\n        System.out.print(b);\n    }\n}', 1, 0, 0, '2026-02-11 15:41:55', '2026-02-25 21:39:42');
-INSERT INTO `question` VALUES (14, '两数之和', '给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出和为目标值 target 的那两个整数，并返回它们的数组下标。', '[\"数组\", \"哈希表\", \"简单\"]', 0, 1000, 128, 'public class Main {\n    public static void main(String[] args) {\n        // 请编写你的代码\n    }\n}', 'public class Main { ... }', 1, 0, 0, '2026-03-03 13:35:15', '2026-03-03 13:35:15');
+INSERT INTO `question` VALUES (1, '回文串判断', '### 题目描述\n请编写一个程序，判断输入的字符串是否为**回文串**。回文串是指正读和反读都一样的字符串（不考虑大小写）。\n\n### 输入描述\n输入一个字符串。\n\n### 输出描述\n如果是回文串输出 `true`，否则输出 `false`。\n\n### 示例\n**输入**：`Level`  \n**输出**：`true`', 0, 1000, 128, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine();\n        // 请在此处编写逻辑\n    }\n}', 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine().toLowerCase();\n        String rev = new StringBuilder(s).reverse().toString();\n        System.out.print(s.equals(rev));\n    }\n}', 1, 0, 0, 0, '2026-02-11 15:41:16', '2026-03-04 15:13:46');
+INSERT INTO `question` VALUES (2, '两数之和', '### 题目描述\n给定一个整数数组 `nums` 和一个目标值 `target`，请在数组中找出和为目标值的那**两个**整数，并输出它们的下标。\n\n### 输入描述\n第一行输入数组长度 n。  \n第二行输入 n 个整数。  \n第三行输入目标值 target。\n\n### 输出描述\n输出这两个数的下标（空格分隔）。\n\n### 示例\n**输入**：\n3\n3 2 4\n6\n**输出**：\n1 2', 0, 1000, 128, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', 'import java.util.Scanner;\nimport java.util.HashMap;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        HashMap<Integer, Integer> map = new HashMap<>();\n        for(int i=0; i<n; i++) {\n            if(map.containsKey(target - nums[i])) {\n                System.out.print(map.get(target - nums[i]) + \" \" + i);\n                return;\n            }\n            map.put(nums[i], i);\n        }\n    }\n}', 1, 0, 0, 0, '2026-02-11 15:41:26', '2026-02-25 21:39:42');
+INSERT INTO `question` VALUES (3, '有效的括号', '### 题目描述\n给定一个只包括 `(`，`)`，`{`，`}`，`[`，`]` 的字符串，判断字符串是否有效。\n有效字符串需满足：左括号必须用相同类型的右括号闭合；左括号必须以正确的顺序闭合。\n\n### 输入描述\n输入一个括号字符串。\n\n### 输出描述\n输出 `true` 或 `false`。\n\n### 示例\n**输入**：`()[]{}`  \n**输出**：`true`', 1, 1000, 128, 'import java.util.Scanner;\nimport java.util.Stack;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine();\n        // 编写逻辑\n    }\n}', 'import java.util.Scanner;\nimport java.util.Stack;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.next();\n        Stack<Character> stack = new Stack<>();\n        for(char c : s.toCharArray()) {\n            if(c==\'(\') stack.push(\')\');\n            else if(c==\'[\') stack.push(\']\');\n            else if(c==\'{\') stack.push(\'}\');\n            else if(stack.isEmpty() || stack.pop() != c) {\n                System.out.print(\"false\"); return;\n            }\n        }\n        System.out.print(stack.isEmpty());\n    }\n}', 1, 0, 1, 0, '2026-02-11 15:41:37', '2026-03-03 21:25:30');
+INSERT INTO `question` VALUES (4, '最大子数组和', '### 题目描述\n给定一个整数数组 `nums`，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。\n\n### 示例\n**输入**：\n9\n-2 1 -3 4 -1 2 1 -5 4\n**输出**：\n6  \n(解释：连续子数组 [4,-1,2,1] 的和最大)', 1, 1000, 128, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        // 编写逻辑\n    }\n}', 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int currentMax = 0, globalMax = Integer.MIN_VALUE;\n        for(int i=0; i<n; i++) {\n            int x = sc.nextInt();\n            currentMax = Math.max(x, currentMax + x);\n            globalMax = Math.max(globalMax, currentMax);\n        }\n        System.out.print(globalMax);\n    }\n}', 1, 0, 0, 0, '2026-02-11 15:41:46', '2026-02-25 21:39:42');
+INSERT INTO `question` VALUES (5, '斐波那契数列（取模）', '### 题目描述\n写一个函数，输入 n ，求斐波那契（Fibonacci）数列的第 n 项。答案需要取模 1000000007 (1e9+7)。\n\n### 示例\n**输入**：45  \n**输出**：134903163', 1, 1000, 128, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        // 编写逻辑\n    }\n}', 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        if(n < 2) { System.out.print(n); return; }\n        int a = 0, b = 1, sum = 0;\n        for(int i = 2; i <= n; i++) {\n            sum = (a + b) % 1000000007;\n            a = b;\n            b = sum;\n        }\n        System.out.print(b);\n    }\n}', 1, 0, 0, 0, '2026-02-11 15:41:55', '2026-02-25 21:39:42');
+INSERT INTO `question` VALUES (16, '回文串判断', '### 题目描述\n请编写一个程序，判断输入的字符串是否为**回文串**。回文串是指正读和反读都一样的字符串（不考虑大小写）。\n\n### 输入描述\n输入一个字符串。\n\n### 输出描述\n如果是回文串输出 `true`，否则输出 `false`。\n\n### 示例\n**输入**：`Level`  \n**输出**：`true`', 0, 1000, 128, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine();\n        // 请在此处编写逻辑\n    }\n}', 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine().toLowerCase();\n        String rev = new StringBuilder(s).reverse().toString();\n        System.out.print(s.equals(rev));\n    }\n}', 1, 1, 0, 0, '2026-03-04 19:26:52', '2026-03-04 19:26:52');
 
 -- ----------------------------
 -- Table structure for question_test_case
@@ -172,7 +173,7 @@ CREATE TABLE `question_test_case`  (
   `input` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '测试用例输入数据',
   `output` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '测试用例预期输出数据',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 32 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '题目测试用例表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 41 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '题目测试用例表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of question_test_case
@@ -190,7 +191,9 @@ INSERT INTO `question_test_case` VALUES (10, 4, '5', '5');
 INSERT INTO `question_test_case` VALUES (11, 5, '2', '1');
 INSERT INTO `question_test_case` VALUES (12, 5, '5', '5');
 INSERT INTO `question_test_case` VALUES (13, 5, '45', '134903163');
-INSERT INTO `question_test_case` VALUES (24, 14, '1', '23');
+INSERT INTO `question_test_case` VALUES (38, 16, 'level', 'true');
+INSERT INTO `question_test_case` VALUES (39, 16, 'hello', 'false');
+INSERT INTO `question_test_case` VALUES (40, 16, 'Aba', 'true');
 
 -- ----------------------------
 -- Table structure for study_group

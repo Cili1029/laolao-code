@@ -36,10 +36,22 @@
                                 :disabled="!(exam?.studentStatus === 1) && !(exam?.studentStatus === 2)">
                                 {{ studentStatusTextMap.get(exam?.studentStatus ?? 0) }}
                             </Button>
-                            <Button v-if="userStore.user.role === 1" @click="router.push(`/exam/create/${exam?.id}`)"
-                                variant="outline" :disabled="!(exam?.status === 0)">
-                                {{ statusTextMap.get(exam?.status ?? 0) }}
-                            </Button>
+                            <div class="flex space-x-2">
+                                <Button v-if="userStore.user.role === 1"
+                                    @click="router.push(`/exam/create/${exam?.id}`)" variant="outline"
+                                    :disabled="!(exam?.status === 0)">
+                                    {{ statusTextMap.get(exam?.status ?? 0) }}
+                                </Button>
+                                <Button v-if="userStore.user.role === 1 && exam?.status === 0" @click="releaseExam()"
+                                    variant="outline">
+                                    发布
+                                </Button>
+                                <Button v-if="userStore.user.role === 1 && exam?.status === 1" @click=""
+                                    variant="outline">
+                                    取消考试
+                                </Button>
+                            </div>
+
                         </div>
                     </div>
                 </div>
@@ -213,4 +225,19 @@
         [1, '已发布'],
         [2, '已取消'],
     ])
+
+    const releaseExam = async () => {
+        try {
+            const res = await axios.post("/api/exam/release", {}, {
+                params: {
+                    examId: route.params.id
+                }
+            })
+            if (res.data.code === 1) {
+                getExamInfo()
+            }
+        } catch (e) {
+            console.log(e)
+        }
+    }
 </script>

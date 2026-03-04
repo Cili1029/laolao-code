@@ -5,6 +5,7 @@ import com.laolao.pojo.entity.Exam;
 import com.laolao.pojo.vo.ExamInfoVO;
 import com.laolao.pojo.vo.ExamQuestionVO;
 import com.laolao.pojo.vo.ExamVO;
+import com.laolao.pojo.vo.ReleaseExamQuestionVO;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -76,4 +77,15 @@ public interface ExamMapper extends BaseMapper<Exam> {
             ON DUPLICATE KEY UPDATE score = VALUES(score)
             """)
     void insertOrUpdateQConfig(Integer examId, Integer questionId, Integer score);
+
+    @Select("""
+            select q.id, q.title, q.standard_solution as code, qc.score
+            from question q
+                     join exam_question_config qc on qc.question_id = q.id
+            where qc.exam_id = #{examId}
+            """)
+    List<ReleaseExamQuestionVO> selectQuestionsCodeByExamId(Integer examId);
+
+    @Select("update exam set status = #{status} where id = #{id}")
+    void updateExamStatus(Integer id, Integer status);
 }

@@ -38,12 +38,6 @@ public class Question implements Serializable {
     private String content;
 
     /**
-     * 标签列表 [ "栈", "简单", "Java" ]
-     */
-    @TableField(typeHandler = JacksonTypeHandler.class)
-    private List<String> tags;
-
-    /**
      * 难度：0-简单, 1-中等, 2-困难
      */
     private Byte difficulty;
