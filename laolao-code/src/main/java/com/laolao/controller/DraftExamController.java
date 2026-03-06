@@ -1,9 +1,13 @@
 package com.laolao.controller;
 
 import com.laolao.common.result.Result;
-import com.laolao.pojo.dto.*;
-import com.laolao.pojo.vo.*;
-import com.laolao.service.ExamService;
+import com.laolao.pojo.dto.CreateExamDTO;
+import com.laolao.pojo.dto.JudgeTestCaseDTO;
+import com.laolao.pojo.dto.SaveAndAddToExamDTO;
+import com.laolao.pojo.dto.UpdateDraftDTO;
+import com.laolao.pojo.vo.DraftQuestionVO;
+import com.laolao.pojo.vo.JudgeRecordVO;
+import com.laolao.service.DraftExamService;
 import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -11,72 +15,17 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/exam")
-public class ExamController {
+@RequestMapping("api/exam/draft")
+public class DraftExamController {
     @Resource
-    private ExamService examService;
-
-    /**
-     * 获取考试列表
-     *
-     * @return 考试列表
-     */
-    @GetMapping
-    public Result<List<ExamVO>> getSimpleExam() {
-        return examService.getSimpleExam();
-    }
-
-    /**
-     * 获取考试详情
-     *
-     * @param examId 考试ID
-     * @return 考试详情
-     */
-    @GetMapping("/info")
-    public Result<ExamInfoVO> getExamInfo(@RequestParam Integer examId) {
-        return examService.getExamInfo(examId);
-    }
-
-    /**
-     * 开始考试
-     *
-     * @param examId 考试ID
-     * @return 考试记录ID
-     */
-    @PostMapping("/start")
-    public Result<Integer> startExam(@RequestParam Integer examId) {
-        return examService.startExam(examId);
-    }
-
-    /**
-     * 获取考试题目
-     *
-     * @param recordId 考试记录ID
-     * @return 考试题目列表
-     */
-    @GetMapping("/begin")
-    public Result<ExamBeginVO> getExamQuestion(@RequestParam Integer recordId) {
-        return examService.getExamQuestion(recordId);
-    }
-
-    /**
-     * 提交代码判题
-     *
-     * @param judgeDTO 判题请求参数
-     * @return 判题结果
-     */
-    @PostMapping("/judge")
-    public Result<JudgeRecordVO> judge(@RequestBody JudgeDTO judgeDTO) {
-        return examService.judge(judgeDTO);
-    }
-
+    private DraftExamService examService;
     /**
      * 导师创建考试
      *
      * @param createExamDTO 考试参数
      * @return 考试Id
      */
-    @PostMapping("/create")
+    @PostMapping("/create-exam")
     @PreAuthorize("hasRole('ADVISOR')")
     public Result<Integer> createExam(@RequestBody CreateExamDTO createExamDTO) {
         return examService.createExam(createExamDTO);
@@ -88,7 +37,7 @@ public class ExamController {
      * @param judgeTestCaseDTO 测试参数
      * @return 判题结果
      */
-    @PostMapping("/create/judge")
+    @PostMapping("/judge")
     @PreAuthorize("hasRole('ADVISOR')")
     public Result<JudgeRecordVO> judgeTestCase(@RequestBody JudgeTestCaseDTO judgeTestCaseDTO) {
         return examService.judgeTestCase(judgeTestCaseDTO);
@@ -100,7 +49,7 @@ public class ExamController {
      * @param examId 考试Id
      * @return 题目数据
      */
-    @GetMapping("/create")
+    @GetMapping("/get-question")
     @PreAuthorize("hasRole('ADVISOR')")
     public Result<List<DraftQuestionVO>> getQuestion(@RequestParam Integer examId) {
         return examService.getDraftQuestion(examId);
@@ -112,7 +61,7 @@ public class ExamController {
      * @param saveAndAddToExamDTO 添加的题目
      * @return 题目Id
      */
-    @PostMapping("/create/add")
+    @PostMapping("/add-question")
     @PreAuthorize("hasRole('ADVISOR')")
     public Result<Integer> saveAndAddToExam(@RequestBody SaveAndAddToExamDTO saveAndAddToExamDTO) {
         return examService.saveAndAddToExam(saveAndAddToExamDTO);
@@ -125,10 +74,34 @@ public class ExamController {
      * @param questionId 题目id
      * @return 结果信息
      */
-    @DeleteMapping("/create/remove-question")
+    @DeleteMapping("/remove-question")
     @PreAuthorize("hasRole('ADVISOR')")
     public Result<String> removeQuestion(@RequestParam Integer examId, @RequestParam Integer questionId) {
         return examService.removeQuestion(examId, questionId);
+    }
+
+    /**
+     * 删除草稿
+     *
+     * @param examId 考试id
+     * @return 结果信息
+     */
+    @DeleteMapping("/delete-draft")
+    @PreAuthorize("hasRole('ADVISOR')")
+    public Result<String> deleteDraft(@RequestParam Integer examId) {
+        return examService.deleteDraft(examId);
+    }
+
+    /**
+     * 更新草稿
+     *
+     * @param draftDTO 信息
+     * @return 消息结果
+     */
+    @PostMapping("/update-info")
+    @PreAuthorize("hasRole('ADVISOR')")
+    public Result<Integer> updateDraft(@RequestBody UpdateDraftDTO draftDTO) {
+        return examService.updateDraft(draftDTO);
     }
 
     /**
@@ -137,7 +110,7 @@ public class ExamController {
      * @param examId 考试ID
      * @return 消息结果
      */
-    @PostMapping("/release")
+    @PostMapping("/release-exam")
     @PreAuthorize("hasRole('ADVISOR')")
     public Result<Integer> releaseExam(@RequestParam Integer examId) {
         return examService.releaseExam(examId);

@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.laolao.mapper.QuestionMapper">
+    <delete id="deleteDraft">
+        delete question where id in
+        <foreach collection="questionIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
     <select id="selectPrivateBank" resultType="com.laolao.pojo.vo.QuestionBankVO">
         select q.id, q.title, u.name as advisor, q.is_public
         from question q

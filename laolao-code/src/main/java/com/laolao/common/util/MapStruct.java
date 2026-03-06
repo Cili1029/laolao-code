@@ -1,6 +1,8 @@
 package com.laolao.common.util;
 
 import com.laolao.pojo.dto.AddQuestionDTO;
+import com.laolao.pojo.dto.UpdateDraftDTO;
+import com.laolao.pojo.entity.Exam;
 import com.laolao.pojo.entity.JudgeRecord;
 import com.laolao.common.result.JudgeResult;
 import com.laolao.pojo.entity.Question;
@@ -15,4 +17,6 @@ public interface MapStruct {
     JudgeRecordVO JudgeResultToJudgeRecordVO(JudgeResult judge);
 
     Question addQuestionDTOtoQuestion(AddQuestionDTO addQuestionDTO);
+
+    Exam updateDraftDTOToExam(UpdateDraftDTO draftDTO);
 }

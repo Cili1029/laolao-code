@@ -9,6 +9,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
+import java.util.List;
+
 @Mapper
 public interface QuestionMapper extends BaseMapper<Question> {
     Page<QuestionBankVO> selectPrivateBank(Page<QuestionBankVO> page, Integer userId, String content);
@@ -27,4 +29,6 @@ public interface QuestionMapper extends BaseMapper<Question> {
             where id = #{questionId};
             """)
     DraftQuestionVO selectQuestionById(Integer questionId);
+
+    void deleteDraft(List<Integer> questionIds);
 }

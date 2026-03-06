@@ -135,7 +135,7 @@
 
     const getQuestions = async () => {
         try {
-            const res = await axios.get("/api/exam/begin", {
+            const res = await axios.get("/api/exam/member/begin", {
                 params: {
                     recordId: route.params.id
                 }

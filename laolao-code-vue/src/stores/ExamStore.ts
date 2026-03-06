@@ -86,7 +86,7 @@ export const useExamStore = defineStore('sidebar', {
 
                 const questionId = this.currentQuestion.id
 
-                const res = await axios.post("/api/exam/judge", {
+                const res = await axios.post("/api/exam/member/judge", {
                     examId: this.examId,
                     recordId: this.recordId,
                     questionId: questionId,

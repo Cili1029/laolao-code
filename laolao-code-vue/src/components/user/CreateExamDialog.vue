@@ -81,7 +81,7 @@
                         </Button>
                     </DialogClose>
                     <DialogClose as-child>
-                        <Button @click="createGroup()" type="submit"
+                        <Button @click="createExam()" type="submit"
                             :disabled="!group.title || !group.description || !startDate || !endDate">
                             提交
                         </Button>
@@ -128,7 +128,7 @@
         endTime: '',
     })
 
-    const createGroup = async () => {
+    const createExam = async () => {
         // 在提交前组装字符串
         if (startDate.value) {
             const d = startDate.value.toDate(getLocalTimeZone())
@@ -140,7 +140,7 @@
         }
 
         try {
-            const res = await axios.post("/api/exam/create", group.value)
+            const res = await axios.post("/api/exam/draft/create-exam", group.value)
             console.log(res.data.code)
             if (res.data.code === 1) {
                 router.push(`/exam/create/${res.data.data}`)

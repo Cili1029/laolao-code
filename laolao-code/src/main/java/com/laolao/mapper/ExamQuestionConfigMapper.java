@@ -25,4 +25,9 @@ public interface ExamQuestionConfigMapper extends BaseMapper<ExamQuestionConfig>
             where exam_id = #{examId};
             """)
     List<DraftQuestionVO> selectDraftQuestion(Integer examId);
+
+    @Select("select id from exam_question_config where exam_id = #{examId}")
+    List<Integer> selectQuestionIdByExamId(Integer examId);
+
+    void deleteDraft(List<Integer> questionIds);
 }

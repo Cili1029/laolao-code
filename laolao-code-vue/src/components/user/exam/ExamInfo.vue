@@ -7,12 +7,13 @@
                     <Bug class="text-white w-25 h-25" />
                 </div>
                 <div class="w-5/7 h-full shadow rounded-lg flex justify-between p-3 bg-white">
-                    <div class="w-1/2 space-y-2">
+                    <div v-if="userStore.user.role !== 1 || exam?.status !== 0" class="w-1/2 space-y-2">
                         <p class="font-bold">考试信息</p>
                         <p class="text-gray-600">{{ exam?.title }}</p>
-                        <p class="text-gray-600">{{ exam?.group }}</p>
+                        <p class="text-gray-600">{{ exam?.studyGroup }}</p>
                         <p class="text-gray-600">{{ exam?.description }}</p>
                     </div>
+                    <div v-else></div>
                     <div class="w-1/2 flex flex-col">
                         <div class="flex justify-end mb-1">
                             <Badge v-if="userStore.user.role === 2" variant="secondary"
@@ -36,19 +37,19 @@
                                 :disabled="!(exam?.studentStatus === 1) && !(exam?.studentStatus === 2)">
                                 {{ studentStatusTextMap.get(exam?.studentStatus ?? 0) }}
                             </Button>
-                            <div class="flex space-x-2">
-                                <Button v-if="userStore.user.role === 1"
-                                    @click="router.push(`/exam/create/${exam?.id}`)" variant="outline"
+                            <div v-if="userStore.user.role === 1" class="flex space-x-2">
+                                <Button @click="router.push(`/exam/create/${exam?.id}`)" variant="outline"
                                     :disabled="!(exam?.status === 0)">
                                     {{ statusTextMap.get(exam?.status ?? 0) }}
                                 </Button>
-                                <Button v-if="userStore.user.role === 1 && exam?.status === 0" @click="releaseExam()"
-                                    variant="outline">
+                                <Button v-if="exam?.status === 0" @click="releaseExam()" variant="outline">
                                     发布
                                 </Button>
-                                <Button v-if="userStore.user.role === 1 && exam?.status === 1" @click=""
-                                    variant="outline">
+                                <Button v-if="exam?.status === 1" @click="" variant="outline">
                                     取消考试
+                                </Button>
+                                <Button v-if="exam?.status === 0" @click="deleteDraft()" variant="outline">
+                                    删除草稿
                                 </Button>
                             </div>
 
@@ -74,11 +75,26 @@
         </div>
         <div class="h-full w-6/7 mx-auto flex justify-center space-x-5">
             <div class="h-full w-4/5 shadow rounded-lg flex justify-between p-3 bg-white">
-                <div class="w-1/2 space-y-2">
+                <!-- 草稿可编辑状态 -->
+                <div v-if="userStore.user.role === 1 && exam?.status === 0" class="w-1/2 space-y-2">
                     <p class="font-bold">考试信息</p>
-                    <p class="text-gray-600">{{ exam?.title }}</p>
-                    <p class="text-gray-600">{{ exam?.group }}</p>
-                    <p class="text-gray-600">{{ exam?.description }}</p>
+                    <div class="grid w-full gap-1.5">
+                        <Label>所属学习组</Label>
+                        <Input v-model="exam.studyGroup" type="text" :disabled="true" />
+                    </div>
+                    <div class="grid w-full gap-1.5">
+                        <Label>标题</Label>
+                        <Input v-model="exam.title" type="text" />
+                    </div>
+                    <div class="grid w-full gap-1.5">
+                        <Label>描述</Label>
+                        <Textarea v-model="exam.description" type="text" />
+                    </div>
+                    <div class="flex justify-end">
+                        <Button @click="updateDraftInfo()">
+                            更新
+                        </Button>
+                    </div>
                 </div>
             </div>
             <div class="w-1/5 h-full shadow rounded-lg p-3 space-y-2 bg-white">
@@ -154,6 +170,9 @@
     import dayjs from 'dayjs'
     import router from '@/router';
     import { useUserStore } from '@/stores/UserStore'
+    import Input from '@/components/ui/input/Input.vue';
+    import { Textarea } from '@/components/ui/textarea';
+    import Label from '@/components/ui/label/Label.vue';
     const userStore = useUserStore()
 
     const route = useRoute()
@@ -175,7 +194,7 @@
         status: number
         studentStatus: number
         description: string
-        group: string
+        studyGroup: string
         questions: number
         startTime: string
         endTime: string
@@ -200,7 +219,7 @@
 
     const startExam = async () => {
         try {
-            const res = await axios.post("/api/exam/start", {}, {
+            const res = await axios.post("/api/exam/member/start", {}, {
                 params: {
                     examId: route.params.id
                 }
@@ -228,7 +247,7 @@
 
     const releaseExam = async () => {
         try {
-            const res = await axios.post("/api/exam/release", {}, {
+            const res = await axios.post("/api/draft//release-exam", {}, {
                 params: {
                     examId: route.params.id
                 }
@@ -236,6 +255,33 @@
             if (res.data.code === 1) {
                 getExamInfo()
             }
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    const deleteDraft = async () => {
+        try {
+            const res = await axios.delete("/api/draft/delete-draft", {
+                params: {
+                    examId: route.params.id
+                }
+            })
+            if (res.data.code === 1) {
+                router.replace("/exam")
+            }
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    const updateDraftInfo = async () => {
+        try {
+            await axios.post("/api/draft/update-info", {
+                id: route.params.id,
+                title: exam.value?.title,
+                description: exam.value?.description,
+            })
         } catch (e) {
             console.log(e)
         }

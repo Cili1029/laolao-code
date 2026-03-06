@@ -11,4 +11,6 @@ public interface QuestionTestCaseMapper extends BaseMapper<QuestionTestCase> {
     void insertBatch(List<QuestionTestCase> testCases);
 
     List<QuestionTestCase> selectBatchByQuestionIds(List<Integer> questionIds);
+
+    void deleteDraft(List<Integer> questionIds);
 }

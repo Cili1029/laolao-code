@@ -88,4 +88,5 @@ public interface ExamMapper extends BaseMapper<Exam> {
 
     @Select("update exam set status = #{status} where id = #{id}")
     void updateExamStatus(Integer id, Integer status);
+
 }
