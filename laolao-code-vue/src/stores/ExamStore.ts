@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia'
 import axios from "@/utils/myAxios"
+import router from '@/router'
 
 export interface Questions {
     id: number
@@ -50,6 +51,9 @@ export const useExamStore = defineStore('sidebar', {
         judgeRecord: null as JudgeRecord | null,
         judgeLoading: false, // 判题加载状态
         judgeDialog: false,
+
+        // 交卷
+        submitLoading: false,
 
         // 老师的判题结果
         advisorJudgeRecord: null as JudgeRecord | null,
@@ -105,6 +109,24 @@ export const useExamStore = defineStore('sidebar', {
                 this.judgeRecord = null
             } finally {
                 this.judgeLoading = false
+            }
+        },
+
+        async submitExam() {
+            try {
+                this.submitLoading = true
+                const res = await axios.put("/api/exam/member/submit", {}, {
+                    params: {
+                        recordId: this.recordId
+                    }
+                })
+                if (res.data.code === 1) {
+                    router.replace(`/exam/${this.examId}`)
+                }
+            } catch (e) {
+                console.error('交卷失败：', e)
+            } finally {
+                this.submitLoading = false
             }
         },
 

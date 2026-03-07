@@ -1,0 +1,38 @@
+package com.laolao.controller;
+
+import com.laolao.common.result.Result;
+import com.laolao.pojo.dto.UpdateScoreDTO;
+import com.laolao.pojo.vo.GradeMemberVO;
+import com.laolao.service.GradeExamService;
+import jakarta.annotation.Resource;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("api/exam/grade")
+public class GradeExamController {
+    @Resource
+    private GradeExamService gradeExamService;
+
+    /**
+     * 获取参与考试的考生
+     *
+     * @return 考生数据
+     */
+    @GetMapping
+    public Result<List<GradeMemberVO>> getGradeMember(@RequestParam Integer examId) {
+        return gradeExamService.getGradeMember(examId);
+    }
+
+    /**
+     * 更新考生某一题的分数
+     *
+     * @param updateScoreDTO id和分数
+     * @return 总分差值
+     */
+    @PutMapping("/update-score")
+    public Result<Integer> updateScore(@RequestBody UpdateScoreDTO updateScoreDTO) {
+        return gradeExamService.updateScore(updateScoreDTO);
+    }
+}

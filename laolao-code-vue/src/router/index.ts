@@ -10,6 +10,7 @@ import UserLayout from "@/components/user/UserLayout.vue";
 import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
 import ExamInfo from "@/components/user/exam/ExamInfo.vue";
 import CreateExam from "@/components/user/exam/CreateExam.vue";
+import GradeExam from "@/components/user/exam/GradeExam.vue";
 
 const routes: Array<RouteRecordRaw> = [
     // 注册
@@ -57,6 +58,10 @@ const routes: Array<RouteRecordRaw> = [
                     {
                         path: 'create/:id',
                         component: CreateExam,
+                    },
+                    {
+                        path: 'grade/:id',
+                        component: GradeExam,
                     },
                 ]
             },

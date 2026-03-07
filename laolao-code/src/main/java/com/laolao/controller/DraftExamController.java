@@ -32,6 +32,18 @@ public class DraftExamController {
     }
 
     /**
+     * 导师更新考试
+     *
+     * @param draftDTO 信息
+     * @return 消息结果
+     */
+    @PutMapping("/update-exam")
+    @PreAuthorize("hasRole('ADVISOR')")
+    public Result<Integer> updateDraft(@RequestBody UpdateDraftDTO draftDTO) {
+        return examService.updateDraft(draftDTO);
+    }
+
+    /**
      * 导师运行测试用例
      *
      * @param judgeTestCaseDTO 测试参数
@@ -90,18 +102,6 @@ public class DraftExamController {
     @PreAuthorize("hasRole('ADVISOR')")
     public Result<String> deleteDraft(@RequestParam Integer examId) {
         return examService.deleteDraft(examId);
-    }
-
-    /**
-     * 更新草稿
-     *
-     * @param draftDTO 信息
-     * @return 消息结果
-     */
-    @PostMapping("/update-info")
-    @PreAuthorize("hasRole('ADVISOR')")
-    public Result<Integer> updateDraft(@RequestBody UpdateDraftDTO draftDTO) {
-        return examService.updateDraft(draftDTO);
     }
 
     /**

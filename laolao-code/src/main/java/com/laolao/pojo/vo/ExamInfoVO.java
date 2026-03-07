@@ -38,6 +38,11 @@ public class ExamInfoVO implements Serializable {
     private String description;
 
     /**
+     * 所属组Id
+     */
+    private String studyGroupId;
+
+    /**
      * 所属组
      */
     private String studyGroup;

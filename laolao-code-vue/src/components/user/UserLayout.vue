@@ -17,9 +17,10 @@
                         <Spinner class="mr-1" v-else />
                         提交答案
                     </div>
-                    <div v-if="examStore.examBegin" @click="examStore.judgeLoading ? '' : examStore.judge()"
+                    <div v-if="examStore.examBegin" @click="examStore.submitLoading ? '' : examStore.submitExam()"
                         class="flex text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded cursor-pointer">
-                        <CheckSquare v-if="!examStore.judgeLoading" class="h-4 w-4 mr-1" />
+                        <CheckSquare v-if="!examStore.submitLoading" class="h-4 w-4 mr-1" />
+                        <Spinner class="mr-1" v-else />
                         交卷
                     </div>
                 </div>

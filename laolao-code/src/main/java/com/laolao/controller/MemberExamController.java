@@ -46,4 +46,15 @@ public class MemberExamController {
     public Result<JudgeRecordVO> judge(@RequestBody JudgeDTO judgeDTO) {
         return memberExamService.judge(judgeDTO);
     }
+
+    /**
+     * 交卷
+     *
+     * @param recordId 考试Id
+     * @return 判题结果
+     */
+    @PutMapping("/submit")
+    public Result<String> submit(@RequestParam Integer recordId) {
+        return memberExamService.submit(recordId);
+    }
 }

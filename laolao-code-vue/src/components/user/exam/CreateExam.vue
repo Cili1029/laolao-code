@@ -241,7 +241,7 @@
 
     const getQuestions = async () => {
         try {
-            const res = await axios.get("/api/exam/create", {
+            const res = await axios.get("/api/exam/draft/get-question", {
                 params: { examId: route.params.id }
             })
             if (!res.data.data || res.data.data.length === 0) {
@@ -292,7 +292,7 @@
         // 后端删除 如果有Id就是保存过的，需要后端也进行删除
         if (currentQuestion.value?.id) {
             try {
-                await axios.delete("/api/exam/create/remove-question", {
+                await axios.delete("/api/exam/draft/remove-question", {
                     params: {
                         examId: Number(route.params.id),
                         questionId: currentQuestion.value?.id
@@ -315,7 +315,7 @@
 
     const saveAndAddToExam = async () => {
         try {
-            const res = await axios.post("/api/exam/create/add", {
+            const res = await axios.post("/api/exam/draft/add-question", {
                 examId: Number(route.params.id),
                 question: currentQuestion.value
             })
@@ -369,7 +369,7 @@
     const runTestCase = async (testCase: TestCase) => {
         try {
             examStore.judgeLoading = true
-            const res = await axios.post("/api/exam/create/judge", {
+            const res = await axios.post("/api/exam/draft/judge", {
                 code: currentQuestion.value!.standardSolution,
                 testCase: testCase
             })

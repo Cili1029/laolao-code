@@ -106,7 +106,7 @@
     import { Badge } from '@/components/ui/badge'
     import dayjs from 'dayjs'
     import { useUserStore } from '@/stores/UserStore'
-    import CreateExamDialog from './CreateExamDialog.vue';
+    import CreateExamDialog from './CreateOrUpdateExamDialog.vue';
     const userStore = useUserStore()
 
     const route = useRoute()

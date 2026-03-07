@@ -43,6 +43,8 @@ public class DraftExamServiceImpl implements DraftExamService {
     private QuestionMapper questionMapper;
     @Resource
     private ExamQuestionConfigMapper examQuestionConfigMapper;
+    @Resource
+    private StudyGroupMapper studyGroupMapper;
 
     @Override
     public Result<Integer> createExam(CreateExamDTO createExamDTO) {
@@ -162,6 +164,12 @@ public class DraftExamServiceImpl implements DraftExamService {
         }
         if (exam.getStartTime().isAfter(exam.getEndTime())) {
             return Result.error("开始时间必须早于结束时间");
+        }
+
+        // 至少要有一个考生
+        Integer memberCount = studyGroupMapper.selectMemberCountByExamId(examId);
+        if (memberCount == 0) {
+            return Result.error("学习组只少要有一名成员才可以发布考试");
         }
 
         // 分数校验

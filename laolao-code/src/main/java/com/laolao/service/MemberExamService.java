@@ -12,4 +12,6 @@ public interface MemberExamService {
     Result<ExamBeginVO> getExamQuestion(Integer recordId);
 
     Result<JudgeRecordVO> judge(JudgeDTO judgeDTO);
+
+    Result<String> submit(Integer recordId);
 }

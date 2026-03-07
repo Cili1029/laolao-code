@@ -15,8 +15,8 @@
         </div>
 
         <!-- 状态二：有 ID 时，渲染真正的详情内容 -->
-        <!-- 这里还要继续往下“传火”，必须给 RouterView 加上 flex-1 flex-col min-h-0 -->
-        <RouterView v-else class="flex flex-1 flex-col min-h-0 overflow-hidden" />
+        <!-- 这里还要继续往下“传火”，必须给 RouterView 加上 flex-1 min-h-0 -->
+        <RouterView v-else class="flex flex-1 min-h-0 overflow-hidden" />
 
     </div>
 </template>

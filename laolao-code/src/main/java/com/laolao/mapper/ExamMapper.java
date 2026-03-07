@@ -34,6 +34,7 @@ public interface ExamMapper extends BaseMapper<Exam> {
                    e.status,
                    e.title,
                    e.description,
+                   g.id              as study_group_id,
                    g.name              as study_group,
                    (select count(*)
                     from exam_question_config

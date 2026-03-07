@@ -60,4 +60,12 @@ public interface StudyGroupMapper extends BaseMapper<StudyGroup> {
             order by start_time desc;
             """)
     List<DetailExamStudyGroupVO> selectDetailExam(Integer studyGroupId, Integer userId);
+
+    @Select("""
+            select count(gm.id)
+            from study_group_member gm
+                     join exam e on gm.study_group_id = e.study_group_id
+            where e.id = #{examId}
+            """)
+    Integer selectMemberCountByExamId(Integer examId);
 }

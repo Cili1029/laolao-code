@@ -50,12 +50,15 @@ public class MemberExamServiceImpl implements MemberExamService {
 
     @Override
     public Result<ExamBeginVO> getExamQuestion(Integer recordId) {
-        // 获取这个记录所在的考试Id
-        Integer examId = examRecordMapper.selectExamIdByRecordId(recordId);
+        // 获取这个记录所在的考试Id和状态
+        ExamRecord examRecord = examRecordMapper.selectExamByRecordId(recordId);
+        if (examRecord.getStatus() != 0) {
+            return Result.error("考试已结束或已交卷");
+        }
         // 获取其题目以及当前学生每道题的分数
-        List<ExamQuestionVO> examQuestionVOList = examMapper.selectQuestionById(examId, recordId, SecurityUtils.getUserId());
+        List<ExamQuestionVO> examQuestionVOList = examMapper.selectQuestionById(examRecord.getExamId(), recordId, SecurityUtils.getUserId());
         ExamBeginVO examBeginVO = new ExamBeginVO();
-        examBeginVO.setExamId(examId);
+        examBeginVO.setExamId(examRecord.getExamId());
         examBeginVO.setQuestions(examQuestionVOList);
         return Result.success(examBeginVO);
     }
@@ -92,5 +95,13 @@ public class MemberExamServiceImpl implements MemberExamService {
             e.printStackTrace();
             return Result.error("判题失败！练习管理员！");
         }
+    }
+
+    @Override
+    public Result<String> submit(Integer recordId) {
+        // 整合分数
+        Integer score = judgeRecordMapper.selectTotalScore(recordId);
+        examRecordMapper.submitExam(recordId, SecurityUtils.getUserId(), score);
+        return Result.success("交卷成功");
     }
 }
