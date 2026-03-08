@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.laolao.pojo.entity.ExamRecord;
 import com.laolao.pojo.vo.ExamRecordVO;
 import com.laolao.pojo.vo.GradeMemberVO;
+import com.laolao.pojo.vo.MemberReportVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -24,7 +25,7 @@ public interface ExamRecordMapper extends BaseMapper<ExamRecord> {
             from exam_record er
                      join exam e on e.id = er.exam_id
                      join study_group g on g.id = e.study_group_id
-            where er.user_id = #{userId}
+            where er.user_id = #{userId} and e.status = 3
             """)
     List<ExamRecordVO> selectSimpleExamRecord(Integer userId);
 
@@ -44,4 +45,12 @@ public interface ExamRecordMapper extends BaseMapper<ExamRecord> {
 
     @Update("update exam_record set score = score + #{diffScore} where id = #{examRecordId}")
     void updateScoreByDiff(Integer examRecordId, Integer diffScore);
+
+    @Select("""
+            select er.id, u.name, er.score, er.enter_time, er.submit_time
+                        from exam_record er
+                                 join user u on er.user_id = u.id
+                        where er.id = #{recordId};
+            """)
+    MemberReportVO selectMemberInfoByRecordId(Integer recordId);
 }

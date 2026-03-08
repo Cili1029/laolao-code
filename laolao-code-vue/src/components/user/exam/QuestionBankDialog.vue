@@ -1,12 +1,15 @@
 <template>
-    <Dialog>
+    <Dialog @update:open="getQuestions()">
         <DialogTrigger as-child>
-            <div @click="getQuestions()" :class="[
-                'w-10 h-10 shrink-0 flex items-center justify-center rounded-lg cursor-pointer text-lg border-dashed border-3 font-semibold transition',
-                'text-gray-400 border-gray-300 hover:border-gray-400 hover:text-gray-600'
-            ]">
-                <Warehouse />
-            </div>
+            <!-- 支持自定义触发按钮，如果不传则使用默认样式 -->
+            <slot name="trigger">
+                <div :class="[
+                    'w-10 h-10 shrink-0 flex items-center justify-center rounded-lg cursor-pointer text-lg border-dashed border-3 font-semibold transition',
+                    'text-gray-400 border-gray-300 hover:border-gray-400 hover:text-gray-600'
+                ]">
+                    <Warehouse />
+                </div>
+            </slot>
         </DialogTrigger>
         <DialogContent class="sm:max-w-2xl">
             <DialogHeader>
@@ -23,7 +26,7 @@
                         <FileKey class="h-4 w-4 mr-1" />
                         我的题库
                     </div>
-                    <div @click="handleSwitchType(1)"
+                    <div v-if="type !== 0" @click="handleSwitchType(1)"
                         class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded"
                         :class="currentType === 1 ? 'bg-gray-200' : ''">
                         <File class="h-4 w-4 mr-1" />
@@ -60,7 +63,7 @@
                                     <Spinner v-if="false" class="mr-1" />
                                     {{ question.isPublic ? '转私有' : '转公共' }}
                                 </div>
-                                <div @click="copyQuestion(question.id)"
+                                <div v-if="type !== 0" @click="copyQuestion(question.id)"
                                     class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
                                     <Copy class="h-4 w-4 mr-1" />
                                     <Spinner v-if="false" class="mr-1" />
@@ -237,4 +240,9 @@
     const emit = defineEmits<{
         (e: 'question-data', question: Question): void
     }>()
+
+    // 0为主页，1为编辑页可克隆
+    const props = withDefaults(defineProps<{ type?: number }>(), {
+        type: 0
+    })
 </script>

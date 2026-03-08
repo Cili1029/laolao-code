@@ -56,7 +56,7 @@ public interface StudyGroupMapper extends BaseMapper<StudyGroup> {
             select distinct id, title, start_time, end_time, status
             from exam
             where study_group_id = #{studyGroupId}
-              and (status = 1 or advisor_id = #{userId})
+              and (status != 0 or advisor_id = #{userId})
             order by start_time desc;
             """)
     List<DetailExamStudyGroupVO> selectDetailExam(Integer studyGroupId, Integer userId);

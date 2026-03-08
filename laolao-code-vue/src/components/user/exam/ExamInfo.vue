@@ -236,8 +236,9 @@
     const statusTextMap = new Map<number, string>([
         [0, '继续选题'],
         [1, '已发布'],
-        [2, '已结束'],
-        [3, '已取消'],
+        [2, '改卷中'],
+        [3, '已改完'],
+        [4, '已取消'],
     ])
 
     const releaseExam = async () => {

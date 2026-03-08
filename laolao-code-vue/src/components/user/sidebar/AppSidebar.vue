@@ -38,6 +38,13 @@
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
+        <QuestionBankDialog v-if="userStore.user.role === 1">
+          <template #trigger>
+            <div class="flex justify-center py-2">
+              <Warehouse />
+            </div>
+          </template>
+        </QuestionBankDialog>
         <NavUser />
       </SidebarFooter>
     </Sidebar>
@@ -77,7 +84,7 @@
 
 <script setup lang="ts">
   import type { SidebarProps } from '@/components/ui/sidebar'
-  import { Brain, BugPlay, NotebookText, UsersRound } from "lucide-vue-next"
+  import { Brain, BugPlay, NotebookText, UsersRound, Warehouse } from "lucide-vue-next"
   import { h, onMounted, ref, watch, type Component } from "vue"
   import logo from '@/assets/logo.jpg'
   import NavUser from '@/components/user/sidebar/NavUser.vue'
@@ -87,7 +94,10 @@
   import groupDialog from '../GroupDialog.vue'
   import { useRoute } from 'vue-router'
   import { useExamStore } from "@/stores/ExamStore"
+  import QuestionBankDialog from '../exam/QuestionBankDialog.vue'
   const examStore = useExamStore()
+  import { useUserStore } from '@/stores/UserStore'
+  const userStore = useUserStore()
 
   const props = withDefaults(defineProps<SidebarProps>(), {
     collapsible: "icon",
@@ -107,7 +117,7 @@
   const type = [
     { title: "我的学习组", url: "/group", icon: UsersRound, isActive: true },
     { title: "我的考试", url: "/exam", icon: BugPlay, isActive: false },
-    { title: "考试记录", url: "/exam-record", icon: NotebookText, isActive: false },
+    { title: "考试报告", url: "/member-report", icon: NotebookText, isActive: false },
     { title: "人工智障", url: "/ai", icon: Brain, isActive: false },
   ] as Type[]
 

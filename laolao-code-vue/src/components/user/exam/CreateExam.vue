@@ -19,7 +19,7 @@
                         ]">
                             <Plus />
                         </div>
-                        <QuestionBank @question-data="getBankQuestion" />
+                        <QuestionBank :type="1" @question-data="getBankQuestion" />
                     </div>
 
                     <div class="h-full w-full flex flex-col bg-white border space-y-2">

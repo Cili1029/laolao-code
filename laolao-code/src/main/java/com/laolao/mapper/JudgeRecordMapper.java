@@ -1,9 +1,11 @@
 package com.laolao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.laolao.pojo.ai.JudgeRecordContext;
 import com.laolao.pojo.entity.JudgeRecord;
 import com.laolao.pojo.vo.GradeJudgeRecordVO;
 import com.laolao.pojo.vo.JudgeRecordVO;
+import com.laolao.pojo.vo.MemberExamJudgeRecordVO;
 import com.laolao.pojo.vo.SimpleJudgeRecordVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -46,4 +48,29 @@ public interface JudgeRecordMapper extends BaseMapper<JudgeRecord> {
 
     @Select("select score from judge_record where id = #{judgeRecordId}")
     Integer selectScoreById(Integer judgeRecordId);
+
+    @Select("""
+            SELECT id, title, total_score, member_score, answer_code, standard_solution, status
+            FROM (SELECT jr.id, q.title, qc.score as total_score, jr.score as member_score, q.standard_solution, jr.answer_code, jr.status,
+                         -- 按question_id分组，按status优先级+提交时间降序排序，标记每条记录的优先级
+                         ROW_NUMBER() OVER (
+                             PARTITION BY jr.question_id
+                             ORDER BY FIELD(jr.status, 0, 1, 2, 3, 4, 5, 6, 7), jr.submit_time DESC
+                             ) AS rn -- rn=1 就是该题优先级最高的记录
+                  FROM judge_record jr
+                           JOIN question q ON jr.question_id = q.id
+                           JOIN exam_question_config qc ON qc.question_id = jr.question_id
+                  WHERE jr.exam_record_id = #{recordId} -- 指定考生本次考试
+                 ) AS temp
+            WHERE temp.rn = 1 -- 只取每个题的第一条（优先级最高）
+            """)
+    List<MemberExamJudgeRecordVO> selectMemberExamReportByRecordId(Integer recordId);
+
+    @Select("""
+            select q.title, jr.answer_code, q.standard_solution
+            from judge_record jr
+                     join question q on jr.question_id = q.id
+            where jr.id = #{judgeRecordId}
+            """)
+    JudgeRecordContext selectJudgeInfoToAi(Integer judgeRecordId);
 }

@@ -9,6 +9,29 @@
             ]">
                 {{ member.name.substring(0, 1) }}
             </div>
+
+            <AlertDialog>
+                <AlertDialogTrigger as-child>
+                    <div :class="[
+                        'w-10 h-10 shrink-0 flex items-center justify-center rounded-lg cursor-pointer text-lg border-dashed border-3 font-semibold transition',
+                        'text-gray-400 border-gray-300 hover:border-gray-400 hover:text-gray-600'
+                    ]">
+                        <SendHorizonal />
+                    </div>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>确定结束改卷？</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            结束后将会公布成绩，不可再次修改
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>取消</AlertDialogCancel>
+                        <AlertDialogAction @click = "graded()">确定</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
         </div>
         <div class="flex flex-col flex-1 items-center p-2 space-y-2 overflow-y-auto">
             <div class=" w-5/7 border rounded py-2 px-6 space-y-2 bg-white">
@@ -62,7 +85,8 @@
     import axios from "@/utils/myAxios"
     import { onMounted, ref } from "vue";
     import { useRoute } from "vue-router";
-    import { Check } from 'lucide-vue-next'
+    import { Check, SendHorizonal } from 'lucide-vue-next'
+    import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from '@/components/ui/alert-dialog'
     import { Button } from '@/components/ui/button'
     import { ButtonGroup } from '@/components/ui/button-group'
     import { Input } from '@/components/ui/input'
@@ -72,6 +96,7 @@
     import { useExamStore } from "@/stores/ExamStore"
     import Badge from "@/components/ui/badge/Badge.vue";
     const examStore = useExamStore()
+    import router from '@/router';
 
     onMounted(() => {
         getMember()
@@ -119,8 +144,23 @@
                 judgeRecordId: judgeRecord.id,
                 score: judgeRecord.memberScore
             })
-            if(res.data.code === 1) {
+            if (res.data.code === 1) {
                 currentMember.value!.score = currentMember.value!.score + res.data.data
+            }
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
+    const graded = async () => {
+        try {
+            const res = await axios.put("/api/exam/grade/graded", {}, {
+                params: {
+                    examId: route.params.id
+                }
+            })
+            if (res.data.code === 1) {
+                router.replace("/exam")
             }
         } catch (e) {
             console.log(e);

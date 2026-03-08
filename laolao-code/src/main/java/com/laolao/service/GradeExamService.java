@@ -10,4 +10,6 @@ public interface GradeExamService {
     Result<List<GradeMemberVO>> getGradeMember(Integer examId);
 
     Result<Integer> updateScore(UpdateScoreDTO updateScoreDTO);
+
+    Result<Integer> graded(Integer examId);
 }

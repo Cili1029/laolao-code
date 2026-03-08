@@ -35,4 +35,15 @@ public class GradeExamController {
     public Result<Integer> updateScore(@RequestBody UpdateScoreDTO updateScoreDTO) {
         return gradeExamService.updateScore(updateScoreDTO);
     }
+
+    /**
+     * 提交改卷
+     *
+     * @param examId 考试Id
+     * @return 结果信息
+     */
+    @PutMapping("/graded")
+    public Result<Integer> graded(@RequestParam Integer examId) {
+        return gradeExamService.graded(examId);
+    }
 }

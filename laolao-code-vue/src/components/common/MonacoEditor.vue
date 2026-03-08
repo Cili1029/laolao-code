@@ -10,6 +10,7 @@
         modelValue: string;
         language?: string;
         theme?: string;
+        readonly?: boolean, // 默认可编辑
         options?: monaco.editor.IStandaloneEditorConstructionOptions;
     }
 
@@ -48,6 +49,7 @@
                 language: props.language,
                 theme: props.theme,
                 ...defaultOptions,
+                readOnly: props.readonly,
                 ...props.options // 父组件配置具有最高优先级
             });
 

@@ -3,7 +3,7 @@ import SignUp from "@/components/common/SignUp.vue";
 import Test from "@/components/common/Test.vue";
 import Ai from "@/components/user/Ai.vue";
 import ExamTool from "@/components/user/exam/ExamTool.vue";
-import ExamRecord from "@/components/user/ExamRecord.vue";
+import MemberExamReport from "@/components/user/MemberExamReport.vue";
 import Group from "@/components/user/Group.vue";
 import Common from "@/components/user/Common.vue";
 import UserLayout from "@/components/user/UserLayout.vue";
@@ -66,12 +66,12 @@ const routes: Array<RouteRecordRaw> = [
                 ]
             },
             {
-                path: 'exam-record',
+                path: 'member-report',
                 component: Common,
                 children: [
                     {
                         path: ':id',
-                        component: ExamRecord,
+                        component: MemberExamReport,
                     }
                 ]
             },
