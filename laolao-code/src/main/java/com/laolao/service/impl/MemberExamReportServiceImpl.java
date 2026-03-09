@@ -2,7 +2,6 @@ package com.laolao.service.impl;
 
 import com.laolao.common.result.Result;
 import com.laolao.common.util.SecurityUtils;
-import com.laolao.mapper.ExamMapper;
 import com.laolao.mapper.ExamRecordMapper;
 import com.laolao.mapper.JudgeRecordMapper;
 import com.laolao.pojo.vo.ExamRecordVO;
@@ -19,8 +18,6 @@ public class MemberExamReportServiceImpl implements MemberExamReportService {
     private ExamRecordMapper examRecordMapper;
     @Resource
     private JudgeRecordMapper judgeRecordMapper;
-    @Resource
-    private ExamMapper examMapper;
 
     @Override
     public Result<List<ExamRecordVO>> getSimpleExamRecord() {
@@ -32,9 +29,7 @@ public class MemberExamReportServiceImpl implements MemberExamReportService {
     @Override
     public Result<MemberReportVO> getExamReport(Integer recordId) {
         MemberReportVO memberReportVO = examRecordMapper.selectMemberInfoByRecordId(recordId);
-        // 获取第一个考生作答情况
         memberReportVO.setJudgeRecords(judgeRecordMapper.selectMemberExamReportByRecordId(memberReportVO.getId()));
-        // 放置
         return Result.success(memberReportVO);
     }
 }

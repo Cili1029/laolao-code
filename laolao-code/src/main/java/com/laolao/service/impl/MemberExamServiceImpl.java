@@ -14,6 +14,8 @@ import com.laolao.pojo.vo.*;
 import com.laolao.service.MemberExamService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
@@ -98,10 +100,13 @@ public class MemberExamServiceImpl implements MemberExamService {
     }
 
     @Override
+    @Transactional
     public Result<String> submit(Integer recordId) {
         // 整合分数
         Integer score = judgeRecordMapper.selectTotalScore(recordId);
         examRecordMapper.submitExam(recordId, SecurityUtils.getUserId(), score);
+        // 同时需要给所有记录都选出每一题分数最好的那一条
+        judgeRecordMapper.updateBestRecord(recordId);
         return Result.success("交卷成功");
     }
 }

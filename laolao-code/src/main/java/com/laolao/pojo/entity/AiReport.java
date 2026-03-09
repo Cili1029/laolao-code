@@ -1,5 +1,7 @@
 package com.laolao.pojo.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.*;
 
 import java.io.Serializable;
@@ -15,6 +17,7 @@ public class AiReport implements Serializable {
     /**
      * 主键ID
      */
+    @TableId(type = IdType.AUTO)
     private Integer id;
 
     /**

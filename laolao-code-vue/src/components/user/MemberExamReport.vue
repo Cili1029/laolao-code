@@ -7,6 +7,7 @@
                     <span>分数：{{ report?.score }}</span>
                 </div>
                 <div class="flex justify-between">
+                    <span>考试：{{ report?.title }}</span>
                     <span>考试时间：{{ dayjs(report?.enterTime).format('YYYY/MM/DD HH:mm') }}</span>
                     <span>提交时间：{{ dayjs(report?.submitTime).format('YYYY/MM/DD HH:mm') }}</span>
                 </div>
@@ -40,7 +41,7 @@
                         </div>
                     </div>
                     <div class="flex justify-between pt-2">
-                        <div @click="aiReport(judgeRecord)" v-if="judgeRecord.status !== 0"
+                        <div @click="aiReport(judgeRecord)" v-if="judgeRecord.status !== 0 && !judgeRecord.aiReport"
                             class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
                             <Spinner v-if="judgeRecord.isGenerating" class="mr-1" />
                             <Rocket v-else class="h-4 w-4 mr-1" />
@@ -50,12 +51,10 @@
                         <p>得分：{{ judgeRecord.memberScore }}</p>
                     </div>
 
-                    <div v-if="judgeRecord.aiReportText || judgeRecord.isGenerating"
+                    <div v-if="judgeRecord.aiReport || judgeRecord.isGenerating"
                         class="mt-4 p-4 bg-slate-50 border border-blue-100 rounded-lg">
-                        <!-- 渲染 Markdown -->
-                        <div class="text-sm text-gray-700" v-html="renderMarkdown(judgeRecord.aiReportText || '')">
+                        <div class="text-sm text-gray-700" v-html="renderMarkdown(judgeRecord.aiReport || '')">
                         </div>
-                        <!-- 打字机闪烁光标 -->
                         <span v-if="judgeRecord.isGenerating"
                             class="inline-block w-2 h-4 bg-blue-500 animate-pulse ml-1 align-middle"></span>
                     </div>
@@ -69,17 +68,15 @@
 
 <script setup lang="ts">
     import axios from "@/utils/myAxios"
-    import { onMounted, ref } from "vue";
-    import { useRoute } from "vue-router";
-    import dayjs from "dayjs";
+    import { onMounted, ref } from "vue"
+    import { useRoute } from "vue-router"
+    import dayjs from "dayjs"
     import MonacoEditor from "@/components/common/MonacoEditor.vue"
     import { useExamStore } from "@/stores/ExamStore"
-    import Badge from "@/components/ui/badge/Badge.vue";
-
-    // 引入 markdown-it
-    import MarkdownIt from 'markdown-it';
-    import Spinner from "../ui/spinner/Spinner.vue";
-    import { Rocket } from "lucide-vue-next";
+    import Badge from "@/components/ui/badge/Badge.vue"
+    import MarkdownIt from 'markdown-it'
+    import Spinner from "../ui/spinner/Spinner.vue"
+    import { Rocket } from "lucide-vue-next"
     const md = new MarkdownIt({ breaks: true }); // breaks: true 允许回车换行
     const renderMarkdown = (text: string) => md.render(text);
 
@@ -90,7 +87,6 @@
         getReport()
     })
 
-    // 🌟 1. 扩展接口：给每道题加上 AI 专属的临时字段
     interface JudgeRecord {
         id: number
         title: string
@@ -99,8 +95,8 @@
         answerCode: string
         standardSolution: string
         status: number
-        // 以下为新增字段，前端专用
-        aiReportText?: string;
+        aiReport: string;
+        // 前端专用字段
         isGenerating?: boolean;
     }
 
@@ -108,6 +104,8 @@
         id: number
         name: string
         score: number
+        examId: number
+        title: string
         enterTime: string
         submitTime: string
         judgeRecords: JudgeRecord[]
@@ -126,95 +124,35 @@
 
             if (reportData && reportData.judgeRecords) {
                 reportData.judgeRecords.forEach((record: JudgeRecord) => {
-                    const userCode = record.answerCode || '';
-                    record.answerCode = `// 你的答案\n${userCode}`;
+                    record.answerCode = `// 你的答案\n${record.answerCode}`
+                    record.standardSolution = `// 标准答案\n${record.standardSolution}`
 
-                    const stdCode = record.standardSolution || '';
-                    record.standardSolution = `// 标准答案\n${stdCode}`;
-
-                    // 初始化 AI 字段
-                    record.aiReportText = '';
-                    record.isGenerating = false;
+                    record.isGenerating = false
                 });
             }
-            report.value = reportData;
-
+            report.value = reportData
         } catch (e) {
             console.log(e);
         }
     }
 
-    // 🌟 2. 改写 AI 调用方法 (使用原生 EventSource 接收流式打字机数据)
     const aiReport = (judgeRecord: JudgeRecord) => {
-        // 防止重复点击
-        if (judgeRecord.isGenerating) return;
+        if (judgeRecord.isGenerating) return
 
-        // 状态重置
-        judgeRecord.isGenerating = true;
-        judgeRecord.aiReportText = '';
+        judgeRecord.isGenerating = true
+        judgeRecord.aiReport = ''
 
-        // ⚠️ 注意：接收流式数据不能用 axios，必须用浏览器的 EventSource
-        // 这里的 URL 请换成你实际的后端 AI 接口地址
-        const eventSource = new EventSource(`/api/ai/report?recordId=${judgeRecord.id}`);
+        const eventSource = new EventSource(`/api/ai/report/question?recordId=${judgeRecord.id}`)
 
-        // 监听持续返回的数据块 (打字机效果核心)
+        // 只要来数据，就往屏幕上打字 (默认监听 message 事件)
         eventSource.onmessage = (event) => {
-            // 替换后端传来的换行符
-            const chunk = event.data.replace(/\\n/g, '\n');
-            // 将文字拼接到当前这道题的专属字段上，Vue会自动更新视图！
-            judgeRecord.aiReportText += chunk;
+            judgeRecord.aiReport += event.data.replace(/\\n/g, '\n')
         };
 
-        // 监听后端发出的完成信号 (我们在 Java 里写的 event().name("finish"))
-        eventSource.addEventListener("finish", () => {
-            judgeRecord.isGenerating = false;
-            eventSource.close();
-        });
-
-        // 新代码
-        // 1. 监听后端的自定义报错信号
-        eventSource.addEventListener("error", (event: any) => {
-            if (event.data) { // 只有后端传了具体的报错内容，才显示出来
-                judgeRecord.aiReportText += `\n\n[❌ 诊断失败: ${event.data}]`;
-            }
-            judgeRecord.isGenerating = false;
-            eventSource.close();
-        });
-
-        // 2. 监听原生的网络层面异常 (当后端调用 emitter.complete() 时会触发这个)
+        // 只要连接断开 (无论是因为后端正常输出完毕，还是网络异常)，统统当作正常结束！
         eventSource.onerror = () => {
-            // 静默关闭即可，这通常意味着正常生成结束或网络波动
-            judgeRecord.isGenerating = false;
-            eventSource.close();
-        };
-
-        // 监听网络层面的异常断开
-        eventSource.onerror = () => {
-            judgeRecord.isGenerating = false;
-            eventSource.close();
+            judgeRecord.isGenerating = false
+            eventSource.close()
         };
     }
 </script>
-
-<style scoped>
-
-    /* 给 markdown 加上极其基础的排版，防止它全糊在一起 */
-    :deep(.text-sm.text-gray-700 p) {
-        margin-bottom: 0.5rem;
-    }
-
-    :deep(.text-sm.text-gray-700 pre) {
-        background-color: #f1f5f9;
-        padding: 0.5rem;
-        border-radius: 0.25rem;
-        margin: 0.5rem 0;
-        overflow-x: auto;
-    }
-
-    :deep(.text-sm.text-gray-700 code) {
-        background-color: #f1f5f9;
-        padding: 0.1rem 0.3rem;
-        border-radius: 0.25rem;
-        font-family: monospace;
-    }
-</style>

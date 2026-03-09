@@ -46,4 +46,9 @@ public class MemberExamJudgeRecordVO implements Serializable {
      * 判题状态
      */
     private Integer status;
+
+    /**
+     * ai报告
+     */
+    private String aiReport;
 }

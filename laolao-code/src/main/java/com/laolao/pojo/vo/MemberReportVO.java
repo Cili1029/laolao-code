@@ -28,6 +28,16 @@ public class MemberReportVO implements Serializable {
     private Integer score;
 
     /**
+     * 考试Id
+     */
+    private Integer examId;
+
+    /**
+     * 考试名
+     */
+    private String title;
+
+    /**
      * 考生进入时间
      */
     private LocalDateTime enterTime;
