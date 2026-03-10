@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/exam")
+@RequestMapping("/api/exam")
 public class ExamQueryController {
     @Resource
     private ExamQueryService examQueryService;
@@ -33,5 +33,16 @@ public class ExamQueryController {
     @GetMapping("/info")
     public Result<ExamInfoVO> getExamInfo(@RequestParam Integer examId) {
         return examQueryService.getExamInfo(examId);
+    }
+
+    /**
+     * 导师获得考试后考试数据
+     *
+     * @param examId 考试Id
+     * @return 考试数据
+     */
+    @GetMapping("/complete-report")
+    public Result<ExamCompleteReportVO> getExamCompleteReport(@RequestParam Integer examId) {
+        return examQueryService.getExamCompleteReport(examId);
     }
 }

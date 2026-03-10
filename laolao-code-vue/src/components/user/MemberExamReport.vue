@@ -11,6 +11,24 @@
                     <span>考试时间：{{ dayjs(report?.enterTime).format('YYYY/MM/DD HH:mm') }}</span>
                     <span>提交时间：{{ dayjs(report?.submitTime).format('YYYY/MM/DD HH:mm') }}</span>
                 </div>
+                <div class="flex pt-2">
+                    <div @click="aiExamRecordReport()"
+                        v-if="!report?.aiReport"
+                        class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
+                        <Spinner v-if="report?.isGenerating" class="mr-1" />
+                        <Rocket v-else class="h-4 w-4 mr-1" />
+                        {{ report?.isGenerating ? 'AI 正在思考...' : '生成 AI 诊断报告' }}
+                    </div>
+                    <p v-else></p>
+                </div>
+
+                <div v-if="report?.aiReport || report?.isGenerating"
+                    class="mt-4 p-4 bg-slate-50 border border-blue-100 rounded-lg">
+                    <div class="text-sm text-gray-700" v-html="renderMarkdown(report.aiReport || '')">
+                    </div>
+                    <span v-if="report.isGenerating"
+                        class="inline-block w-2 h-4 bg-blue-500 animate-pulse ml-1 align-middle"></span>
+                </div>
             </div>
 
             <div class=" w-6/7 shrink-0 border rounded py-2 px-6 space-y-2 bg-white">
@@ -41,7 +59,8 @@
                         </div>
                     </div>
                     <div class="flex justify-between pt-2">
-                        <div @click="aiReport(judgeRecord)" v-if="judgeRecord.status !== 0 && !judgeRecord.aiReport"
+                        <div @click="aiJudgeRecordReport(judgeRecord)"
+                            v-if="judgeRecord.status !== 0 && !judgeRecord.aiReport"
                             class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
                             <Spinner v-if="judgeRecord.isGenerating" class="mr-1" />
                             <Rocket v-else class="h-4 w-4 mr-1" />
@@ -95,9 +114,9 @@
         answerCode: string
         standardSolution: string
         status: number
-        aiReport: string;
+        aiReport: string
         // 前端专用字段
-        isGenerating?: boolean;
+        isGenerating?: boolean
     }
 
     interface Member {
@@ -109,6 +128,9 @@
         enterTime: string
         submitTime: string
         judgeRecords: JudgeRecord[]
+        aiReport: string
+        // 前端专用字段
+        isGenerating?: boolean
     }
 
     const report = ref<Member>()
@@ -121,8 +143,10 @@
                 }
             })
             const reportData = res.data.data;
+            reportData.isGenerating = false
 
             if (reportData && reportData.judgeRecords) {
+                reportData.isGenerating = false
                 reportData.judgeRecords.forEach((record: JudgeRecord) => {
                     record.answerCode = `// 你的答案\n${record.answerCode}`
                     record.standardSolution = `// 标准答案\n${record.standardSolution}`
@@ -136,7 +160,7 @@
         }
     }
 
-    const aiReport = (judgeRecord: JudgeRecord) => {
+    const aiJudgeRecordReport = (judgeRecord: JudgeRecord) => {
         if (judgeRecord.isGenerating) return
 
         judgeRecord.isGenerating = true
@@ -152,6 +176,26 @@
         // 只要连接断开 (无论是因为后端正常输出完毕，还是网络异常)，统统当作正常结束！
         eventSource.onerror = () => {
             judgeRecord.isGenerating = false
+            eventSource.close()
+        };
+    }
+
+    const aiExamRecordReport = () => {
+        if (report.value!.isGenerating) return
+
+        report.value!.isGenerating = true
+        report.value!.aiReport = ''
+
+        const eventSource = new EventSource(`/api/ai/report/exam-record?examId=${report.value?.examId}&examRecordId=${report.value?.id}`)
+
+        // 只要来数据，就往屏幕上打字 (默认监听 message 事件)
+        eventSource.onmessage = (event) => {
+            report.value!.aiReport += event.data.replace(/\\n/g, '\n')
+        };
+
+        // 只要连接断开 (无论是因为后端正常输出完毕，还是网络异常)，统统当作正常结束！
+        eventSource.onerror = () => {
+            report.value!.isGenerating = false
             eventSource.close()
         };
     }

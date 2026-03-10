@@ -47,11 +47,12 @@ public interface ExamRecordMapper extends BaseMapper<ExamRecord> {
     void updateScoreByDiff(Integer examRecordId, Integer diffScore);
 
     @Select("""
-            select er.id, u.name, er.score, e.id as exam_id, e.title, er.enter_time, er.submit_time
-                        from exam_record er
-                                 join user u on er.user_id = u.id
-                                 join exam e on e.id = er.exam_id
-                        where er.id = #{recordId};
+            select er.id, u.name, er.score, e.id as exam_id, e.title, er.enter_time, er.submit_time, ai.content as ai_report
+            from exam_record er
+                     join user u on er.user_id = u.id
+                     join exam e on e.id = er.exam_id
+                     left join ai_report ai on ai.target_id = er.id
+            where er.id = #{recordId};
             """)
     MemberReportVO selectMemberInfoByRecordId(Integer recordId);
 }

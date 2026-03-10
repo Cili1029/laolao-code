@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("api/exam/member")
+@RequestMapping("/api/exam/member")
 public class MemberExamController {
     @Resource
     private MemberExamService memberExamService;

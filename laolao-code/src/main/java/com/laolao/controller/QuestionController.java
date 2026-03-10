@@ -12,7 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/question")
+@RequestMapping("/api/question")
 public class QuestionController {
     @Resource
     private QuestionService questionService;

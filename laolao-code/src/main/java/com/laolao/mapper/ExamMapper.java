@@ -1,6 +1,7 @@
 package com.laolao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.laolao.pojo.ai.ExamScoreDataContent;
 import com.laolao.pojo.entity.Exam;
 import com.laolao.pojo.vo.ExamInfoVO;
 import com.laolao.pojo.vo.ExamQuestionVO;
@@ -90,4 +91,20 @@ public interface ExamMapper extends BaseMapper<Exam> {
     @Select("update exam set status = #{status} where id = #{id}")
     void updateExamStatus(Integer id, Integer status);
 
+    @Select("""
+            SELECT u.name                                 AS username,
+                   IF(er.score IS NULL, '缺考', er.score) AS score
+            FROM
+                -- 通过考试ID找到对应的学习组
+                exam e
+                    -- 关联该学习组的所有成员
+                    JOIN study_group_member gm ON gm.study_group_id = e.study_group_id
+                    -- 关联成员的用户信息
+                    JOIN user u ON u.id = gm.member_id
+                    -- 左连接该考试的成绩（缺考则score为NULL）
+                    LEFT JOIN exam_record er ON er.user_id = gm.member_id AND er.exam_id = e.id
+            -- 只需要指定考试ID，无需指定组ID
+            WHERE e.id = #{examId};
+            """)
+    List<ExamScoreDataContent> selectAttendanceAndScores(Integer examId);
 }

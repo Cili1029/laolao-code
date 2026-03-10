@@ -2,6 +2,7 @@ package com.laolao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.laolao.pojo.ai.JudgeRecordContext;
+import com.laolao.pojo.ai.MemberAnswerDataContent;
 import com.laolao.pojo.entity.JudgeRecord;
 import com.laolao.pojo.vo.GradeJudgeRecordVO;
 import com.laolao.pojo.vo.JudgeRecordVO;
@@ -98,4 +99,18 @@ public interface JudgeRecordMapper extends BaseMapper<JudgeRecord> {
             WHERE eq.exam_id = #{examId};
             """)
     List<JudgeRecordContext> selectMemberExamInfoToAi(Integer examId, Integer userId);
+
+    @Select("""
+            SELECT u.name AS username,
+                   q.id   AS question_id,
+                   jr.answer_code
+            FROM exam e
+                     JOIN exam_record er ON er.exam_id = e.id
+                     JOIN judge_record jr ON jr.exam_record_id = er.id
+                     JOIN question q ON q.id = jr.question_id
+                     JOIN user u ON u.id = er.user_id
+            WHERE e.id = 10
+              AND jr.is_best = 1;
+            """)
+    List<MemberAnswerDataContent> selectMemberAnswersByExamId(Integer examId);
 }

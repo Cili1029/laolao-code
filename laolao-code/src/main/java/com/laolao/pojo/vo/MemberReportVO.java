@@ -51,4 +51,9 @@ public class MemberReportVO implements Serializable {
      * 作答情况
      */
     private List<MemberExamJudgeRecordVO> judgeRecords;
+
+    /**
+     * ai报告
+     */
+    private String aiReport;
 }

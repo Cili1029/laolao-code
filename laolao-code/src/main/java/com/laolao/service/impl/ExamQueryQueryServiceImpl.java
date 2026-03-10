@@ -1,5 +1,6 @@
 package com.laolao.service.impl;
 
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.laolao.common.result.Result;
 import com.laolao.common.util.SecurityUtils;
 import com.laolao.common.util.StudentExamStatusCalculator;
@@ -17,6 +18,8 @@ public class ExamQueryQueryServiceImpl implements ExamQueryService {
     private ExamMapper examMapper;
     @Resource
     private ExamRecordMapper examRecordMapper;
+    @Resource
+    private AiReportMapper aiReportMapper;
 
     @Override
     public Result<List<ExamVO>> getSimpleExam() {
@@ -43,5 +46,17 @@ public class ExamQueryQueryServiceImpl implements ExamQueryService {
         examInfoVO.setStudentStatus(StudentExamStatusCalculator.calculate(examInfoVO.getStartTime(), examInfoVO.getEndTime(),
                 examInfoVO.getEnterTime(), examInfoVO.getSubmitTime()));
         return Result.success(examInfoVO);
+    }
+
+    @Override
+    public Result<ExamCompleteReportVO> getExamCompleteReport(Integer examId) {
+        AiReport report = aiReportMapper.selectOne(Wrappers.<AiReport>lambdaQuery()
+                .eq(AiReport::getTargetType, 3)
+                .eq(AiReport::getTargetId, examId));
+        ExamCompleteReportVO examCompleteReportVO = new ExamCompleteReportVO();
+        if (report != null) {
+            examCompleteReportVO.setAiReport(report.getContent());
+        }
+        return Result.success(examCompleteReportVO);
     }
 }

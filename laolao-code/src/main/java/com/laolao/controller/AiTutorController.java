@@ -16,13 +16,37 @@ public class AiTutorController {
     @Resource
     private AiTutorService aiTutorService;
 
+    /**
+     * 分析错题生成报告
+     *
+     * @param judgeRecordId 判题记录Id
+     * @return 报告
+     */
     @GetMapping(value = "/question", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> generateQuestionReport(@RequestParam Integer recordId) {
-        return aiTutorService.generateQuestionReport(recordId);
+    public Flux<String> generateQuestionReport(@RequestParam Integer judgeRecordId) {
+        return aiTutorService.generateQuestionReport(judgeRecordId);
     }
 
-    @GetMapping(value = "/member-exam", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> generateMemberExamReport(@RequestParam Integer examId) {
-        return aiTutorService.generateMemberExamReport(examId);
+    /**
+     * 分析这次考试生成考生的报告
+     *
+     * @param examId 考试Id
+     * @param examRecordId 考试记录Id
+     * @return 报告
+     */
+    @GetMapping(value = "/exam-record", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> generateMemberExamReport(@RequestParam Integer examId, @RequestParam Integer examRecordId) {
+        return aiTutorService.generateMemberExamReport(examId, examRecordId);
+    }
+
+    /**
+     * 分析这次考试生成导师的报告
+     *
+     * @param examId 考试Id
+     * @return 报告
+     */
+    @GetMapping(value = "/exam-report", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public Flux<String> generateAdvisorExamReport(@RequestParam Integer examId) {
+        return aiTutorService.generateAdvisorExamReport(examId);
     }
 }

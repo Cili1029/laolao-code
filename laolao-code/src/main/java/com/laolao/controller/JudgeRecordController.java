@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/judge-record")
+@RequestMapping("/api/judge-record")
 public class JudgeRecordController {
     @Resource
     private JudgeRecordService judgeRecordService;

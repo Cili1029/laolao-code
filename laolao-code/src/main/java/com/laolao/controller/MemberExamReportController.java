@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("api/member-report")
+@RequestMapping("/api/member-report")
 public class MemberExamReportController {
     @Resource
     private MemberExamReportService memberExamReportService;
@@ -29,7 +29,6 @@ public class MemberExamReportController {
         return memberExamReportService.getSimpleExamRecord();
     }
 
-
     /**
      * 获取详细报告
      *
@@ -40,6 +39,4 @@ public class MemberExamReportController {
     public Result<MemberReportVO> getExamReport(@RequestParam Integer recordId) {
         return memberExamReportService.getExamReport(recordId);
     }
-
-
 }

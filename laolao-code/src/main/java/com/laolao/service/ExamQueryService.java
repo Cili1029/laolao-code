@@ -9,4 +9,6 @@ public interface ExamQueryService {
     Result<List<ExamVO>> getSimpleExam();
 
     Result<ExamInfoVO> getExamInfo(Integer examId);
+
+    Result<ExamCompleteReportVO> getExamCompleteReport(Integer examId);
 }

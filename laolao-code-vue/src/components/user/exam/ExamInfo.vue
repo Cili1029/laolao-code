@@ -64,7 +64,8 @@
                                         删除草稿
                                     </Button>
 
-                                    <Button v-if="exam?.status === 2" @click="router.push(`/exam/grade/${exam?.id}`)" variant="outline">
+                                    <Button v-if="exam?.status === 2" @click="router.push(`/exam/grade/${exam?.id}`)"
+                                        variant="outline">
                                         去改卷
                                     </Button>
                                 </div>
@@ -89,8 +90,29 @@
                 </p>
             </div>
         </div>
-        <div class="h-full w-6/7 mx-auto flex justify-center space-x-5">
-            <div class="h-full w-4/5 shadow rounded-lg flex justify-between p-3 bg-white">
+
+        <div class="flex-1 min-h-0 w-6/7 mx-auto flex justify-center space-x-5">
+            <div
+                class="h-full w-4/5 shadow rounded-lg p-2 bg-white overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <div v-if="exam?.status === 3">
+                    <div class="flex" v-if="!report?.aiReport">
+                        <div @click="aiAdvisorExamReport()"
+                            class="flex cursor-pointer text-green-600 items-center px-2 py-2 mb-2 bg-gray-100 text-sm hover:bg-gray-200 rounded">
+                            <Spinner v-if="isGenerating" class="mr-1" />
+                            <Rocket v-else class="h-4 w-4 mr-1" />
+                            {{ isGenerating ? 'AI 正在思考...' : '生成 AI 诊断报告' }}
+                        </div>
+                    </div>
+
+                    <div v-if="report?.aiReport || isGenerating"
+                        class="p-4 bg-slate-50 border border-blue-100 rounded-lg">
+                        <div class="text-sm text-gray-700" v-html="renderMarkdown(report?.aiReport || '')">
+                        </div>
+                        <span v-if="isGenerating"
+                            class="inline-block w-2 h-4 bg-blue-500 animate-pulse ml-1 align-middle"></span>
+                    </div>
+                </div>
+
             </div>
             <div class="w-1/5 h-full shadow rounded-lg p-3 space-y-2 bg-white">
                 <p class="font-bold">时间线</p>
@@ -166,18 +188,25 @@
     import router from '@/router';
     import { useUserStore } from '@/stores/UserStore'
     import CreateExamDialog from '../CreateOrUpdateExamDialog.vue';
+    import MarkdownIt from 'markdown-it'
+    import { Rocket } from "lucide-vue-next"
+    import Spinner from '@/components/ui/spinner/Spinner.vue'
+    const md = new MarkdownIt({ breaks: true }); // breaks: true 允许回车换行
+    const renderMarkdown = (text: string) => md.render(text);
     const userStore = useUserStore()
 
     const route = useRoute()
 
     onMounted(() => {
         getExamInfo()
+        getAdvisorReport()
     })
 
     watch(
         () => route.params.id,
         async () => {
             getExamInfo()
+            getAdvisorReport()
         }
     )
 
@@ -268,6 +297,49 @@
             }
         } catch (e) {
             console.log(e)
+        }
+    }
+
+    // 导师改完卷后显示
+    
+    const isGenerating = ref<boolean>(false)
+
+    interface ExamCompleteReport {
+        aiReport: string
+    }
+
+    const report = ref<ExamCompleteReport>()
+
+    const getAdvisorReport = async () => {
+        try {
+            const res = await axios.get("/api/exam/complete-report", {
+                params: {
+                    examId: route.params.id
+                }
+            })
+            report.value = res.data.data
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    const aiAdvisorExamReport = () => {
+        if (isGenerating.value) return
+        isGenerating.value = true
+        report.value!.aiReport = ''
+
+        const eventSource = new EventSource(`/api/ai/report/exam-report?examId=${route.params.id}`)
+
+        // 接收SSE消息，拼接内容
+        eventSource.onmessage = (event) => {
+            // 4. 响应式变量拼接必须操作.value
+            report.value!.aiReport += event.data.replace(/\\n/g, '\n')
+        }
+
+        // 连接异常/结束处理
+        eventSource.onerror = () => {
+            isGenerating.value = false
+            eventSource.close()
         }
     }
 </script>
