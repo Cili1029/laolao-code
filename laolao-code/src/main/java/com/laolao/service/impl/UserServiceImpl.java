@@ -33,6 +33,7 @@ public class UserServiceImpl implements UserService {
     public Result<UserInfoVO> getInfo() {
         Integer userId = SecurityUtils.getUserId();
         UserInfoVO user = userMapper.selectInfoById(userId);
+        System.out.println(SecurityUtils.getUserInfo());
         return Result.success(user);
     }
 }

@@ -2,6 +2,7 @@ package com.laolao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.laolao.pojo.ai.ExamScoreDataContent;
+import com.laolao.pojo.dto.WebSocketExamDTO;
 import com.laolao.pojo.entity.Exam;
 import com.laolao.pojo.vo.ExamInfoVO;
 import com.laolao.pojo.vo.ExamQuestionVO;
@@ -25,7 +26,7 @@ public interface ExamMapper extends BaseMapper<Exam> {
                         where gm.study_group_id = e.study_group_id
                           and gm.member_id = #{userId}) and e.status = 1
                -- 条件2：导师，全部其创建的考试
-               or e.advisor_id = #{userId};
+               or e.advisor_id = #{userId} order by e.start_time desc;
             """)
     List<ExamVO> selectSimpleExam(Integer userId);
 
@@ -107,4 +108,7 @@ public interface ExamMapper extends BaseMapper<Exam> {
             WHERE e.id = #{examId};
             """)
     List<ExamScoreDataContent> selectAttendanceAndScores(Integer examId);
+
+    @Select("select start_time, end_time from exam where id = #{examId}")
+    WebSocketExamDTO selectWebSocketExamInfo(int examId);
 }

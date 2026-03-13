@@ -12,12 +12,14 @@ import java.util.Collection;
 public class MyUserDetail implements UserDetails {
     private Integer userId;
     private String username;
+    private String name;
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
 
-    public MyUserDetail(Integer userId, String username, String password, Collection<? extends GrantedAuthority> authorities) {
+    public MyUserDetail(Integer userId, String username, String name, String password, Collection<? extends GrantedAuthority> authorities) {
         this.userId = userId;
         this.username = username;
+        this.name = name;
         this.password = password;
         this.authorities = authorities;
     }

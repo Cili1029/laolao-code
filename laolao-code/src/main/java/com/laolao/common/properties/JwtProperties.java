@@ -1,4 +1,4 @@
-package com.laolao.common.security;
+package com.laolao.common.properties;
 
 import lombok.Getter;
 import lombok.Setter;

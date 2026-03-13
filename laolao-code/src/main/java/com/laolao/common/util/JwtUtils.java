@@ -1,5 +1,6 @@
-package com.laolao.common.security;
+package com.laolao.common.util;
 
+import com.laolao.common.properties.JwtProperties;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -12,7 +13,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Component
-public class JwtUtil {
+public class JwtUtils {
     @Resource
     private JwtProperties jwtProperties;
     @Resource

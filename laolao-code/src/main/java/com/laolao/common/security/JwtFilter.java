@@ -1,5 +1,6 @@
 package com.laolao.common.security;
 
+import com.laolao.common.util.JwtUtils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import jakarta.annotation.Resource;
@@ -23,7 +24,7 @@ import java.util.Collections;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
     @Resource
-    private JwtUtil jwtUtil;
+    private JwtUtils jwtUtils;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -37,7 +38,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         try {
             // 先验证jwt是否有效
-            Claims claims = jwtUtil.parseJWT(jwt);
+            Claims claims = jwtUtils.parseJWT(jwt);
 
             // 合法但是redis不一致，顶号/异账号登陆
             if (claims == null) {
@@ -54,11 +55,13 @@ public class JwtFilter extends OncePerRequestFilter {
             // 有效且一致
             Integer userId = Integer.parseInt(claims.get("userId").toString());
             String username = claims.get("username").toString();
+            String name = claims.get("name").toString();
             String role = "ROLE_" + claims.get("role").toString();
             // 创建 MyUserDetail 对象存入Security和线程
             MyUserDetail userDetail = new MyUserDetail(
                     userId,
                     username,
+                    name,
                     null, // JWT 场景下不需要密码
                     Collections.singletonList(new SimpleGrantedAuthority(role))
             );
@@ -72,12 +75,6 @@ public class JwtFilter extends OncePerRequestFilter {
             // jwt无效
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
         }
-    }
-
-    private void handleException(HttpServletResponse response, String msg) throws IOException {
-        response.setStatus(HttpStatus.UNAUTHORIZED.value());
-        response.setContentType("application/json;charset=utf-8");
-        response.getWriter().write("{\"code\": 401, \"msg\": \"" + msg + "\"}");
     }
 
     public String getJwtFromCookie(Cookie[] cookies) {

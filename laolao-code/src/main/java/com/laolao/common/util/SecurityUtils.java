@@ -31,4 +31,17 @@ public class SecurityUtils {
         }
         return null;
     }
+
+    // 获取用户完整信息（id， username， name）
+    public static MyUserDetail getUserInfo() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth == null || !auth.isAuthenticated()) {
+            return null;
+        }
+        Object principal = auth.getPrincipal();
+        if (principal instanceof MyUserDetail) {
+            return ((MyUserDetail) principal);
+        }
+        return null;
+    }
 }

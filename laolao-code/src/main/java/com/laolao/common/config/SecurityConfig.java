@@ -1,7 +1,10 @@
-package com.laolao.common.security;
+package com.laolao.common.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.laolao.common.result.Result;
+import com.laolao.common.security.JwtFilter;
+import com.laolao.common.util.JwtUtils;
+import com.laolao.common.security.MyUserDetail;
 import io.jsonwebtoken.Claims;
 import jakarta.annotation.Resource;
 import jakarta.servlet.DispatcherType;
@@ -34,7 +37,7 @@ public class SecurityConfig {
     @Resource
     private JwtFilter jwtFilter;
     @Resource
-    private JwtUtil jwtUtil;
+    private JwtUtils jwtUtils;
     @Resource
     private StringRedisTemplate stringRedisTemplate;
     @Resource
@@ -48,7 +51,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .dispatcherTypeMatchers(DispatcherType.ASYNC).permitAll()
-                        .requestMatchers("/api/user/sign-in", "/api/user/sign-up", "/error").permitAll()
+                        .requestMatchers("/api/user/sign-in", "/api/user/sign-up", "/error", "/ws/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(exception -> exception
@@ -67,8 +70,9 @@ public class SecurityConfig {
                             HashMap<String, Object> claims = new HashMap<>();
                             claims.put("userId", userDetail.getUserId());
                             claims.put("username", userDetail.getUsername());
+                            claims.put("name", userDetail.getName());
                             claims.put("role", userDetail.getAuthorities().iterator().next().getAuthority());
-                            String token = jwtUtil.createJWT(claims);
+                            String token = jwtUtils.createJWT(claims);
 
                             // 创建 HttpOnly Cookie
                             ResponseCookie cookie = ResponseCookie.from("jwt", token)
@@ -98,7 +102,7 @@ public class SecurityConfig {
                             String jwt = jwtFilter.getJwtFromCookie(cookies);
                             if (jwt != null) {
                                 try {
-                                    Claims claims = jwtUtil.parseJWT(jwt);
+                                    Claims claims = jwtUtils.parseJWT(jwt);
                                     int userId = Integer.parseInt(claims.get("userId").toString());
                                     stringRedisTemplate.delete("CODE:TOKEN:" + userId);
                                 } catch (Exception ignored) {}
