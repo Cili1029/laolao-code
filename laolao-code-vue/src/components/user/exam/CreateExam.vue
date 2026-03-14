@@ -1,5 +1,5 @@
 <template>
-    <div v-if="currentQuestion">
+    <div v-if="currentQuestion" class="h-full">
         <ResizablePanelGroup direction="horizontal">
             <ResizablePanel :default-size="30">
                 <div class="h-full flex border-t">
@@ -204,11 +204,11 @@
     import { Input } from '@/components/ui/input'
     import { Label } from '@/components/ui/label'
     import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from '@/components/ui/select'
-    import JudgeDialog from '../JudgeDialog.vue'
+    import JudgeDialog from '../question/JudgeDialog.vue'
     import Spinner from '@/components/ui/spinner/Spinner.vue'
     import { useRoute } from 'vue-router'
     import { toast } from 'vue-sonner'
-    import QuestionBank from './QuestionBankDialog.vue'
+    import QuestionBank from '../question/QuestionBankDialog.vue'
     const route = useRoute()
 
     onMounted(async () => {

@@ -1,16 +1,17 @@
 import SignIn from "@/components/common/SignIn.vue";
 import SignUp from "@/components/common/SignUp.vue";
 import Test from "@/components/common/Test.vue";
-import Ai from "@/components/user/Ai.vue";
 import ExamTool from "@/components/user/exam/ExamTool.vue";
-import MemberExamReport from "@/components/user/MemberExamReport.vue";
-import Group from "@/components/user/Group.vue";
-import Common from "@/components/user/Common.vue";
-import UserLayout from "@/components/user/UserLayout.vue";
+import MemberExamReport from "@/components/user/report/MemberExamReport.vue";
+import Group from "@/components/user/group/Group.vue";
 import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
 import ExamInfo from "@/components/user/exam/ExamInfo.vue";
 import CreateExam from "@/components/user/exam/CreateExam.vue";
 import GradeExam from "@/components/user/exam/GradeExam.vue";
+import MyStudyGroup from "@/components/user/group/MyStudyGroup.vue";
+import MyExam from "@/components/user/exam/MyExam.vue";
+import MyReport from "@/components/user/report/MyReport.vue";
+import UserLayout from "@/components/user/UserLayout.vue";
 
 const routes: Array<RouteRecordRaw> = [
     // 注册
@@ -27,7 +28,6 @@ const routes: Array<RouteRecordRaw> = [
         path: '/test',
         component: Test,
     },
-    // 用户端
     {
         path: '/',
         component: UserLayout,
@@ -35,55 +35,39 @@ const routes: Array<RouteRecordRaw> = [
         children: [
             {
                 path: 'group',
-                component: Common,
-                children: [
-                    {
-                        path: ':id',
-                        component: Group,
-                    }
-                ]
+                component: MyStudyGroup,
+            },
+            {
+                path: 'group/:id',
+                component: Group,
             },
             {
                 path: 'exam',
-                component: Common,
-                children: [
-                    {
-                        path: ':id',
-                        component: ExamInfo,
-                    },
-                    {
-                        path: 'start/:id',
-                        component: ExamTool,
-                    },
-                    {
-                        path: 'create/:id',
-                        component: CreateExam,
-                    },
-                    {
-                        path: 'grade/:id',
-                        component: GradeExam,
-                    },
-                ]
+                component: MyExam,
+            },
+            {
+                path: 'exam/:id',
+                component: ExamInfo,
+            },
+            {
+                path: 'exam/start/:id',
+                component: ExamTool,
+            },
+            {
+                path: 'exam/create/:id',
+                component: CreateExam,
+            },
+            {
+                path: 'grade/:id',
+                component: GradeExam,
             },
             {
                 path: 'member-report',
-                component: Common,
-                children: [
-                    {
-                        path: ':id',
-                        component: MemberExamReport,
-                    }
-                ]
+                component: MyReport,
             },
             {
-                path: 'ai',
-                component: Common,
-                children: [
-                    {
-                        path: ':id',
-                        component: Ai,
-                    }
-                ]
+                path: 'member-report/:id',
+                component: MemberExamReport,
             },
         ]
     }

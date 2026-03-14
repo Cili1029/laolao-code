@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="h-full">
         <ResizablePanelGroup direction="horizontal">
             <ResizablePanel :default-size="40">
                 <div class="h-full flex border-t">
@@ -32,7 +32,7 @@
                                 提交记录
                             </p>
                         </div>
-                        <div class="flex-1 overflow-y-auto">
+                        <div class="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                             <div v-show="currentSelect == 0" class="flex flex-col p-1">
                                 <div class="flex justify-between">
                                     <p>
@@ -50,7 +50,7 @@
                                     </Badge>
                                 </div>
 
-                                <article v-html="renderedContent" class="" />
+                                <article v-html="renderedContent" />
                             </div>
 
                             <Table v-show="currentSelect == 1">
@@ -110,7 +110,7 @@
 <script setup lang="ts">
     import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
     import MonacoEditor from '@/components/common/MonacoEditor.vue'
-    import { onMounted, ref, computed } from 'vue'
+    import { onMounted, ref, computed, onUnmounted } from 'vue'
     import axios from "@/utils/myAxios"
     import { useRoute } from 'vue-router'
     import MarkdownIt from 'markdown-it'
@@ -119,7 +119,9 @@
     const examStore = useExamStore()
     import { Cpu, ScrollText, Timer, TimerReset } from 'lucide-vue-next'
     import { Badge } from '@/components/ui/badge'
-    import JudgeDialog from '../JudgeDialog.vue'
+    import JudgeDialog from '../question/JudgeDialog.vue'
+    import { useWebsocketStore } from '@/stores/websocketStore'
+    const wsStore = useWebsocketStore()
 
 
     const route = useRoute()
@@ -131,6 +133,14 @@
 
     onMounted(async () => {
         await getQuestions()
+        // 连接websocket
+        wsStore.connect(examStore.examId!)
+        examStore.beginExam()
+    })
+
+    onUnmounted(() => {
+        wsStore.close()
+        examStore.endExam()
     })
 
     const getQuestions = async () => {

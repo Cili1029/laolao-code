@@ -19,7 +19,7 @@ public class WebSocketConfig implements WebSocketConfigurer {
 
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(notificationHandler, "/ws/notify") // 前端连接地址
+        registry.addHandler(notificationHandler, "/ws/exam") // 前端连接地址
                 .addInterceptors(myHandshakeInterceptor)
                 .setAllowedOrigins("*"); // 允许跨域
     }

@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-blue-50 p-5 flex flex-col space-y-5">
+    <div class="bg-blue-50 p-5 flex flex-col space-y-5 h-full">
         <div class="h-45 w-6/7 mx-auto flex justify-center space-x-5">
             <div class="w-4/5 h-full flex space-x-5">
                 <div
@@ -94,7 +94,7 @@
         <div class="flex-1 min-h-0 w-6/7 mx-auto flex justify-center space-x-5">
             <div
                 class="h-full w-4/5 shadow rounded-lg p-2 bg-white overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                <div v-if="exam?.status === 3">
+                <div v-if="exam?.status === 3 && userStore.user.role === 1">
                     <div class="flex" v-if="!report?.aiReport">
                         <div @click="aiAdvisorExamReport()"
                             class="flex cursor-pointer text-green-600 items-center px-2 py-2 mb-2 bg-gray-100 text-sm hover:bg-gray-200 rounded">
@@ -187,7 +187,7 @@
     import dayjs from 'dayjs'
     import router from '@/router';
     import { useUserStore } from '@/stores/UserStore'
-    import CreateExamDialog from '../CreateOrUpdateExamDialog.vue';
+    import CreateExamDialog from './CreateOrUpdateExamDialog.vue';
     import MarkdownIt from 'markdown-it'
     import { Rocket } from "lucide-vue-next"
     import Spinner from '@/components/ui/spinner/Spinner.vue'

@@ -1,120 +1,106 @@
-import { defineStore } from 'pinia'
-import { ref } from 'vue'
-import { toast } from 'vue-sonner'
+import { defineStore } from 'pinia'      // 导入 Pinia 的 store 定义函数
+import { ref } from 'vue'                // 导入 Vue 的响应式引用
+import { toast } from 'vue-sonner'       // 导入通知组件，用于显示提示信息
+import { useRouter } from 'vue-router'    // 导入 Vue Router 用于页面跳转
 
-export const useWebSocketStore = defineStore('websocket', () => {
+export const useWebsocketStore = defineStore('websocket', () => {
+    // 响应式 WebSocket 实例
     const socket = ref<WebSocket | null>(null)
+    // 连接状态标志
     const isConnected = ref(false)
-    let heartbeatTimer: any = null
-    let reconnectTimer: any = null
-    let isIntentionalDisconnect = false // 标记是否为主动断开
+    // Vue Router 实例
+    const router = useRouter()
 
-    // location.host 会自动适配 localhost:5173
-    const WS_URL = `ws://${location.host}/ws/notify`
+    // 心跳定时器 ID（浏览器环境使用 number，Node 环境可能不同）
+    let heartbeatTimer: number | null = null
 
-    // 1. 初始化连接
-    const connect = () => {
-        if (socket.value?.readyState === WebSocket.OPEN) return
+    /**
+     * 初始化 WebSocket 连接
+     * @param examId 考试 ID，用于构建连接 URL
+     */
+    const connect = (examId: number) => {
+        // 如果已有连接且处于打开状态，则直接返回，避免重复连接
+        if (socket.value && socket.value.readyState === WebSocket.OPEN) return
 
-        socket.value = new WebSocket(WS_URL)
+        // 构建 WebSocket URL（这里硬编码了后端地址，生产环境应从环境变量读取）
+        const url = `ws://localhost:8080/ws/exam?examId=${examId}`
+        socket.value = new WebSocket(url)
 
+        // 连接建立时的处理
         socket.value.onopen = () => {
-            console.log('✅ WebSocket 连接成功')
             isConnected.value = true
-            isIntentionalDisconnect = false // 连接成功时重置标记
-            startHeartbeat()
+            startHeartbeat()   // 启动心跳
         }
 
+        // 收到消息时的处理
         socket.value.onmessage = (event) => {
             handleMessage(event.data)
         }
 
+        // 连接关闭时的处理
         socket.value.onclose = () => {
-            console.log('❌ WebSocket 连接断开')
             isConnected.value = false
-            stopHeartbeat()
-
-            // 如果是主动断开（退出登录），不重连
-            if (isIntentionalDisconnect) {
-                isIntentionalDisconnect = false // 重置标记
-                return
-            }
-
-            // 只有意外断开时才重连
-            clearTimeout(reconnectTimer)
-            reconnectTimer = setTimeout(() => {
-                console.log('🔄 尝试重连 WebSocket...')
-                connect()
-            }, 5000)
-        }
-
-        socket.value.onerror = (error) => {
-            console.error('WebSocket 错误:', error)
-            socket.value?.close()
+            stopHeartbeat()    // 停止心跳
         }
     }
 
-    // 2. 处理消息 (核心业务逻辑)
-    const handleMessage = (msg: string) => {
-        if (msg === 'pong') return // 心跳回执，忽略
-
-        try {
-            const data = JSON.parse(msg)
-            switch (data.type) {
-                case 'new_order':
-                    // 管理员收到新订单
-                    toast('新订单', {
-                        description: data.data,
-                        action: {
-                            label: '查看',
-                            onClick: () => console.log('Undo'),
-                        },
-                    })
-                    break
-
-                // case 'order_shipped':
-                //     // 用户收到发货
-                //     toast.success('发货提醒', {
-                //         description: data.content,
-                //     })
-                //     break
-
-                default:
-                    console.log('收到未知消息:', data)
-            }
-        } catch (e) {
-            console.log('收到非JSON消息:', msg)
-        }
-    }
-
-    // 3. 心跳检测 (防止 Nginx/防火墙 60s 自动断开)
+    /**
+     * 启动心跳定时器，每隔 30 秒发送一次 "ping" 消息，保持连接活跃
+     */
     const startHeartbeat = () => {
-        stopHeartbeat()
-        heartbeatTimer = setInterval(() => {
+        heartbeatTimer = window.setInterval(() => {
             if (socket.value?.readyState === WebSocket.OPEN) {
-                socket.value.send('ping') // 发送心跳包
+                socket.value.send("ping")
             }
-        }, 30000) // 30秒一次
+        }, 30000)   // 30 秒间隔
     }
 
+    /**
+     * 停止心跳定时器
+     */
     const stopHeartbeat = () => {
         if (heartbeatTimer) clearInterval(heartbeatTimer)
     }
 
-    // 4. 主动断开 (退出登录时调用)
-    const disconnect = () => {
-        isIntentionalDisconnect = true // 标记为主动断开
-        if (socket.value) {
-            socket.value.close()
-            socket.value = null
+    /**
+     * 处理接收到的 WebSocket 消息
+     * @param data 原始消息数据（字符串）
+     */
+    const handleMessage = (data: string) => {
+        // 如果是心跳响应 "pong"，直接忽略
+        if (data === "pong") return
+
+        // 处理强制交卷逻辑（系统或管理员强制交卷）
+        if (data === "SYSTEM_FORCE_SUBMIT" || data === "ADMIN_FORCE_SUBMIT") {
+            toast.warning("考试已结束，正在强制交卷...")
+            // 1. 触发全局的交卷函数（可以在这里调用 API）
+            // 2. 跳转到考试结果页
+            router.push('/exam/result')
+            return
         }
-        stopHeartbeat()
-        clearTimeout(reconnectTimer)
+
+        // 尝试解析 JSON 消息
+        try {
+            const json = JSON.parse(data)
+            // 判题结果推送
+            if (json.type === 'JUDGE_RESULT') {
+                toast.success(`题目 ${json.data.problemCode} 判题完成: ${json.data.status}`)
+                // 你还可以在这里触发一个全局事件，通知题目列表更新状态
+            }
+        } catch (e) {
+            // 非 JSON 格式的消息，仅打印日志
+            console.log("Receive text:", data)
+        }
     }
 
-    return {
-        isConnected,
-        connect,
-        disconnect
+    /**
+     * 主动关闭 WebSocket 连接
+     */
+    const close = () => {
+        socket.value?.close()
+        socket.value = null
     }
+
+    // 返回公开的方法和状态，供组件使用
+    return { isConnected, connect, close }
 })

@@ -4,7 +4,7 @@
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
           <SidebarMenuButton size="lg"
-            class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground md:h-8 md:p-0">
+            class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
             <Avatar class="h-8 w-8 rounded-lg">
               <AvatarImage :src="userStore.user?.avatar || ''" />
               <AvatarFallback class="rounded-lg">

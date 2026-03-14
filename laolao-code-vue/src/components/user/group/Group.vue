@@ -45,14 +45,14 @@
                 </div>
                 <div class="text-right">
                     <p class="text-xs h-4 mb-2 text-gray-500">考试数</p>
-                    <p>50</p>
+                    <p>{{ exams.length }}</p>
                 </div>
             </div>
         </div>
         <div class="space-y-2">
             <div class="flex justify-between pb-2">
                 <p class="text-lg">考试列表</p>
-                <CreateExamDialog v-if="userStore.user.role === 1 && group?.advisorName === userStore.user.name" />
+                <CreateOrUpdateExamDialog v-if="userStore.user.role === 1 && group?.advisorName === userStore.user.name" />
             </div>
 
             <RouterLink :to="'/exam/' + exam.id" v-for="exam in exams" :key="exam.id"
@@ -106,7 +106,7 @@
     import { Badge } from '@/components/ui/badge'
     import dayjs from 'dayjs'
     import { useUserStore } from '@/stores/UserStore'
-    import CreateExamDialog from './CreateOrUpdateExamDialog.vue';
+    import CreateOrUpdateExamDialog from '../exam/CreateOrUpdateExamDialog.vue';
     const userStore = useUserStore()
 
     const route = useRoute()

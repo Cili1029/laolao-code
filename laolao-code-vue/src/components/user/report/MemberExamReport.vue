@@ -94,7 +94,7 @@
     import { useExamStore } from "@/stores/ExamStore"
     import Badge from "@/components/ui/badge/Badge.vue"
     import MarkdownIt from 'markdown-it'
-    import Spinner from "../ui/spinner/Spinner.vue"
+    import Spinner from "@/components/ui/spinner/Spinner.vue"
     import { Rocket } from "lucide-vue-next"
     const md = new MarkdownIt({ breaks: true }); // breaks: true 允许回车换行
     const renderMarkdown = (text: string) => md.render(text);

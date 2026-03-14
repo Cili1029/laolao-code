@@ -8,6 +8,7 @@ import jakarta.annotation.Resource;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.HandshakeInterceptor;
@@ -22,10 +23,10 @@ public class MyHandshakeInterceptor implements HandshakeInterceptor {
     private ExamMapper examMapper;
 
     @Override
-    public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response,
-                                   WebSocketHandler wsHandler, Map<String, Object> attributes) {
+    public boolean beforeHandshake(@NonNull ServerHttpRequest request, @NonNull ServerHttpResponse response,
+                                   @NonNull  WebSocketHandler wsHandler, @NonNull Map<String, Object> attributes) {
 
-        // 1. 获取用户 ID (从 Spring Security 上下文)
+        // 从 Spring Security 上下文获取获取用户信息
         MyUserDetail userInfo = SecurityUtils.getUserInfo();
         if (userInfo == null) return false;
 
@@ -39,7 +40,7 @@ public class MyHandshakeInterceptor implements HandshakeInterceptor {
 
                 if (examInfo == null) return false;
 
-                // 2. 考试时间校验
+                // 考试时间校验
                 LocalDateTime now = LocalDateTime.now();
                 if (now.isBefore(examInfo.getStartTime())) {
                     return false; // 还没开始，禁止连接
@@ -63,7 +64,7 @@ public class MyHandshakeInterceptor implements HandshakeInterceptor {
     }
 
     @Override
-    public void afterHandshake(ServerHttpRequest request, ServerHttpResponse response,
-                               WebSocketHandler wsHandler, Exception exception) {
+    public void afterHandshake(@NonNull ServerHttpRequest request, @NonNull ServerHttpResponse response,
+                               @NonNull WebSocketHandler wsHandler,  Exception exception) {
     }
 }

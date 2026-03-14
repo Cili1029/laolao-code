@@ -35,6 +35,11 @@ public class ExamVO implements Serializable {
     /**
      * 开始时间
      */
-    private LocalDateTime time;
+    private LocalDateTime startTime;
+
+    /**
+     * 结束时间
+     */
+    private LocalDateTime endTime;
 }
 

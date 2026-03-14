@@ -3,7 +3,7 @@
         <!-- 学生的加入学习组 -->
         <Dialog v-if="UserStore.user.role === 2">
             <DialogTrigger as-child>
-                <Plus />
+                <span class="flex justify-end cursor-pointer hover:text-blue-500 text-gray-500 text-sm">加入学习组</span>
             </DialogTrigger>
             <DialogContent class="sm:max-w-106.25">
                 <DialogHeader>
@@ -30,7 +30,7 @@
 
         <Dialog v-else-if="UserStore.user.role === 1">
             <DialogTrigger as-child>
-                <Plus />
+                <span class="flex justify-end cursor-pointer hover:text-blue-500 text-gray-500 text-sm">创建学习组</span>
             </DialogTrigger>
             <DialogContent class="sm:max-w-106.25">
                 <DialogHeader>
@@ -67,7 +67,6 @@
 </template>
 
 <script setup lang="ts">
-    import { Plus } from 'lucide-vue-next'
     import { Button } from '@/components/ui/button'
     import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, } from '@/components/ui/dialog'
     import { Input } from '@/components/ui/input'
