@@ -1,0 +1,71 @@
+version: "3.8"
+services:
+  namesrv:
+    image: apache/rocketmq:5.4.0
+    container_name: rmqnamesrv
+    ports:
+      - 9876:9876
+    environment:
+      # 1. 限制 JVM 堆内存：给 128M - 256M 足够了
+      - JAVA_OPT_EXT=-Xms256m -Xmx256m
+    # 2. 限制 Docker 容器物理内存
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+    networks:
+      - rocketmq
+    command: sh mqnamesrv
+  broker:
+    image: apache/rocketmq:5.4.0
+    container_name: rmqbroker
+    ports:
+      - 10909:10909
+      - 10911:10911
+      - 10912:10912
+    environment:
+      - NAMESRV_ADDR=rmqnamesrv:9876
+      # 限制堆 512M，限制堆外内存 512M，这样加起来 1G，容器给 1.5G 就很稳
+      - JAVA_OPT_EXT=-Xms512m -Xmx512m -XX:MaxDirectMemorySize=512m
+    deploy:
+      resources:
+        limits:
+          memory: 1536M
+    depends_on:
+      - namesrv
+    networks:
+      - rocketmq
+    command: sh mqbroker
+  proxy:
+    image: apache/rocketmq:5.4.0
+    container_name: rmqproxy
+    networks:
+      - rocketmq
+    depends_on:
+      - broker
+      - namesrv
+    ports:
+      - 8080:8080
+      - 8081:8081
+    restart: on-failure
+    environment:
+      - NAMESRV_ADDR=rmqnamesrv:9876
+      - JAVA_OPT_EXT=-Xms512m -Xmx512m -XX:MaxDirectMemorySize=256m
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+    command: sh mqproxy
+
+  dashboard:
+    image: apacherocketmq/rocketmq-dashboard:latest
+    container_name: rmqdashboard
+    ports:
+      - 9877:8082
+    environment:
+      - NAMESRV_ADDR=rmqnamesrv:9876
+    networks:
+      - rocketmq
+networks:
+  rocketmq:
+    driver: bridge

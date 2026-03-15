@@ -22,10 +22,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class JudgeService {
@@ -78,6 +80,9 @@ public class JudgeService {
         }
     }
 
+    // 定义一个计数器
+    private final AtomicInteger containerIdx = new AtomicInteger(1);
+
     /**
      * 异步创建一个新容器并放入池中
      * 使用异步防止创建容器的过程卡住主线程
@@ -85,8 +90,10 @@ public class JudgeService {
     private void createNewContainerToPool() {
         CompletableFuture.runAsync(() -> {
             try {
+                String containerName = "laolao-judge-" + containerIdx.getAndIncrement();
                 // 创建容器并进行安全配置
                 CreateContainerResponse container = dockerClient.createContainerCmd("eclipse-temurin:17-jdk-alpine")
+                        .withName(containerName)
                         .withLabels(Collections.singletonMap(JudgeConstant.LABEL_KEY, JudgeConstant.LABEL_VALUE)) // 给容器打标签
                         .withNetworkDisabled(true)    // 禁用网络
                         .withWorkingDir("/app")                     // 设置容器内的工作目录
