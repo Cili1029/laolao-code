@@ -45,9 +45,9 @@ public class JudgeRecord implements Serializable {
     private Integer isBest;
 
     /**
-     * 退出状态码（0为成功，非0为失败）
+     * 判题状态
      */
-    private Integer exitCode;
+    private Integer status;
 
     /**
      * 得分
@@ -73,11 +73,6 @@ public class JudgeRecord implements Serializable {
      * 错误示例Id
      */
     private Integer questionTestCaseId;
-
-    /**
-     * 判题状态
-     */
-    private String status;
 
     /**
      * 执行耗时(ms)

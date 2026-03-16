@@ -16,6 +16,7 @@ services:
     networks:
       - rocketmq
     command: sh mqnamesrv
+    
   broker:
     image: apache/rocketmq:5.4.0
     container_name: rmqbroker
@@ -36,6 +37,7 @@ services:
     networks:
       - rocketmq
     command: sh mqbroker
+
   proxy:
     image: apache/rocketmq:5.4.0
     container_name: rmqproxy
@@ -45,8 +47,8 @@ services:
       - broker
       - namesrv
     ports:
-      - 8080:8080
-      - 8081:8081
+      - 9080:9080
+      - 9081:9081
     restart: on-failure
     environment:
       - NAMESRV_ADDR=rmqnamesrv:9876
@@ -55,8 +57,11 @@ services:
       resources:
         limits:
           memory: 1G
-    command: sh mqproxy
-
+    volumes:
+      # 挂载自定义的配置文件
+      - ./rmq-proxy.json:/home/rocketmq/rocketmq-5.4.0/conf/rmq-proxy.json
+    command: sh mqproxy -pc /home/rocketmq/rocketmq-5.4.0/conf/rmq-proxy.json
+  
   dashboard:
     image: apacherocketmq/rocketmq-dashboard:latest
     container_name: rmqdashboard
@@ -64,6 +69,13 @@ services:
       - 9877:8082
     environment:
       - NAMESRV_ADDR=rmqnamesrv:9876
+      # 限制 JVM 堆内存，512M 非常稳健，256M 是极限经济型
+      - JAVA_OPTS=-Xms512m -Xmx512m
+    deploy:
+      resources:
+        limits:
+          # 容器物理内存限制，比堆内存大 256M 左右即可
+          memory: 768M
     networks:
       - rocketmq
 networks:

@@ -21,11 +21,6 @@ public class JudgeResult {
     private Integer status;
 
     /**
-     * 得分
-     */
-    private Integer score;
-
-    /**
      * 标准输出
      */
     private String stdout;
@@ -79,7 +74,6 @@ public class JudgeResult {
     public static JudgeResult commonError(String stderr, String msg) {
         JudgeResult result = new JudgeResult();
         result.status = JudgeConstant.STATUS_UNKNOWN;
-        result.score = 0;
         result.stderr = stderr;
         result.msg = msg;
         return result;
@@ -89,7 +83,6 @@ public class JudgeResult {
     public static JudgeResult compileError(String stderr) {
         JudgeResult result = new JudgeResult();
         result.status = JudgeConstant.STATUS_CE;
-        result.score = 0;
         result.stderr = stderr;
         result.msg = "编译未通过";
         return result;

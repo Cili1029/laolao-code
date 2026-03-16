@@ -1,11 +1,7 @@
 package com.laolao.service.impl;
 
-import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.laolao.common.constant.JudgeConstant;
-import com.laolao.common.docker.JudgeService;
-import com.laolao.common.result.JudgeResult;
 import com.laolao.common.result.Result;
-import com.laolao.common.util.MapStruct;
 import com.laolao.common.util.SecurityUtils;
 import com.laolao.mapper.*;
 import com.laolao.pojo.dto.*;
@@ -13,6 +9,7 @@ import com.laolao.pojo.entity.*;
 import com.laolao.pojo.vo.*;
 import com.laolao.service.MemberExamService;
 import jakarta.annotation.Resource;
+import org.apache.rocketmq.client.core.RocketMQClientTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,15 +20,11 @@ public class MemberExamServiceImpl implements MemberExamService {
     @Resource
     private ExamMapper examMapper;
     @Resource
-    private JudgeService judgeService;
-    @Resource
     private JudgeRecordMapper judgeRecordMapper;
     @Resource
-    private MapStruct mapStruct;
-    @Resource
-    private QuestionTestCaseMapper questionTestCaseMapper;
-    @Resource
     private ExamRecordMapper examRecordMapper;
+    @Resource
+    private RocketMQClientTemplate rocketMQClientTemplate;
 
     @Override
     public Result<Integer> startExam(Integer examId) {
@@ -66,37 +59,27 @@ public class MemberExamServiceImpl implements MemberExamService {
     }
 
     @Override
-    public Result<JudgeRecordVO> judge(JudgeDTO judgeDTO) {
-        try {
-            // 获取测试用例
-            List<QuestionTestCase> questionTestCases = questionTestCaseMapper.selectList(
-                    Wrappers.lambdaQuery(QuestionTestCase.class)
-                            .eq(QuestionTestCase::getQuestionId, judgeDTO.getQuestionId()));
-            // 获取这一题定的分值
-            Integer score = examMapper.selectScoreByQuestionId(judgeDTO.getExamId(), judgeDTO.getQuestionId());
-            JudgeResult judge = judgeService.judge(judgeDTO.getCode(), questionTestCases);
-            // 填写分数
-            if (judge.getStatus() == JudgeConstant.STATUS_AC) {
-                judge.setScore(score);
-            } else if (judge.getStatus() == JudgeConstant.STATUS_WA) {
-                judge.setScore((score * judge.getPassTestCaseCount() / questionTestCases.size()));
-            } else {
-                judge.setScore(0);
-            }
-            // 转换写入记录提交表
-            JudgeRecord judgeRecord = mapStruct.JudgeResultToJudgeRecord(judge);
-            judgeRecord.setExamRecordId(judgeDTO.getRecordId());
-            judgeRecord.setQuestionId(judgeDTO.getQuestionId());
-            judgeRecord.setUserId(SecurityUtils.getUserId());
-            judgeRecord.setAnswerCode(judgeDTO.getCode());
-            judgeRecordMapper.insert(judgeRecord);
-            // 转VO返回
-            JudgeRecordVO judgeRecordVO = mapStruct.JudgeResultToJudgeRecordVO(judge);
-            return Result.success(judgeRecordVO);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Result.error("判题失败！练习管理员！");
-        }
+    public Result<Integer> judge(JudgeDTO judgeDTO) {
+        // 构建代测试记录
+        JudgeRecord judgeRecord = JudgeRecord.builder()
+                .status(JudgeConstant.STATUS_JUDGING)
+                .userId(SecurityUtils.getUserId())
+                .examRecordId(judgeDTO.getRecordId())
+                .questionId(judgeDTO.getQuestionId())
+                .answerCode(judgeDTO.getCode())
+                .build();
+
+        judgeRecordMapper.insert(judgeRecord);
+
+        ExamIdAndJudgeRecordIdDTO examIdAndJudgeRecordIdDTO = ExamIdAndJudgeRecordIdDTO.builder()
+                .examId(judgeDTO.getExamId())
+                .judgeRecordId(judgeRecord.getId())
+                .build();
+
+        // 发送队列
+        rocketMQClientTemplate.convertAndSend("JudgeTopic", examIdAndJudgeRecordIdDTO);
+        // 返回记录Id
+        return Result.success(judgeRecord.getId());
     }
 
     @Override

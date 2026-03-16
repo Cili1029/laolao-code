@@ -97,19 +97,21 @@ export const useExamStore = defineStore('sidebar', {
                     code: this.currentQuestion.templateCode
                 })
 
-                this.judgeRecord = res.data.data
-                this.judgeDialog = true
+                // this.judgeRecord = res.data.data
+                // this.judgeDialog = true
 
-                const targetQuestion = this.questions?.find(q => q.id === questionId)
-                if (targetQuestion) {
-                    targetQuestion.userScore = this.judgeRecord!.score!
-                }
+                // const targetQuestion = this.questions?.find(q => q.id === questionId)
+                // if (targetQuestion) {
+                //     targetQuestion.userScore = this.judgeRecord!.score!
+                // }
             } catch (e) {
                 console.error('判题失败：', e)
                 this.judgeRecord = null
-            } finally {
-                this.judgeLoading = false
             }
+            // finally {
+            //     // 改为返回的时候修改回来
+            //     this.judgeLoading = false
+            // }
         },
 
         async submitExam() {

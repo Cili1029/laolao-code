@@ -120,7 +120,7 @@
     import { Cpu, ScrollText, Timer, TimerReset } from 'lucide-vue-next'
     import { Badge } from '@/components/ui/badge'
     import JudgeDialog from '../question/JudgeDialog.vue'
-    import { useWebsocketStore } from '@/stores/websocketStore'
+    import { useWebsocketStore } from '@/stores/WebsocketStore'
     const wsStore = useWebsocketStore()
 
 

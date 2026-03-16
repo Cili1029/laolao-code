@@ -40,10 +40,10 @@ public class MemberExamController {
      * 提交代码判题
      *
      * @param judgeDTO 判题请求参数
-     * @return 判题结果
+     * @return 判题记录Id
      */
     @PostMapping("/judge")
-    public Result<JudgeRecordVO> judge(@RequestBody JudgeDTO judgeDTO) {
+    public Result<Integer> judge(@RequestBody JudgeDTO judgeDTO) {
         return memberExamService.judge(judgeDTO);
     }
 

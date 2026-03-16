@@ -72,7 +72,7 @@ public interface ExamMapper extends BaseMapper<Exam> {
             from exam_question_config
             where exam_id = #{examId} and question_id = #{questionId};
             """)
-    Integer selectScoreByQuestionId(Integer examId, Integer questionId);
+    Integer selectScoreByExamIdAndQuestionId(Integer examId, Integer questionId);
 
     @Insert("""
             INSERT INTO exam_question_config (exam_id, question_id, score)

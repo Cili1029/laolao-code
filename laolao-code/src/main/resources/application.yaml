@@ -38,6 +38,11 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
 
+rocketmq:
+  # 生产者配置
+  producer:
+    endpoints: 127.0.0.1:9081
+
 jwt:
   # 设置jwt签名加密时使用的秘钥
   user-secret-key: ${jwt.user-secret-key}
