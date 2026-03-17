@@ -65,7 +65,7 @@
                                 </TableHeader>
                                 <TableBody>
                                     <TableRow v-for="(simple, index) in simpleJudgeRecords" :key="simple.id"
-                                        @click="getJudgeRecord(simple.id)">
+                                        @click="simple.status !== -1 && simple.status !== 6 && simple.status !== 7 && getJudgeRecord(simple.id)">
                                         <TableCell>
                                             {{ simpleJudgeRecords.length - index }}
                                         </TableCell>

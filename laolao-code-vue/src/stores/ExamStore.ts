@@ -20,6 +20,7 @@ export interface QuestionTestCase {
 }
 
 export interface JudgeRecord {
+    questionId: number
     status: number
     score: number
     stdout: string
@@ -31,6 +32,7 @@ export interface JudgeRecord {
 }
 
 const statusTextMap = new Map<number, string>([
+    [-1, '判题中'],
     [0, '通过'],
     [1, '答案错误'],
     [2, '内存超限'],
@@ -43,20 +45,23 @@ const statusTextMap = new Map<number, string>([
 
 export const useExamStore = defineStore('sidebar', {
     state: () => ({
-        examBegin: false,
-        examId: null as number | null,
-        recordId: null as number | null,
-        questions: null as Questions[] | null,
-        currentQuestion: null as Questions | null,
-        judgeRecord: null as JudgeRecord | null,
-        judgeLoading: false, // 判题加载状态
-        judgeDialog: false,
+        // ===================== 考试核心信息 =====================
+        examBegin: false,          // 考试是否已开始
+        examId: null as number | null,       // 当前考试ID
+        recordId: null as number | null,     // 当前考试记录ID
 
-        // 交卷
-        submitLoading: false,
+        // ===================== 题目相关 =====================
+        questions: null as Questions[] | null,       // 所有题目列表
+        currentQuestion: null as Questions | null,   // 当前作答的题目
 
-        // 老师的判题结果
-        advisorJudgeRecord: null as JudgeRecord | null,
+        // ===================== 判题相关(附加老师编辑考试时候的判题功能) =====================
+        judgeLoading: false,       // 自动判题加载状态
+        judgeDialog: false,        // 判题结果弹窗显隐
+        judgeRecord: null as JudgeRecord | null,     // 判题结果
+        advisorJudgeRecord: null as JudgeRecord | null,  // 老师编辑考试时判题结果
+
+        // ===================== 交卷相关 =====================
+        submitLoading: false       // 交卷操作加载状态
     }),
 
     getters: {
@@ -90,28 +95,17 @@ export const useExamStore = defineStore('sidebar', {
 
                 const questionId = this.currentQuestion.id
 
-                const res = await axios.post("/api/exam/member/judge", {
+                await axios.post("/api/exam/member/judge", {
                     examId: this.examId,
                     recordId: this.recordId,
                     questionId: questionId,
                     code: this.currentQuestion.templateCode
                 })
 
-                // this.judgeRecord = res.data.data
-                // this.judgeDialog = true
-
-                // const targetQuestion = this.questions?.find(q => q.id === questionId)
-                // if (targetQuestion) {
-                //     targetQuestion.userScore = this.judgeRecord!.score!
-                // }
             } catch (e) {
                 console.error('判题失败：', e)
                 this.judgeRecord = null
             }
-            // finally {
-            //     // 改为返回的时候修改回来
-            //     this.judgeLoading = false
-            // }
         },
 
         async submitExam() {

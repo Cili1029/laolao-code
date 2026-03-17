@@ -11,6 +11,11 @@ import lombok.*;
 public class JudgeRecordVO {
 
     /**
+     * 问题ID
+     */
+    private Integer questionId;
+
+    /**
      * 判题状态
      */
     private Integer status;

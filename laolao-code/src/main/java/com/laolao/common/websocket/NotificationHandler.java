@@ -1,5 +1,6 @@
 package com.laolao.common.websocket;
 
+import com.laolao.common.result.WsResult;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -71,7 +72,7 @@ public class NotificationHandler extends TextWebSocketHandler {
     protected void handleTextMessage(@NonNull WebSocketSession session, TextMessage message) {
         // 心跳处理
         if ("ping".equals(message.getPayload())) {
-            sendMessage(session, "pong");
+            sendMessage(session, WsResult.of("PONG", null));
         }
     }
 

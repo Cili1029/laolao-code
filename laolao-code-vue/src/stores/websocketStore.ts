@@ -1,15 +1,14 @@
-import { defineStore } from 'pinia'      // 导入 Pinia 的 store 定义函数
-import { ref } from 'vue'                // 导入 Vue 的响应式引用
-import { toast } from 'vue-sonner'       // 导入通知组件，用于显示提示信息
-import { useRouter } from 'vue-router'    // 导入 Vue Router 用于页面跳转
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+import { useExamStore } from './ExamStore'
 
 export const useWebsocketStore = defineStore('websocket', () => {
     // 响应式 WebSocket 实例
     const socket = ref<WebSocket | null>(null)
     // 连接状态标志
     const isConnected = ref(false)
-    // Vue Router 实例
-    const router = useRouter()
+
+    const examStore = useExamStore()
 
     // 心跳定时器 ID（浏览器环境使用 number，Node 环境可能不同）
     let heartbeatTimer: number | null = null
@@ -63,35 +62,50 @@ export const useWebsocketStore = defineStore('websocket', () => {
     }
 
     /**
-     * 处理接收到的 WebSocket 消息
-     * @param data 原始消息数据（字符串）
-     */
+ * 处理接收到的 WebSocket 消息
+ * @param data 原始消息数据（字符串）
+ */
     const handleMessage = (data: string) => {
-        // 如果是心跳响应 "pong"，直接忽略
-        if (data === "pong") return
-
-        // 处理强制交卷逻辑（系统或管理员强制交卷）
-        if (data === "SYSTEM_FORCE_SUBMIT" || data === "ADMIN_FORCE_SUBMIT") {
-            toast.warning("考试已结束，正在强制交卷...")
-            // 1. 触发全局的交卷函数（可以在这里调用 API）
-            // 2. 跳转到考试结果页
-            router.push('/exam/result')
-            return
-        }
-
-        // 尝试解析 JSON 消息
+        // 先去除首尾空白字符（避免传输中多空格导致判断失效）
+        const cleanData = data.trim()
         try {
-            const json = JSON.parse(data)
+            // 统一解析为 JSON 格式（后端所有消息都遵循 WsResult 结构）
+            const json = JSON.parse(cleanData)
+
+            // 心跳响应处理
+            if (json.type === 'PONG') {
+                return;
+            }
+
             // 判题结果推送
             if (json.type === 'JUDGE_RESULT') {
-                toast.success(`题目 ${json.data.problemCode} 判题完成: ${json.data.status}`)
-                // 你还可以在这里触发一个全局事件，通知题目列表更新状态
+                examStore.judgeRecord = json.data
+                examStore.judgeDialog = true
+                examStore.judgeLoading = false
+
+                const targetQuestion = examStore.questions?.find(q => q.id === json.data.questionId)
+                if (targetQuestion) {
+                    targetQuestion.userScore = examStore.judgeRecord!.score
+                }
+                return
             }
+
+            // // 强制交卷处理（统一用 type 字段判断，更规范）
+            // if (json.type === 'SYSTEM_FORCE_SUBMIT' || json.type === 'ADMIN_FORCE_SUBMIT') {
+            //     toast.warning("考试已结束，正在强制交卷...");
+            //     // 1. 触发全局的交卷函数（可以在这里调用 API）
+            //     // 2. 跳转到考试结果页
+            //     router.push('/exam/result');
+            //     return;
+            // }
+
+            // 其他未匹配的消息类型（便于调试）
+            console.log("接收到未知类型的WebSocket消息:", json)
         } catch (e) {
-            // 非 JSON 格式的消息，仅打印日志
-            console.log("Receive text:", data)
+            // 非 JSON 格式的消息（兼容旧格式/异常消息）
+            console.warn("接收到非JSON格式的WebSocket消息:", cleanData)
         }
-    }
+    };
 
     /**
      * 主动关闭 WebSocket 连接

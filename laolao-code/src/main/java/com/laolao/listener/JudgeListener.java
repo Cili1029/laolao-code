@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.laolao.common.constant.JudgeConstant;
 import com.laolao.common.docker.JudgeService;
 import com.laolao.common.result.JudgeResult;
+import com.laolao.common.result.WsResult;
 import com.laolao.common.util.MapStruct;
 import com.laolao.common.websocket.NotificationHandler;
 import com.laolao.mapper.ExamMapper;
@@ -95,8 +96,9 @@ public class JudgeListener implements RocketMQListener {
             judgeRecordMapper.updateById(judgeRecord);
             // 调用rocketmq传结果
             JudgeRecordVO judgeRecordVO = mapStruct.JudgeResultToJudgeRecordVO(judgeResult);
+            judgeRecordVO.setQuestionId(judgeRecord.getQuestionId());
             judgeRecordVO.setScore(judgeRecord.getScore());
-            notificationHandler.sendToUser(examId, judgeRecord.getUserId(), objectMapper.writeValueAsString(judgeRecordVO));
+            notificationHandler.sendToUser(examId, judgeRecord.getUserId(), WsResult.of("JUDGE_RESULT", judgeRecordVO));
         } catch (Exception e) {
             e.printStackTrace();
             // 失败了更新状态为“异常”
