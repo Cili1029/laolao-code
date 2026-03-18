@@ -60,5 +60,10 @@ public class Exam implements Serializable {
      * 结束时间
      */
     private LocalDateTime endTime;
+
+    /**
+     * 是否已在队列
+     */
+    private Integer isQueued;
 }
 

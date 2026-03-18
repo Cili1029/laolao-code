@@ -14,13 +14,13 @@
                         ]">
                             {{ examStore.statusText }}
                         </DialogTitle>
-                        <DialogDescription v-if="!examStore.judgeLoading" class="text-lg font-medium mt-1">
+                        <DialogDescription v-if="targetRecord?.msg" class="text-lg font-medium mt-1">
                             {{ targetRecord?.msg }}
                         </DialogDescription>
                     </DialogHeader>
                 </div>
 
-                <div class="p-6 space-y-6">
+                <div class="px-4 pb-4 space-y-6">
                     <!-- 成功状态 (AC) -->
                     <div v-if="targetRecord?.status === 0" class="grid grid-cols-2 gap-6">
                         <div class="space-y-1">
@@ -38,48 +38,39 @@
                     </div>
 
                     <!-- 答案错误 (WA) -->
-                    <div v-if="targetRecord?.status === 1" class="space-y-4">
-                        <div class="space-y-2">
+                    <div v-if="targetRecord?.status === 1" class="space-y-3">
+                        <div class="space-y-3">
                             <p class="text-sm font-bold">测试输入</p>
                             <pre
-                                class="w-full p-4 bg-gray-100 rounded-lg font-mono text-gray-800">{{ targetRecord.questionTestCase?.input }}</pre>
+                                class="w-full p-3 bg-gray-100 rounded font-mono text-gray-800">{{ targetRecord.questionTestCase?.input }}</pre>
                         </div>
-                        <div class="space-y-2">
-                            <p class="text-sm font-bold">预期输出</p>
+                        <div class="flex space-x-3">
+                            <p class="w-1/2 text-sm font-bold">预期输出</p>
+                            <p class="w-1/2 text-sm font-bold">你的输出</p>
+                        </div>
+                        <div class="flex space-x-3">
                             <pre
-                                class="w-full p-4 bg-gray-100 rounded-lg font-mono text-gray-800">{{ targetRecord.questionTestCase?.output }}</pre>
-                        </div>
-                        <div class="space-y-2">
-                            <p class="text-sm font-bold">你的输出</p>
+                                class="w-1/2 p-3 bg-gray-100 rounded font-mono text-gray-800">{{ targetRecord.questionTestCase?.output }}</pre>
                             <pre
-                                class="w-full p-4 bg-gray-100 rounded-lg font-mono text-gray-800">{{ targetRecord.stdout }}</pre>
+                                class="w-1/2 p-3 bg-gray-100 rounded font-mono text-gray-800">{{ targetRecord.stdout }}</pre>
                         </div>
+
                     </div>
 
                     <!-- 编译错误 (CE) -->
                     <div v-if="targetRecord?.status === 5" class="space-y-2">
                         <p class="text-sm font-bold text-red-600">错误信息</p>
                         <pre
-                            class="w-full p-5 bg-red-50 text-red-400 rounded-lg font-mono text-sm leading-relaxed overflow-x-auto max-h-75">{{ targetRecord.stderr }}</pre>
+                            class="w-full p-5 bg-red-50 text-red-400 rounded font-mono text-sm leading-relaxed overflow-x-auto max-h-75">{{ targetRecord.stderr }}</pre>
                     </div>
                 </div>
-
-                <!-- 底部按钮 -->
-                <DialogFooter class="p-4 bg-gray-50 border-t">
-                    <DialogClose as-child>
-                        <Button variant="outline" class="w-full sm:w-24 py-5">
-                            关闭
-                        </Button>
-                    </DialogClose>
-                </DialogFooter>
             </DialogContent>
         </Dialog>
     </div>
 </template>
 
 <script setup lang="ts">
-    import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-    import { Button } from '@/components/ui/button'
+    import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
     import { useExamStore, type JudgeRecord } from "@/stores/ExamStore"
     import { computed } from 'vue'
     const examStore = useExamStore()

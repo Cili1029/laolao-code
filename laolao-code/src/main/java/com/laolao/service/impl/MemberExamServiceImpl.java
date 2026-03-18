@@ -9,12 +9,15 @@ import com.laolao.pojo.entity.*;
 import com.laolao.pojo.vo.*;
 import com.laolao.service.MemberExamService;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.core.RocketMQClientTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
+@Slf4j
 @Service
 public class MemberExamServiceImpl implements MemberExamService {
     @Resource
@@ -85,11 +88,22 @@ public class MemberExamServiceImpl implements MemberExamService {
     @Override
     @Transactional
     public Result<String> submit(Integer recordId) {
-        // 整合分数
-        Integer score = judgeRecordMapper.selectTotalScore(recordId);
-        examRecordMapper.submitExam(recordId, SecurityUtils.getUserId(), score);
-        // 同时需要给所有记录都选出每一题分数最好的那一条
-        judgeRecordMapper.updateBestRecord(recordId);
-        return Result.success("交卷成功");
+        // 仅修改状态和交卷时间, 剩下的交卷再改
+        examRecordMapper.updateStatusToSubmitted(recordId, SecurityUtils.getUserId());
+        return Result.success("交卷成功，请耐心等待考试结束统一公布成绩");
+    }
+
+    @Transactional
+    public void submitBatch(Integer examId) {
+        // 批量交卷并算分
+        examRecordMapper.batchSubmitAndCalculateScore(examId);
+        // 批量维护最优记录 (异步执行，不阻塞主流程)
+        CompletableFuture.runAsync(() -> {
+            try {
+                judgeRecordMapper.batchUpdateBestRecords(examId);
+            } catch (Exception e) {
+                log.error("批量维护最优记录失败", e);
+            }
+        });
     }
 }

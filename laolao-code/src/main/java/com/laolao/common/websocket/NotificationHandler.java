@@ -1,6 +1,7 @@
 package com.laolao.common.websocket;
 
 import com.laolao.common.result.WsResult;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
@@ -9,11 +10,11 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.*;
 
+@Slf4j
 @Component
 public class NotificationHandler extends TextWebSocketHandler {
 
@@ -31,41 +32,17 @@ public class NotificationHandler extends TextWebSocketHandler {
         String name = (String) attrs.get("name");
         LocalDateTime endTime = (LocalDateTime) attrs.get("endTime");
 
-        // 存储
+        // 注册到内存 Map
         examMap.computeIfAbsent(examId, k -> new ConcurrentHashMap<>()).put(userId, session);
 
-        // 计算剩余时间
-        long delaySeconds = Duration.between(LocalDateTime.now(), endTime).getSeconds();
-
-        if (delaySeconds > 0) {
-            // 距离结束还有时间，设置定时任务
-            scheduleForceSubmit(session, delaySeconds);
-        } else {
-            // 已过结束时间（处于5分钟宽限期内）
-            sendMessage(session, "EXAM_ALREADY_ENDED");
+        // 特殊情况处理：如果学生由于网络原因，在考试已经结束后（但在5分钟宽限期内）才连上
+        if (LocalDateTime.now().isAfter(endTime)) {
+            // 直接下发交卷指令，不给答题机会
+            sendMessage(session, WsResult.of("EXAM_SUBMIT", null));
+            return;
         }
 
-        System.out.println("考生 " + name + " 已连接考试 " + examId);
-    }
-
-    /**
-     * 到点强制交卷
-     */
-    private void scheduleForceSubmit(WebSocketSession session, long delayInSeconds) {
-        ScheduledFuture<?> future = scheduler.schedule(() -> {
-            try {
-                if (session.isOpen()) {
-                    sendMessage(session, "SYSTEM_FORCE_SUBMIT");
-                    Thread.sleep(2000);
-                    session.close(CloseStatus.NORMAL);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }, delayInSeconds, TimeUnit.SECONDS);
-
-        // 把闹钟凭证存入 session 属性中
-        session.getAttributes().put("submitTask", future);
+        log.info("考生 {} 已连接考试 {}", name, examId);
     }
 
     @Override
@@ -78,14 +55,6 @@ public class NotificationHandler extends TextWebSocketHandler {
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, @NonNull CloseStatus status) {
-        // 获取闹钟凭证
-        ScheduledFuture<?> future = (ScheduledFuture<?>) session.getAttributes().get("submitTask");
-
-        // 如果连接断了，把这个闹钟取消掉，防止重连后产生一堆废弃闹钟
-        if (future != null && !future.isDone()) {
-            future.cancel(false);
-        }
-
         // 连接关闭时，从 Map 中移除，防止内存泄漏
         Integer examId = (Integer) session.getAttributes().get("examId");
         Integer userId = (Integer) session.getAttributes().get("userId");
@@ -112,6 +81,25 @@ public class NotificationHandler extends TextWebSocketHandler {
             WebSocketSession session = users.get(userId);
             sendMessage(session, message);
         }
+    }
+
+    /**
+     * 给特定考试的所有在线学生发送消息
+     */
+    public void sendToAllUsersInExam(Integer examId, String message) {
+        // 获取该考试下的所有在线考生Session
+        Map<Integer, WebSocketSession> users = examMap.get(examId);
+        if (users == null || users.isEmpty()) {
+            return;
+        }
+        // 遍历发送给所有在线考生
+        users.values().forEach(session -> {
+            if (session.isOpen()) {
+                sendMessage(session, message);
+                // 强制交卷后，建议在 1-2 秒后由后端主动断开 WebSocket
+                // 或者由前端收到消息后执行完交卷逻辑自行断开
+            }
+        });
     }
 
     /**

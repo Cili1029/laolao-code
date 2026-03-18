@@ -87,7 +87,7 @@ public interface JudgeRecordMapper extends BaseMapper<JudgeRecord> {
             SET jr.is_best = 1
             WHERE jr.exam_record_id = #{examRecordId}
             """)
-    void updateBestRecord(Integer recordId);
+    void updateBestRecord(Integer examRecordId);
 
     @Select("""
             SELECT q.title, jr.answer_code, q.standard_solution
@@ -113,4 +113,22 @@ public interface JudgeRecordMapper extends BaseMapper<JudgeRecord> {
               AND jr.is_best = 1;
             """)
     List<MemberAnswerDataContent> selectMemberAnswersByExamId(Integer examId);
+
+
+    @Update("""
+            UPDATE judge_record jr
+                INNER JOIN (SELECT id
+                            FROM (SELECT jr_inner.id,
+                                         ROW_NUMBER() OVER (
+                                             PARTITION BY exam_record_id, question_id -- 必须按学生+题目双重分组
+                                             ORDER BY jr_inner.score DESC, jr_inner.status, jr_inner.submit_time DESC -- 优先级：分高 > 状态好 > 时间新
+                                             ) as rn
+                                  FROM judge_record jr_inner
+                                  INNER JOIN exam_record er ON jr_inner.exam_record_id = er.id
+                                  WHERE er.exam_id = #{examId}
+                                 ) t
+                            WHERE t.rn = 1) best ON jr.id = best.id
+            SET jr.is_best = 1;
+            """)
+    void batchUpdateBestRecords(Integer examId);
 }
