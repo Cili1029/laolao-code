@@ -11,7 +11,7 @@
  Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 09/03/2026 21:58:35
+ Date: 31/03/2026 20:29:20
 */
 
 SET NAMES utf8mb4;
@@ -28,12 +28,14 @@ CREATE TABLE `ai_report`  (
   `content` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT 'AI生成的报告',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_target`(`target_type` ASC, `target_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 3 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = 'AI分析报告表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 17 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = 'AI分析报告表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of ai_report
 -- ----------------------------
-INSERT INTO `ai_report` VALUES (2, 1, 41, '同学你好，我看到你在\"有效的括号\"这道题中提交的代码只有一行注释\"这一题我不会，给点分吧\"。这显然不是解决问题的正确方式。\n\n这道题的核心是使用栈数据结构来匹配括号。你需要遍历字符串，遇到左括号就将其对应的右括号压入栈中，遇到右括号就检查栈顶是否匹配。\n\n我建议你先理解栈的基本操作，然后尝试实现这个算法。如果你对栈还不熟悉，可以先复习一下栈的push、pop和isEmpty方法，然后再来尝试这道题。');
+INSERT INTO `ai_report` VALUES (7, 1, 41, '我看到你提交的代码中写着\"这一题我不会，给点分吧\"，这反映出你面对栈数据结构应用时遇到了困难。有效的括号匹配是典型的栈应用场景，关键在于理解括号的配对关系。\n\n你的主要问题在于没有理解栈在解决这类问题中的作用。栈的\"后进先出\"特性正好适合处理括号的嵌套关系。建议你从理解栈的基本操作开始，然后思考如何用栈来跟踪未匹配的括号。可以先尝试手动模拟几个简单例子，比如\"()\"、\"([])\"，理解栈在其中的变化过程，再尝试编写代码实现。');
+INSERT INTO `ai_report` VALUES (9, 2, 6, '从本次考试情况来看，你在\"回文串判断\"这道题上表现相当出色！你的代码逻辑清晰，思路完整，不仅正确处理了大小写问题，还使用了StringBuilder的reverse()方法，代码质量很高，这说明你对字符串处理的基本功掌握得很扎实。\n\n不过，在\"有效的括号\"这道题上，你遇到了明显的困难。从代码中可以看出，你虽然引入了必要的Scanner和Stack类，但核心算法逻辑尚未掌握。栈数据结构在处理括号匹配这类问题时非常关键，你需要理解如何通过栈来跟踪括号的配对关系。\n\n建议你重点复习栈数据结构的应用场景，特别是括号匹配这类经典算法。可以尝试从简单的单种括号匹配开始练习，逐步扩展到多种括号的复杂情况。同时，要注意边界条件的处理，比如空栈判断和最终栈是否为空等细节。\n\n总的来说，你在基础字符串操作方面表现良好，但在数据结构应用和算法实现方面还需要加强。建议多做一些栈、队列相关的练习题，培养解决这类问题的思维模式。加油，相信通过针对性的练习，你很快就能掌握这些知识点！');
+INSERT INTO `ai_report` VALUES (16, 3, 10, '# 班级考试分析报告（考试ID：10）\n\n## 一、考情概览\n\n本次考试共有2名学生参加，实际参考1人，缺考1人，出勤率为50%。参考学生小明的得分为40分（满分100分），成绩处于较低水平。从出勤情况来看，缺考率较高，需要关注学生的考试参与度。\n\n## 二、学情诊断\n\n通过分析学生的具体作答情况，发现以下共性问题：\n\n1. **知识掌握不均衡**：学生在\"回文串判断\"题目中表现较好，代码逻辑清晰完整，但在\"有效的括号\"题目中完全无法作答，表明对栈数据结构的应用掌握不足。\n\n2. **解题策略缺失**：对于\"有效的括号\"题目，学生直接放弃作答，在代码中写\"这一题我不会，给点分吧\"，反映出面对复杂问题时缺乏解题思路和方法。\n\n3. **代码规范性不足**：虽然回文串判断代码功能正确，但在输出格式上使用了`System.out.println()`而非题目要求的`System.out.print()`，可能导致判分扣分。\n\n## 三、教学方向建议\n\n针对本次考试暴露的问题，建议从以下几个方面调整教学：\n\n1. **强化数据结构应用训练**：重点加强栈、队列等基础数据结构的应用教学，特别是括号匹配、表达式求值等经典应用场景的讲解与练习。\n\n2. **建立解题思维框架**：针对算法题目，教授学生建立\"问题分析-思路构建-代码实现-测试验证\"的标准化解题流程，避免遇到难题时直接放弃。\n\n3. **加强输出格式规范**：在平时练习中强调输出格式的重要性，特别是`print()`与`println()`的区别，避免因格式问题失分。\n\n4. **关注学习态度引导**：对于缺考和放弃作答的情况，需要与学生进行沟通，了解学习困难，激发学习动力，培养面对挑战的积极态度。\n\n建议在下阶段教学中，安排专项训练课，重点讲解栈的应用，并通过小组讨论、结对编程等方式，帮助学生建立解决问题的信心和能力。');
 
 -- ----------------------------
 -- Table structure for exam
@@ -48,16 +50,17 @@ CREATE TABLE `exam`  (
   `status` tinyint NULL DEFAULT 0 COMMENT '状态：0-草稿，1-已发布，2-已结束，改卷中，3-已改完，4-考试已取消',
   `start_time` datetime NOT NULL COMMENT '开始时间',
   `end_time` datetime NOT NULL COMMENT '结束时间',
+  `is_queued` tinyint NOT NULL DEFAULT 0 COMMENT '是否已在队列',
   PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB AUTO_INCREMENT = 12 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '考试表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of exam
 -- ----------------------------
-INSERT INTO `exam` VALUES (1, '2024年春季 Java 核心技术月考', '本次考试涵盖多线程、JVM、集合类。请在规定时间内独立完成，AI助教将进行逻辑审查。', 1, 1, 1, '2030-03-20 09:00:00', '2030-03-20 11:00:00');
-INSERT INTO `exam` VALUES (2, '【AI生成】动态规划专题练习', '由 Spring AI 根据近期大家的薄弱点自动选取的题目，主要针对背包问题和区间DP。', 1, 2, 1, '2025-03-01 00:00:00', '2027-03-31 23:59:59');
-INSERT INTO `exam` VALUES (10, '测试考试', '这是一个测试考试', 1, 1, 3, '2026-03-07 15:01:00', '2026-03-07 15:30:00');
-INSERT INTO `exam` VALUES (11, '测试2', '测试2', 1, 2, 0, '2026-03-09 00:00:00', '2026-03-10 00:00:00');
+INSERT INTO `exam` VALUES (1, '2024年春季 Java 核心技术月考', '本次考试涵盖多线程、JVM、集合类。请在规定时间内独立完成，AI助教将进行逻辑审查。', 1, 1, 1, '2030-03-20 09:00:00', '2030-03-20 11:00:00', 0);
+INSERT INTO `exam` VALUES (2, '【AI生成】动态规划专题练习', '由 Spring AI 根据近期大家的薄弱点自动选取的题目，主要针对背包问题和区间DP。', 1, 2, 1, '2025-03-01 00:00:00', '2027-03-31 23:59:59', 0);
+INSERT INTO `exam` VALUES (10, '测试考试', '这是一个测试考试', 1, 1, 3, '2026-03-07 15:01:00', '2026-03-07 15:30:00', 0);
+INSERT INTO `exam` VALUES (11, '测试2', '测试2', 1, 2, 0, '2026-03-09 00:00:00', '2026-03-10 00:00:00', 0);
 
 -- ----------------------------
 -- Table structure for exam_question_config
@@ -110,6 +113,32 @@ INSERT INTO `exam_record` VALUES (5, 2, 1, 0, 0, NULL, '2026-03-01 15:40:00', NU
 INSERT INTO `exam_record` VALUES (6, 10, 2, 40, 1, NULL, '2026-03-07 15:01:13', '2026-03-07 15:26:14');
 
 -- ----------------------------
+-- Table structure for judge_member_result
+-- ----------------------------
+DROP TABLE IF EXISTS `judge_member_result`;
+CREATE TABLE `judge_member_result`  (
+  `id` int NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `exam_id` int NOT NULL COMMENT '考试ID',
+  `exam_record_id` int NOT NULL COMMENT '考试记录ID',
+  `user_id` int NOT NULL COMMENT '用户ID',
+  `question_id` int NOT NULL COMMENT '题目ID',
+  `best_judge_record_id` int NOT NULL COMMENT '最优判题记录ID',
+  `score` int NOT NULL DEFAULT 0 COMMENT '最高得分',
+  `status` tinyint NOT NULL DEFAULT (-(1)) COMMENT '最高分对应的状态',
+  `submit_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '提交时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  UNIQUE INDEX `uk_exam_user_question`(`exam_record_id` ASC, `question_id` ASC) USING BTREE
+) ENGINE = InnoDB AUTO_INCREMENT = 8 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '成员判题最终成绩汇总表' ROW_FORMAT = Dynamic;
+
+-- ----------------------------
+-- Records of judge_member_result
+-- ----------------------------
+INSERT INTO `judge_member_result` VALUES (1, 2, 2, 2, 2, 55, 0, 1, '2026-03-17 21:18:23');
+INSERT INTO `judge_member_result` VALUES (2, 2, 2, 2, 5, 28, 30, 0, '2026-02-25 21:06:25');
+INSERT INTO `judge_member_result` VALUES (3, 10, 6, 2, 16, 42, 40, 0, '2026-03-07 15:04:35');
+INSERT INTO `judge_member_result` VALUES (4, 10, 6, 2, 17, 44, 0, 5, '2026-03-07 15:03:17');
+
+-- ----------------------------
 -- Table structure for judge_record
 -- ----------------------------
 DROP TABLE IF EXISTS `judge_record`;
@@ -119,8 +148,8 @@ CREATE TABLE `judge_record`  (
   `question_id` int NOT NULL COMMENT '题目ID',
   `user_id` int NOT NULL COMMENT '用户ID（冗余字段，方便查询）',
   `is_best` tinyint NOT NULL DEFAULT 0 COMMENT '是否为本题最优记录：0-否，1-是',
-  `status` tinyint NOT NULL COMMENT '判题状态',
-  `score` int NOT NULL COMMENT '得分',
+  `status` tinyint NOT NULL DEFAULT (-(1)) COMMENT '判题状态',
+  `score` int NOT NULL DEFAULT 0 COMMENT '得分',
   `answer_code` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '学生提交的代码快照',
   `stdout` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '标准输出',
   `stderr` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NULL COMMENT '错误输出（包括报错信息）',
@@ -129,7 +158,7 @@ CREATE TABLE `judge_record`  (
   `memory` int NULL DEFAULT NULL COMMENT '内存消耗(MB)',
   `submit_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '提交时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 45 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '判题记录' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 57 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '判题记录' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of judge_record
@@ -155,6 +184,18 @@ INSERT INTO `judge_record` VALUES (40, 2, 2, 2, 0, 1, 0, 'import java.util.Scann
 INSERT INTO `judge_record` VALUES (41, 6, 17, 2, 1, 5, 0, 'import java.util.Scanner;\nimport java.util.Stack;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine();\n        // 编写逻辑\n        这一题我不会，给点分吧\n    }\n}', NULL, 'Main.java:14: error: illegal character: \'\\uff0c\'\n        这一题我不会，给点分吧\n              ^\nMain.java:14: error: not a statement\n        这一题我不会，给点分吧\n        ^\nMain.java:14: error: not a statement\n        这一题我不会，给点分吧\n               ^\nMain.java:14: error: \';\' expected\n        这一题我不会，给点分吧\n                   ^\n4 errors\n', NULL, NULL, NULL, '2026-03-07 15:03:17');
 INSERT INTO `judge_record` VALUES (42, 6, 16, 2, 1, 0, 40, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine();\n        \n        // 步骤1：统一转为小写（也可以转大写），消除大小写影响\n        String lowerStr = s.toLowerCase();\n        // 步骤2：反转字符串\n        String reversedStr = new StringBuilder(lowerStr).reverse().toString();\n        // 步骤3：对比原小写字符串和反转后的字符串是否相等\n        boolean isPalindrome = lowerStr.equals(reversedStr);\n        \n        // 输出结果\n        System.out.println(isPalindrome);\n    }\n}', NULL, NULL, NULL, 110, 34, '2026-03-07 15:04:35');
 INSERT INTO `judge_record` VALUES (44, 6, 17, 2, 0, 5, 0, 'import java.util.Scanner;\nimport java.util.Stack;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine();\n        // 编写逻辑\n        这一题我不会，给点分吧\n    }\n}', NULL, 'Main.java:14: error: illegal character: \'\\uff0c\'\n        这一题我不会，给点分吧\n              ^\nMain.java:14: error: not a statement\n        这一题我不会，给点分吧\n        ^\nMain.java:14: error: not a statement\n        这一题我不会，给点分吧\n               ^\nMain.java:14: error: \';\' expected\n        这一题我不会，给点分吧\n                   ^\n4 errors\n', NULL, NULL, NULL, '2026-03-07 15:03:17');
+INSERT INTO `judge_record` VALUES (45, 2, 2, 2, 0, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-16 19:59:24');
+INSERT INTO `judge_record` VALUES (46, 2, 2, 2, 0, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-16 20:04:14');
+INSERT INTO `judge_record` VALUES (47, 2, 2, 2, 0, 5, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();123\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', NULL, 'Main.java:11: error: not a statement\n        int n = sc.nextInt();123\n                             ^\nMain.java:11: error: \';\' expected\n        int n = sc.nextInt();123\n                                ^\n2 errors\n', NULL, NULL, NULL, '2026-03-16 20:15:51');
+INSERT INTO `judge_record` VALUES (48, 2, 2, 2, 0, 5, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];1234\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', NULL, 'Main.java:12: error: not a statement\n        int[] nums = new int[n];1234\n                                ^\nMain.java:12: error: \';\' expected\n        int[] nums = new int[n];1234\n                                    ^\n2 errors\n', NULL, NULL, NULL, '2026-03-16 20:39:18');
+INSERT INTO `judge_record` VALUES (49, 2, 2, 2, 0, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-16 20:41:55');
+INSERT INTO `judge_record` VALUES (50, 2, 2, 2, 0, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-17 20:59:02');
+INSERT INTO `judge_record` VALUES (51, 2, 2, 2, 0, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-17 21:01:34');
+INSERT INTO `judge_record` VALUES (52, 2, 2, 2, 0, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-17 21:06:15');
+INSERT INTO `judge_record` VALUES (53, 2, 5, 2, 0, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 11, NULL, NULL, '2026-03-17 21:11:01');
+INSERT INTO `judge_record` VALUES (54, 2, 2, 2, 0, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-17 21:18:03');
+INSERT INTO `judge_record` VALUES (55, 2, 2, 2, 0, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-17 21:18:23');
+INSERT INTO `judge_record` VALUES (56, 2, 5, 2, 0, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 11, NULL, NULL, '2026-03-18 17:52:15');
 
 -- ----------------------------
 -- Table structure for question
@@ -254,12 +295,13 @@ CREATE TABLE `study_group_member`  (
   `member_id` int NOT NULL COMMENT '成员ID',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_group_member`(`study_group_id` ASC, `member_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 4 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '班级成员关联表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 5 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '班级成员关联表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of study_group_member
 -- ----------------------------
 INSERT INTO `study_group_member` VALUES (1, 1, 2);
+INSERT INTO `study_group_member` VALUES (4, 1, 3);
 INSERT INTO `study_group_member` VALUES (2, 2, 2);
 INSERT INTO `study_group_member` VALUES (3, 2, 3);
 

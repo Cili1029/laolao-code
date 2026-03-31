@@ -10,7 +10,6 @@ import com.laolao.pojo.vo.MemberExamJudgeRecordVO;
 import com.laolao.pojo.vo.SimpleJudgeRecordVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -39,15 +38,6 @@ public interface JudgeRecordMapper extends BaseMapper<JudgeRecord> {
             """)
     List<GradeJudgeRecordVO> selectGradeInfoByRecordId(Integer recordId);
 
-    @Select("""
-            SELECT SUM(max_score) AS score
-            FROM (SELECT MAX(score) AS max_score
-                  FROM judge_record
-                  WHERE exam_record_id = #{recordId}
-                  GROUP BY question_id) AS question_max_scores;
-            """)
-    Integer selectTotalScore(Integer recordId);
-
     @Select("select score from judge_record where id = #{judgeRecordId}")
     Integer selectScoreById(Integer judgeRecordId);
 
@@ -69,25 +59,6 @@ public interface JudgeRecordMapper extends BaseMapper<JudgeRecord> {
             where jr.id = #{judgeRecordId}
             """)
     JudgeRecordContext selectMemberJudgeInfoToAi(Integer judgeRecordId);
-
-    @Update("""
-            UPDATE judge_record jr
-                INNER JOIN (SELECT id
-                            FROM (SELECT id,
-                                         -- 按题目分组
-                                         -- 排序规则：1.分数降序 2.状态码升序(0优先) 3.提交时间降序
-                                         ROW_NUMBER() OVER (
-                                             PARTITION BY question_id
-                                             ORDER BY score DESC, status , submit_time DESC
-                                             ) AS rn
-                                  FROM judge_record
-                                  WHERE exam_record_id = #{examRecordId}
-                                 ) AS temp
-                            WHERE temp.rn = 1) best_records ON jr.id = best_records.id
-            SET jr.is_best = 1
-            WHERE jr.exam_record_id = #{examRecordId}
-            """)
-    void updateBestRecord(Integer examRecordId);
 
     @Select("""
             SELECT q.title, jr.answer_code, q.standard_solution
@@ -113,22 +84,4 @@ public interface JudgeRecordMapper extends BaseMapper<JudgeRecord> {
               AND jr.is_best = 1;
             """)
     List<MemberAnswerDataContent> selectMemberAnswersByExamId(Integer examId);
-
-
-    @Update("""
-            UPDATE judge_record jr
-                INNER JOIN (SELECT id
-                            FROM (SELECT jr_inner.id,
-                                         ROW_NUMBER() OVER (
-                                             PARTITION BY exam_record_id, question_id -- 必须按学生+题目双重分组
-                                             ORDER BY jr_inner.score DESC, jr_inner.status, jr_inner.submit_time DESC -- 优先级：分高 > 状态好 > 时间新
-                                             ) as rn
-                                  FROM judge_record jr_inner
-                                  INNER JOIN exam_record er ON jr_inner.exam_record_id = er.id
-                                  WHERE er.exam_id = #{examId}
-                                 ) t
-                            WHERE t.rn = 1) best ON jr.id = best.id
-            SET jr.is_best = 1;
-            """)
-    void batchUpdateBestRecords(Integer examId);
 }

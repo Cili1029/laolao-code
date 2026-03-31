@@ -97,13 +97,5 @@ public class MemberExamServiceImpl implements MemberExamService {
     public void submitBatch(Integer examId) {
         // 批量交卷并算分
         examRecordMapper.batchSubmitAndCalculateScore(examId);
-        // 批量维护最优记录 (异步执行，不阻塞主流程)
-        CompletableFuture.runAsync(() -> {
-            try {
-                judgeRecordMapper.batchUpdateBestRecords(examId);
-            } catch (Exception e) {
-                log.error("批量维护最优记录失败", e);
-            }
-        });
     }
 }

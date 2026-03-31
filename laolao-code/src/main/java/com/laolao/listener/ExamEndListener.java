@@ -5,7 +5,6 @@ import com.laolao.common.result.WsResult;
 import com.laolao.common.websocket.NotificationHandler;
 import com.laolao.mapper.ExamMapper;
 import com.laolao.pojo.entity.Exam;
-import com.laolao.service.MemberExamService;
 import com.laolao.service.impl.MemberExamServiceImpl;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;

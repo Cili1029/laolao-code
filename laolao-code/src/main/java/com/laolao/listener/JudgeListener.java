@@ -10,9 +10,11 @@ import com.laolao.common.result.WsResult;
 import com.laolao.common.util.MapStruct;
 import com.laolao.common.websocket.NotificationHandler;
 import com.laolao.mapper.ExamMapper;
+import com.laolao.mapper.JudgeMemberResultMapper;
 import com.laolao.mapper.JudgeRecordMapper;
 import com.laolao.mapper.QuestionTestCaseMapper;
 import com.laolao.pojo.dto.ExamIdAndJudgeRecordIdDTO;
+import com.laolao.pojo.entity.JudgeMemberResult;
 import com.laolao.pojo.entity.JudgeRecord;
 import com.laolao.pojo.entity.QuestionTestCase;
 import com.laolao.pojo.vo.JudgeRecordVO;
@@ -50,6 +52,8 @@ public class JudgeListener implements RocketMQListener {
     private NotificationHandler notificationHandler;
     @Resource
     private ObjectMapper objectMapper;
+    @Resource
+    private JudgeMemberResultMapper judgeMemberResultMapper;
 
     @Override
     public ConsumeResult consume(MessageView messageView) {
@@ -80,12 +84,14 @@ public class JudgeListener implements RocketMQListener {
             // 获取这一题定的分值
             Integer score = examMapper.selectScoreByExamIdAndQuestionId(examId, judgeRecord.getQuestionId());
             JudgeResult judgeResult = judgeService.judge(judgeRecord.getAnswerCode(), questionTestCases);
+
             // 填写分数
             if (judgeResult.getStatus() == JudgeConstant.STATUS_AC) {
                 judgeRecord.setScore(score);
             } else if (judgeResult.getStatus() == JudgeConstant.STATUS_WA) {
                 judgeRecord.setScore((score * judgeResult.getPassTestCaseCount() / questionTestCases.size()));
             }
+
             // 填写记录表
             judgeRecord.setStdout(judgeResult.getStdout());
             judgeRecord.setStderr(judgeResult.getStderr());
@@ -94,11 +100,25 @@ public class JudgeListener implements RocketMQListener {
             judgeRecord.setTime(judgeResult.getTime());
             judgeRecord.setMemory(judgeResult.getMemory());
             judgeRecordMapper.updateById(judgeRecord);
+
             // 调用rocketmq传结果
             JudgeRecordVO judgeRecordVO = mapStruct.JudgeResultToJudgeRecordVO(judgeResult);
             judgeRecordVO.setQuestionId(judgeRecord.getQuestionId());
             judgeRecordVO.setScore(judgeRecord.getScore());
             notificationHandler.sendToUser(examId, judgeRecord.getUserId(), WsResult.of("JUDGE_RESULT", judgeRecordVO));
+
+            // 更新最优答案
+            JudgeMemberResult memberResult = JudgeMemberResult.builder()
+                    .examId(examId)
+                    .examRecordId(judgeRecord.getExamRecordId())
+                    .userId(judgeRecord.getUserId())
+                    .questionId(judgeRecord.getQuestionId())
+                    .bestJudgeRecordId(judgeRecord.getId())
+                    .score(judgeRecord.getScore())
+                    .status(judgeRecord.getStatus())
+                    .submitTime(judgeRecord.getSubmitTime()) // 或者使用 LocalDateTime.now()
+                    .build();
+            judgeMemberResultMapper.updateResult(memberResult);
         } catch (Exception e) {
             e.printStackTrace();
             // 失败了更新状态为“异常”
