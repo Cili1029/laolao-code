@@ -105,7 +105,7 @@ public class JudgeListener implements RocketMQListener {
             JudgeRecordVO judgeRecordVO = mapStruct.JudgeResultToJudgeRecordVO(judgeResult);
             judgeRecordVO.setQuestionId(judgeRecord.getQuestionId());
             judgeRecordVO.setScore(judgeRecord.getScore());
-            notificationHandler.sendToUser(examId, judgeRecord.getUserId(), WsResult.of("JUDGE_RESULT", judgeRecordVO));
+            notificationHandler.sendToUser(judgeRecord.getUserId(), WsResult.of("JUDGE_RESULT", judgeRecordVO));
 
             // 更新最优答案
             JudgeMemberResult memberResult = JudgeMemberResult.builder()
@@ -116,7 +116,7 @@ public class JudgeListener implements RocketMQListener {
                     .bestJudgeRecordId(judgeRecord.getId())
                     .score(judgeRecord.getScore())
                     .status(judgeRecord.getStatus())
-                    .submitTime(judgeRecord.getSubmitTime()) // 或者使用 LocalDateTime.now()
+                    .submitTime(judgeRecord.getSubmitTime())
                     .build();
             judgeMemberResultMapper.updateResult(memberResult);
         } catch (Exception e) {

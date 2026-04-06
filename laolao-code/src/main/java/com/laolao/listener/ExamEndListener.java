@@ -21,7 +21,8 @@ import java.nio.charset.StandardCharsets;
 @RocketMQMessageListener(
         endpoints = "127.0.0.1:9081",
         topic = "ExamEndTopic",
-        consumerGroup = "exam_end_consumer_group"
+        consumerGroup = "exam_end_consumer_group",
+        tag = "*"
 )
 public class ExamEndListener implements RocketMQListener {
     @Resource

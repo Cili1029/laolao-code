@@ -39,16 +39,12 @@ request.interceptors.response.use(
             const status = error.response.status
             switch (status) {
                 case 401:
-                    if (error.response.data.msg != null) {
-                        toast.info(error.response.data.msg)
-                    } else {
-                        // 跳转到登录页
-                        router.replace('/sign-in')
-                        toast.info("登录已过期，请重新登录！")
-                        // 清空现有user数据
-                        const userStore = useUserStore()
-                        userStore.clearUser()
-                    }
+                    // 跳转到登录页
+                    router.replace('/sign-in')
+                    toast.info("登录已过期，请重新登录！")
+                    // 清空现有user数据
+                    const userStore = useUserStore()
+                    userStore.clearUser()
                     break
                 case 403:
                     // 跳转到用户首页

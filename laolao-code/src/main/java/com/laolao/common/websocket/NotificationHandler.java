@@ -1,5 +1,7 @@
 package com.laolao.common.websocket;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.laolao.common.result.WsResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.NonNull;
@@ -10,96 +12,141 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.*;
 
 @Slf4j
 @Component
 public class NotificationHandler extends TextWebSocketHandler {
 
-    // 结构：ExamID -> (UserID -> Session)
-    private static final Map<Integer, Map<Integer, WebSocketSession>> examMap = new ConcurrentHashMap<>();
+    // 全局连接池：UserID -> Session
+    private static final Map<Integer, WebSocketSession> userSessions = new ConcurrentHashMap<>();
 
-    // 用于执行定时强制交卷的任务调度器
-    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(2);
+    // 考试分组索引：ExamID -> Set<UserID> (仅用于考试广播)
+    private static final Map<Integer, Set<Integer>> examMembers = new ConcurrentHashMap<>();
+
+    // ObjectMapper
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
         Map<String, Object> attrs = session.getAttributes();
-        Integer examId = (Integer) attrs.get("examId");
         Integer userId = (Integer) attrs.get("userId");
+        userSessions.put(userId, session);
+
         String name = (String) attrs.get("name");
-        LocalDateTime endTime = (LocalDateTime) attrs.get("endTime");
-
-        // 注册到内存 Map
-        examMap.computeIfAbsent(examId, k -> new ConcurrentHashMap<>()).put(userId, session);
-
-        // 特殊情况处理：如果学生由于网络原因，在考试已经结束后（但在5分钟宽限期内）才连上
-        if (LocalDateTime.now().isAfter(endTime)) {
-            // 直接下发交卷指令，不给答题机会
-            sendMessage(session, WsResult.of("EXAM_SUBMIT", null));
-            return;
-        }
-
-        log.info("考生 {} 已连接考试 {}", name, examId);
-    }
-
-    @Override
-    protected void handleTextMessage(@NonNull WebSocketSession session, TextMessage message) {
-        // 心跳处理
-        if ("ping".equals(message.getPayload())) {
-            sendMessage(session, WsResult.of("PONG", null));
-        }
+        log.info("用户 {} 进入网站", name);
     }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, @NonNull CloseStatus status) {
-        // 连接关闭时，从 Map 中移除，防止内存泄漏
+        // 连接关闭时移除数据，防止内存泄漏
         Integer examId = (Integer) session.getAttributes().get("examId");
         Integer userId = (Integer) session.getAttributes().get("userId");
         String name = (String) session.getAttributes().get("name");
 
         if (examId != null && userId != null) {
-            Map<Integer, WebSocketSession> users = examMap.get(examId);
-            if (users != null) {
-                users.remove(userId);
-                if (users.isEmpty()) {
-                    examMap.remove(examId);
-                }
+            Set<Integer> members = examMembers.get(examId);
+            if (members != null) {
+                members.remove(userId);
+                log.info("用户 {} 离开考试 {}", name, examId);
+                if (members.isEmpty()) examMembers.remove(examId);
             }
         }
-        System.out.println("考生 " + name + " 连接断开");
+
+        if (userId != null) {
+            userSessions.remove(userId);
+        }
+        log.info("用户 {} 连接已断开", name);
+    }
+
+    @Override
+    protected void handleTextMessage(@NonNull WebSocketSession session, TextMessage message) {
+        try {
+            // 先转成 WsResult<Object>
+            WsResult<Object> wsResult = OBJECT_MAPPER.readValue(message.getPayload(),
+                    new TypeReference<>() {
+                    });
+
+            // 处理心跳
+            if ("PING".equals(wsResult.getType())) {
+                sendMessage(session, WsResult.of("PONG", null));
+                return;
+            }
+
+            if ("BIND_EXAM".equals(wsResult.getType())) {
+                Integer userId = (Integer) session.getAttributes().get("userId");
+                String name = (String) session.getAttributes().get("name");
+                Integer newExamId = (Integer) wsResult.getData();
+
+                // 处理“换场”情况
+                Integer oldExamId = (Integer) session.getAttributes().get("examId");
+                if (oldExamId != null && !oldExamId.equals(newExamId)) {
+                    Set<Integer> oldMembers = examMembers.get(oldExamId);
+                    if (oldMembers != null) {
+                        oldMembers.remove(userId);
+                        if (oldMembers.isEmpty()) {
+                            examMembers.remove(oldExamId); // 清理空的考试 Key
+                        }
+                    }
+                }
+                // 将 examId 存入 Session 的 Attributes 中，方便断开时查找
+                session.getAttributes().put("examId", newExamId);
+
+                // 更新索引映射（原本是空的，现在加进去）
+                examMembers.computeIfAbsent(newExamId, k -> ConcurrentHashMap.newKeySet()).add(userId);
+                log.info("用户 {} 进入考试 {}", name, newExamId);
+            }
+
+            if ("REMOVE_EXAM".equals(wsResult.getType())) {
+                String name = (String) session.getAttributes().get("name");
+                Integer examId = (Integer) session.getAttributes().get("examId");
+                Integer userId = (Integer) session.getAttributes().get("userId");
+
+                // 安全判断，防止空指针
+                if (examId == null || userId == null) {
+                    log.info("用户 {} 未绑定任何考试，无需离开", name);
+                    return;
+                }
+
+                // 安全移除考试成员
+                Set<Integer> members = examMembers.get(examId);
+                if (members != null) {
+                    members.remove(userId);
+                    if (members.isEmpty()) {
+                        examMembers.remove(examId);
+                    }
+                }
+
+                // 清空当前会话的 examId
+                session.getAttributes().remove("examId");
+                log.info("用户 {} 离开考试 {}", name, examId);
+            }
+        } catch (Exception e) {
+            log.error("解析 WebSocket 消息失败", e);
+        }
     }
 
     /**
-     * 给特定考试的特定学生发消息（比如监考老师发警告）
+     * 发送给特定用户（老师调试、发布校验结果、学生单题判题结果）
+     * 无论用户是否在考试中，只要在线就能收到
      */
-    public void sendToUser(Integer examId, Integer userId, String message) {
-        Map<Integer, WebSocketSession> users = examMap.get(examId);
-        if (users != null) {
-            WebSocketSession session = users.get(userId);
+    public void sendToUser(Integer userId, String message) {
+        WebSocketSession session = userSessions.get(userId);
+        if (session != null && session.isOpen()) {
             sendMessage(session, message);
         }
     }
 
     /**
-     * 给特定考试的所有在线学生发送消息
+     * 发送给整场考试的所有人（考试结束指令、全场公告）
      */
     public void sendToAllUsersInExam(Integer examId, String message) {
-        // 获取该考试下的所有在线考生Session
-        Map<Integer, WebSocketSession> users = examMap.get(examId);
-        if (users == null || users.isEmpty()) {
-            return;
+        Set<Integer> members = examMembers.get(examId);
+        if (members != null) {
+            members.forEach(uid -> sendToUser(uid, message));
         }
-        // 遍历发送给所有在线考生
-        users.values().forEach(session -> {
-            if (session.isOpen()) {
-                sendMessage(session, message);
-                // 强制交卷后，建议在 1-2 秒后由后端主动断开 WebSocket
-                // 或者由前端收到消息后执行完交卷逻辑自行断开
-            }
-        });
     }
 
     /**

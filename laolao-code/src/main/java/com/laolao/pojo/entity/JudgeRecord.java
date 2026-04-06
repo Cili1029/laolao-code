@@ -40,11 +40,6 @@ public class JudgeRecord implements Serializable {
     private Integer userId;
 
     /**
-     * 是否为本题最优记录：0-否，1-是
-     */
-    private Integer isBest;
-
-    /**
      * 判题状态
      */
     private Integer status;

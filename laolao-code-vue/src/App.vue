@@ -8,12 +8,18 @@
   import 'vue-sonner/style.css'
   import { Toaster } from '@/components/ui/sonner'
   import { useUserStore } from "@/stores/UserStore"
-  import { onMounted } from 'vue'
+  import { onMounted, onUnmounted } from 'vue'
+  import { useWebsocketStore } from '@/stores/WebsocketStore'
+  const wsStore = useWebsocketStore()
 
   const userStore = useUserStore()
 
-  onMounted(() => {
+  onMounted(async () => {
     userStore.getInfo()
+  })
+
+  onUnmounted(() => {
+    wsStore.close()
   })
 
 

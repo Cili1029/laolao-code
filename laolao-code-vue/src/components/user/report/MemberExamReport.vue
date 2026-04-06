@@ -166,7 +166,7 @@
         judgeRecord.isGenerating = true
         judgeRecord.aiReport = ''
 
-        const eventSource = new EventSource(`/api/ai/report/question?recordId=${judgeRecord.id}`)
+        const eventSource = new EventSource(`/api/ai/report/question?judgeRecordId=${judgeRecord.id}`)
 
         // 只要来数据，就往屏幕上打字 (默认监听 message 事件)
         eventSource.onmessage = (event) => {

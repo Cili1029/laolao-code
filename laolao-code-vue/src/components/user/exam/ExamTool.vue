@@ -133,14 +133,12 @@
 
     onMounted(async () => {
         await getQuestions()
-        // 连接websocket
-        wsStore.connect(examStore.examId!)
         examStore.beginExam()
+        wsStore.bindExamWhenReady(examStore.examId!)
     })
 
     onUnmounted(() => {
-        wsStore.close()
-        examStore.endExam()
+        wsStore.sendJsonMessage("REMOVE_EXAM", null)
     })
 
     const getQuestions = async () => {

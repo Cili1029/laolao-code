@@ -10,24 +10,31 @@ export const useWebsocketStore = defineStore('websocket', () => {
 
     const examStore = useExamStore()
 
+    // 等连接成功后，要发送的 BIND_EXAM
+    const pendingBindExamId = ref<number | null>(null)
+
     // 心跳定时器 ID（浏览器环境使用 number，Node 环境可能不同）
     let heartbeatTimer: number | null = null
 
     /**
      * 初始化 WebSocket 连接
-     * @param examId 考试 ID，用于构建连接 URL
      */
-    const connect = (examId: number) => {
+    const connect = () => {
         // 如果已有连接且处于打开状态，则直接返回，避免重复连接
         if (socket.value && socket.value.readyState === WebSocket.OPEN) return
 
         // 构建 WebSocket URL（这里硬编码了后端地址，生产环境应从环境变量读取）
-        const url = `ws://localhost:8080/ws/exam?examId=${examId}`
+        const url = `ws://localhost:8080/ws/connect`
         socket.value = new WebSocket(url)
 
         // 连接建立时的处理
         socket.value.onopen = () => {
             isConnected.value = true
+            // 考试页刷新自动进入考试
+            if (pendingBindExamId.value !== null) {
+                sendJsonMessage('BIND_EXAM', pendingBindExamId.value)
+                pendingBindExamId.value = null // 发完清空
+            }
             startHeartbeat()   // 启动心跳
         }
 
@@ -49,7 +56,7 @@ export const useWebsocketStore = defineStore('websocket', () => {
     const startHeartbeat = () => {
         heartbeatTimer = window.setInterval(() => {
             if (socket.value?.readyState === WebSocket.OPEN) {
-                socket.value.send("ping")
+                sendJsonMessage("PING", null)
             }
         }, 30000)   // 30 秒间隔
     }
@@ -62,9 +69,9 @@ export const useWebsocketStore = defineStore('websocket', () => {
     }
 
     /**
- * 处理接收到的 WebSocket 消息
- * @param data 原始消息数据（字符串）
- */
+    * 处理接收到的 WebSocket 消息
+    * @param data 原始消息数据（字符串）
+    */
     const handleMessage = (data: string) => {
         // 先去除首尾空白字符（避免传输中多空格导致判断失效）
         const cleanData = data.trim()
@@ -115,6 +122,29 @@ export const useWebsocketStore = defineStore('websocket', () => {
         socket.value = null
     }
 
+    const sendJsonMessage = (type: string, data: any) => {
+        if (!socket.value || socket.value.readyState !== WebSocket.OPEN) {
+            // 未连接
+            return
+        }
+        const jsonStr = JSON.stringify({
+            type: type,
+            data: data
+        })
+        socket.value.send(jsonStr)
+    }
+
+    // 🔥 考试页面调用这个，不是直接发！
+    function bindExamWhenReady(examId: number) {
+        if (isConnected.value) {
+            // 已连接 → 直接发
+            sendJsonMessage('BIND_EXAM', examId)
+        } else {
+            // 未连接 → 先存起来，等连接成功自动发
+            pendingBindExamId.value = examId
+        }
+    }
+
     // 返回公开的方法和状态，供组件使用
-    return { isConnected, connect, close }
+    return { isConnected, connect, close, sendJsonMessage, bindExamWhenReady }
 })

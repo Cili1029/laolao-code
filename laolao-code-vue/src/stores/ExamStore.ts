@@ -56,7 +56,7 @@ export const useExamStore = defineStore('sidebar', {
 
         // ===================== 判题相关(附加老师编辑考试时候的判题功能) =====================
         judgeLoading: false,       // 自动判题加载状态
-        judgeDialog: true,        // 判题结果弹窗显隐
+        judgeDialog: false,        // 判题结果弹窗显隐
         judgeRecord: null as JudgeRecord | null,     // 判题结果
         advisorJudgeRecord: null as JudgeRecord | null,  // 老师编辑考试时判题结果
 

@@ -1,5 +1,6 @@
 import axios from "@/utils/myAxios"
 import { defineStore } from 'pinia'
+import { useWebsocketStore } from '@/stores/WebsocketStore'
 
 interface User {
     id: number
@@ -42,6 +43,9 @@ export const useUserStore = defineStore('user', {
                 const res = await axios.get("/api/user/info")
                 if (res.data.code === 1) {
                     this.setUser(res.data.data)
+                    // 连接websocket
+                    const wsStore = useWebsocketStore()
+                    wsStore.connect()
                 }
             } catch (e) {
                 console.log(e);
