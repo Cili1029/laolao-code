@@ -15,6 +15,7 @@ import com.laolao.pojo.vo.*;
 import com.laolao.service.DraftExamService;
 import com.laolao.service.QuestionService;
 import jakarta.annotation.Resource;
+import org.apache.rocketmq.client.core.RocketMQClientTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +46,8 @@ public class DraftExamServiceImpl implements DraftExamService {
     private ExamQuestionConfigMapper examQuestionConfigMapper;
     @Resource
     private StudyGroupMapper studyGroupMapper;
+    @Resource
+    private RocketMQClientTemplate rocketMQClientTemplate;
 
     @Override
     public Result<Integer> createExam(CreateExamDTO createExamDTO) {
@@ -64,15 +67,10 @@ public class DraftExamServiceImpl implements DraftExamService {
     }
 
     @Override
-    public Result<JudgeRecordVO> judgeTestCase(JudgeTestCaseDTO judgeTestCaseDTO) {
-        try {
-            JudgeResult judge = judgeService.judge(judgeTestCaseDTO.getCode(), List.of(judgeTestCaseDTO.getTestCase()));
-            JudgeRecordVO judgeRecordVO = mapStruct.JudgeResultToJudgeRecordVO(judge);
-            return Result.success(judgeRecordVO);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Result.error("判题失败！练习管理员！");
-        }
+    public Result<String> judgeTestCase(Integer questionId) {
+        // 发送队列
+        rocketMQClientTemplate.convertAndSend("JudgeTopic:ADVISOR", questionId);
+        return Result.success();
     }
 
     @Override

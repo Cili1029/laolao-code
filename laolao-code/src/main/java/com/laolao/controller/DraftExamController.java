@@ -2,11 +2,9 @@ package com.laolao.controller;
 
 import com.laolao.common.result.Result;
 import com.laolao.pojo.dto.CreateExamDTO;
-import com.laolao.pojo.dto.JudgeTestCaseDTO;
 import com.laolao.pojo.dto.SaveAndAddToExamDTO;
 import com.laolao.pojo.dto.UpdateDraftDTO;
 import com.laolao.pojo.vo.DraftQuestionVO;
-import com.laolao.pojo.vo.JudgeRecordVO;
 import com.laolao.service.DraftExamService;
 import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -44,15 +42,15 @@ public class DraftExamController {
     }
 
     /**
-     * 导师运行测试用例
+     * 导师运行题目
      *
-     * @param judgeTestCaseDTO 测试参数
+     * @param questionId 问题ID
      * @return 判题结果
      */
     @PostMapping("/judge")
     @PreAuthorize("hasRole('ADVISOR')")
-    public Result<JudgeRecordVO> judgeTestCase(@RequestBody JudgeTestCaseDTO judgeTestCaseDTO) {
-        return examService.judgeTestCase(judgeTestCaseDTO);
+    public Result<String> judgeTestCase(@RequestParam Integer questionId) {
+        return examService.judgeTestCase(questionId);
     }
 
     /**

@@ -24,11 +24,11 @@
 
                     <div class="h-full w-full flex flex-col bg-white border space-y-2">
                         <div class="flex px-2 pt-2 justify-between">
-                            <div @click="saveAndAddToExam()"
+                            <div @click="!examStore.judgeLoading && saveAndAddToExam()"
                                 class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
-                                <Save class="h-4 w-4 mr-1" />
-                                <Spinner v-if="false" class="mr-1" />
-                                写入考试
+                                <Spinner v-if="examStore.judgeLoading" class="mr-1" />
+                                <Save v-else class="h-4 w-4 mr-1" />
+                                写入并测试
                             </div>
                             <div @click="deleteQuestion()"
                                 class="flex cursor-pointer text-red-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
@@ -162,12 +162,6 @@
                                     </Dialog>
                                 </div>
                                 <div class="flex space-x-2">
-                                    <div @click="!examStore.judgeLoading && runTestCase(testCase)"
-                                        class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
-                                        <Spinner v-if="examStore.judgeLoading" class="mr-1" />
-                                        <Save v-else class="h-4 w-4 mr-1" />
-                                        运行示例
-                                    </div>
                                     <div @click="deleteTestCase(currentQuestion!, index)"
                                         class="flex cursor-pointer text-red-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
                                         <Trash class="h-4 w-4 mr-1" />
@@ -314,12 +308,16 @@
     }
 
     const saveAndAddToExam = async () => {
+        examStore.judgeLoading = true
         try {
             const res = await axios.post("/api/exam/draft/add-question", {
                 examId: Number(route.params.id),
                 question: currentQuestion.value
             })
-            currentQuestion.value!.id = res.data.data
+            if (res.data.code === 1) {
+                currentQuestion.value!.id = res.data.data
+                run()
+            }
         } catch (e) {
             console.log(e);
         }
@@ -366,16 +364,13 @@
         question.testCases.splice(index, 1);
     };
 
-    const runTestCase = async (testCase: TestCase) => {
+    const run = async () => {
         try {
-            examStore.judgeLoading = true
-            const res = await axios.post("/api/exam/draft/judge", {
-                code: currentQuestion.value!.standardSolution,
-                testCase: testCase
+            await axios.post("/api/exam/draft/judge", {}, {
+                params: {
+                    questionId: currentQuestion.value?.id
+                }
             })
-            examStore.advisorJudgeRecord = res.data.data
-            examStore.judgeDialog = true
-            examStore.judgeLoading = false
         } catch (e) {
             console.log(e);
         }

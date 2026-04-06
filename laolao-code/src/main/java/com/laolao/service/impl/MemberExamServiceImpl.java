@@ -79,7 +79,7 @@ public class MemberExamServiceImpl implements MemberExamService {
                 .build();
 
         // 发送队列
-        rocketMQClientTemplate.convertAndSend("JudgeTopic", examIdAndJudgeRecordIdDTO);
+        rocketMQClientTemplate.convertAndSend("JudgeTopic:MEMBER", examIdAndJudgeRecordIdDTO);
         // 返回记录Id
         return Result.success(judgeRecord.getId());
     }

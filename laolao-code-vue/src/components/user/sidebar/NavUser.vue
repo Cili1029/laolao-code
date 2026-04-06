@@ -68,8 +68,9 @@
   import axios from "@/utils/myAxios"
   import { useUserStore } from "@/stores/UserStore"
   import router from "@/router"
+  import { useWebsocketStore } from '@/stores/WebsocketStore'
 
-
+  const wsStore = useWebsocketStore()
   const userStore = useUserStore()
   const { isMobile } = useSidebar()
 
@@ -77,6 +78,7 @@
     try {
       await axios.get("/api/user/sign-out")
       userStore.clearUser()
+      wsStore.close()
       router.push("/sign-in")
     } catch (e) {
       console.log(e);

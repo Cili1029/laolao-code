@@ -9,13 +9,11 @@ import com.laolao.common.result.JudgeResult;
 import com.laolao.common.result.WsResult;
 import com.laolao.common.util.MapStruct;
 import com.laolao.common.websocket.NotificationHandler;
-import com.laolao.mapper.ExamMapper;
-import com.laolao.mapper.JudgeMemberResultMapper;
-import com.laolao.mapper.JudgeRecordMapper;
-import com.laolao.mapper.QuestionTestCaseMapper;
+import com.laolao.mapper.*;
 import com.laolao.pojo.dto.ExamIdAndJudgeRecordIdDTO;
 import com.laolao.pojo.entity.JudgeMemberResult;
 import com.laolao.pojo.entity.JudgeRecord;
+import com.laolao.pojo.entity.Question;
 import com.laolao.pojo.entity.QuestionTestCase;
 import com.laolao.pojo.vo.JudgeRecordVO;
 import jakarta.annotation.Resource;
@@ -33,7 +31,7 @@ import java.util.List;
         endpoints = "127.0.0.1:9081",
         topic = "JudgeTopic",
         consumerGroup = "judge_consumer_group",
-        tag = "*",
+        tag = "*", // 监听 MEMBER, ADVISOR, RELEASE
         consumptionThreadCount = 10,
         requestTimeout = 6000
 )
@@ -54,9 +52,24 @@ public class JudgeListener implements RocketMQListener {
     private ObjectMapper objectMapper;
     @Resource
     private JudgeMemberResultMapper judgeMemberResultMapper;
+    @Resource
+    private QuestionMapper questionMapper;
 
     @Override
     public ConsumeResult consume(MessageView messageView) {
+        String tag = messageView.getTag().orElse("MEMBER");
+        if ("MEMBER".equals(tag)) {
+            memberJudge(messageView);
+        } else if ("ADVISOR".equals(tag)) {
+            advisorTestJudge(messageView);
+        } else {
+            // 其他标签不处理，直接消费掉
+            System.out.println("未识别的消息标签：" + tag);
+        }
+        return ConsumeResult.SUCCESS;
+    }
+
+    private void memberJudge(MessageView messageView) {
         Integer judgeRecordId, examId;
         ExamIdAndJudgeRecordIdDTO data;
         // 获取记录json反序列化
@@ -68,13 +81,13 @@ public class JudgeListener implements RocketMQListener {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
 //            log.error("MQ消息格式错误，无法解析: {}", json);
-            return ConsumeResult.SUCCESS; // 格式错误的消息，直接消费掉，不要重试
+            return;
         }
 
         System.out.println("记录 " + judgeRecordId + " 开始判题");
         // 查出记录
         JudgeRecord judgeRecord = judgeRecordMapper.selectById(judgeRecordId);
-        if (judgeRecord == null) return ConsumeResult.SUCCESS;
+        if (judgeRecord == null) return;
         try {
             // 获取测试用例
             List<QuestionTestCase> questionTestCases = questionTestCaseMapper.selectList(
@@ -125,6 +138,39 @@ public class JudgeListener implements RocketMQListener {
             judgeRecord.setStatus(JudgeConstant.STATUS_UNKNOWN);
             judgeRecordMapper.updateById(judgeRecord);
         }
-        return ConsumeResult.SUCCESS;
+    }
+
+    private void advisorTestJudge(MessageView messageView) {
+        Integer questionId;
+        // 获取记录json反序列化
+        String json = StandardCharsets.UTF_8.decode((messageView.getBody())).toString();
+        try {
+            questionId = objectMapper.readValue(json, Integer.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+//            log.error("MQ消息格式错误，无法解析: {}", json);
+            return;
+        }
+        if (questionId == null) return;
+
+        System.out.println("题目 " + questionId + " 开始判题");
+        try {
+            // 获取题目
+            Question question = questionMapper.selectById(questionId);
+            // 获取测试用例
+            List<QuestionTestCase> questionTestCases = questionTestCaseMapper.selectList(
+                    Wrappers.lambdaQuery(QuestionTestCase.class)
+                            .eq(QuestionTestCase::getQuestionId, questionId));
+
+            JudgeResult judgeResult = judgeService.judge(question.getStandardSolution(), questionTestCases);
+
+            // 调用rocketmq传结果
+            JudgeRecordVO judgeRecordVO = mapStruct.JudgeResultToJudgeRecordVO(judgeResult);
+            notificationHandler.sendToUser(question.getAdvisorId(), WsResult.of("JUDGE_RESULT", judgeRecordVO));
+
+        } catch (Exception e) {
+            // 判题失败
+            e.printStackTrace();
+        }
     }
 }

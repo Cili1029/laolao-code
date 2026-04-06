@@ -28,8 +28,6 @@ public class QuestionServiceImpl implements QuestionService {
     private QuestionTestCaseMapper questionTestCaseMapper;
     @Resource
     private MapStruct mapStruct;
-    @Resource
-    private QuestionTestCaseMapper questionTestCaseDao;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
