@@ -78,6 +78,16 @@ public class Question implements Serializable {
     private Integer isPublic;
 
     /**
+     * 是否被删除(0-否, 1-是)
+     */
+    private Integer isDeleted;
+
+    /**
+     * 是否以通过判题(0-否, 1-是)
+     */
+    private Integer isValidated;
+
+    /**
      * 创建时间
      */
     private LocalDateTime createTime;

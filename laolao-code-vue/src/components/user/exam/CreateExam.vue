@@ -1,5 +1,5 @@
 <template>
-    <div v-if="currentQuestion" class="h-full">
+    <div class="h-full">
         <ResizablePanelGroup direction="horizontal">
             <ResizablePanel :default-size="30">
                 <div class="h-full flex border-t">
@@ -22,13 +22,18 @@
                         <QuestionBank :type="1" @question-data="getBankQuestion" />
                     </div>
 
-                    <div class="h-full w-full flex flex-col bg-white border space-y-2">
+                    <div v-if="questions.length > 0" class="h-full w-full flex flex-col bg-white border space-y-2">
                         <div class="flex px-2 pt-2 justify-between">
-                            <div @click="!examStore.judgeLoading && saveAndAddToExam()"
-                                class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
-                                <Spinner v-if="examStore.judgeLoading" class="mr-1" />
-                                <Save v-else class="h-4 w-4 mr-1" />
-                                写入并测试
+                            <div @click="saveAndAddToExam()"
+                                class="flex cursor-pointer items-center px-2 py-1 text-sm rounded transition-colors"
+                                :class="[isDirty ? 'text-orange-600 bg-orange-50 hover:bg-orange-100'
+                                    : 'text-green-600 bg-gray-100 hover:bg-gray-200'
+                                ]">
+                                <Rocket v-if="!examStore.judgeLoading" class="h-4 w-4 mr-1" />
+                                <Spinner v-else class="mr-1" />
+                                <span>{{ isDirty ? '保存并测试' : '测试' }}</span>
+                                <span v-if="isDirty"
+                                    class="ml-1 w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span>
                             </div>
                             <div @click="deleteQuestion()"
                                 class="flex cursor-pointer text-red-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
@@ -87,12 +92,19 @@
                                 placeholder="请输入 Markdown 内容..." />
                         </div>
                     </div>
+                    <div v-else class="flex flex-col flex-1 justify-center items-center text-center">
+                        <div class="bg-white p-4 rounded-full shadow inline-block mb-4">
+                            <Ghost class="h-10 w-10 text-gray-600" />
+                        </div>
+                        <p class="text-gray-600 font-medium">暂无题目</p>
+                        <p class="text-sm text-gray-600">点击左边创建一道题</p>
+                    </div>
                 </div>
             </ResizablePanel>
 
             <ResizableHandle />
 
-            <ResizablePanel :default-size="70">
+            <ResizablePanel v-if="questions.length > 0" :default-size="70">
                 <ResizablePanelGroup direction="vertical">
                     <ResizablePanel :default-size="65">
                         <ResizablePanelGroup direction="horizontal">
@@ -189,11 +201,11 @@
     import { Dialog, DialogTrigger, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
     import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
     import MonacoEditor from '@/components/common/MonacoEditor.vue'
-    import { onMounted, ref, computed } from 'vue'
+    import { onMounted, ref, computed, watch } from 'vue'
     import axios from "@/utils/myAxios"
     import { useExamStore } from "@/stores/ExamStore"
     const examStore = useExamStore()
-    import { CirclePlus, Plus, Save, Trash } from 'lucide-vue-next'
+    import { CirclePlus, Ghost, Plus, Rocket, Trash } from 'lucide-vue-next'
     import { Textarea } from '@/components/ui/textarea'
     import { Input } from '@/components/ui/input'
     import { Label } from '@/components/ui/label'
@@ -204,6 +216,7 @@
     import { toast } from 'vue-sonner'
     import QuestionBank from '../question/QuestionBankDialog.vue'
     const route = useRoute()
+    import { cloneDeep, isEqual } from 'lodash-es' // 引入 lodash 工具
 
     onMounted(async () => {
         getQuestions()
@@ -231,25 +244,41 @@
     }
 
     const questions = ref<Question[]>([])
-    const currentQuestion = ref<Question | undefined>(undefined)
+
+    // 当前题目快照
+    const currentQuestionSnapshot = ref<Question | null>(null)
+    const currentQuestion = ref<Question | null>(null)
 
     const getQuestions = async () => {
         try {
             const res = await axios.get("/api/exam/draft/get-question", {
                 params: { examId: route.params.id }
             })
-            if (!res.data.data || res.data.data.length === 0) {
-                questions.value = [createDefaultQuestion()]
-            } else {
+            // 有数据
+            if (res.data.data && res.data.data.length > 0) {
                 questions.value = res.data.data
+                currentQuestion.value = questions.value[0]!
+                // 深度克隆当前题目
+                currentQuestionSnapshot.value = cloneDeep(currentQuestion.value)
             }
-            currentQuestion.value = questions.value[0]
         } catch (e) {
             console.error('获取题目失败：', e)
-            questions.value = [createDefaultQuestion()]
-            currentQuestion.value = questions.value[0]
         }
     }
+
+    // 判断当前题目是否被修改过
+    const isDirty = computed(() => {
+        if (!currentQuestion.value || !currentQuestionSnapshot.value) return false
+        // 使用 lodash 的 isEqual 进行深度对象对比
+        return !isEqual(currentQuestion.value, currentQuestionSnapshot.value)
+    })
+
+    watch(currentQuestion, (newVal) => {
+        if (newVal) {
+            // 切换时，重新建立当前题目的快照
+            currentQuestionSnapshot.value = cloneDeep(newVal)
+        }
+    }, { deep: false })
 
     const createDefaultQuestion = (): Question => {
         return {
@@ -279,10 +308,6 @@
     }
 
     const deleteQuestion = async () => {
-        if (questions.value.length === 1) {
-            toast.info("至少要有一题！")
-            return
-        }
         // 后端删除 如果有Id就是保存过的，需要后端也进行删除
         if (currentQuestion.value?.id) {
             try {
@@ -301,25 +326,40 @@
         const index = questions.value.findIndex(q => q === currentQuestion.value);
         questions.value.splice(index, 1);
         if (index > 0) {
-            currentQuestion.value = questions.value[index - 1];
+            currentQuestion.value = questions.value[index - 1]!;
         } else {
-            currentQuestion.value = questions.value[0];
+            currentQuestion.value = questions.value[0]!;
         }
     }
 
     const saveAndAddToExam = async () => {
+        if (!currentQuestion.value || examStore.judgeLoading) return
+
         examStore.judgeLoading = true
+
+        // 如果数据没变且已有 ID，直接运行
+        if (!isDirty.value && currentQuestion.value.id) {
+            await run()
+            return
+        }
+
+        // 数据有变动，先执行保存
         try {
             const res = await axios.post("/api/exam/draft/add-question", {
                 examId: Number(route.params.id),
                 question: currentQuestion.value
             })
+
             if (res.data.code === 1) {
-                currentQuestion.value!.id = res.data.data
-                run()
+                currentQuestion.value.id = res.data.data
+
+                // 保存成功后，将当前的最新状态存为新的快照
+                currentQuestionSnapshot.value = cloneDeep(currentQuestion.value)
+
+                await run()
             }
         } catch (e) {
-            console.log(e);
+            console.error(e)
         }
     }
 
