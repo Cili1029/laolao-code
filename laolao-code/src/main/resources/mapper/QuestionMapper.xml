@@ -9,10 +9,10 @@
     </delete>
 
     <select id="selectPrivateBank" resultType="com.laolao.pojo.vo.QuestionBankVO">
-        select q.id, q.title, u.name as advisor, q.is_public
+        select q.id, q.title, u.name as manager, q.is_public
         from question q
-        join user u on u.id = q.advisor_id
-        where q.advisor_id = #{userId} and q.parent_id = 0 and q.is_deleted = 0
+        join user u on u.id = q.creator_id
+        where q.creator_id = #{userId} and q.parent_id = 0 and q.is_deleted = 0
         <if test="content != null and content != ''">
             and
             (q.title like concat('%', #{content}, '%')
@@ -21,9 +21,9 @@
     </select>
 
     <select id="selectPublicBank" resultType="com.laolao.pojo.vo.QuestionBankVO">
-        select q.id, q.title, u.name as advisor
+        select q.id, q.title, u.name as manager
         from question q
-        join user u on u.id = q.advisor_id
+        join user u on u.id = q.creator_id
         where q.is_public = 1 and q.parent_id = 0 and q.is_deleted = 0
         <if test="content != null and content != ''">
             and

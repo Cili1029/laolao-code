@@ -2,8 +2,8 @@ package com.laolao.controller;
 
 import com.laolao.common.result.Result;
 import com.laolao.pojo.vo.ExamRecordVO;
-import com.laolao.pojo.vo.MemberReportVO;
-import com.laolao.service.MemberExamReportService;
+import com.laolao.pojo.vo.UserReportVO;
+import com.laolao.service.UserExamReportService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/member-report")
-public class MemberExamReportController {
+@RequestMapping("/api/user-report")
+public class UserExamReportController {
     @Resource
-    private MemberExamReportService memberExamReportService;
+    private UserExamReportService userExamReportService;
 
     /**
      * 获取考试报告
@@ -26,7 +26,7 @@ public class MemberExamReportController {
      */
     @GetMapping
     public Result<List<ExamRecordVO>> getSimpleExamReport() {
-        return memberExamReportService.getSimpleExamRecord();
+        return userExamReportService.getSimpleExamRecord();
     }
 
     /**
@@ -36,7 +36,7 @@ public class MemberExamReportController {
      * @return 基础信息
      */
     @GetMapping("/detail")
-    public Result<MemberReportVO> getExamReport(@RequestParam Integer recordId) {
-        return memberExamReportService.getExamReport(recordId);
+    public Result<UserReportVO> getExamReport(@RequestParam Integer recordId) {
+        return userExamReportService.getExamReport(recordId);
     }
 }

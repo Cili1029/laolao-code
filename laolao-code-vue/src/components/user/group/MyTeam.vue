@@ -38,10 +38,10 @@
                         <div class="flex items-center space-x-2">
                             <Avatar class="h-6 w-6">
                                 <AvatarFallback class="text-[10px] bg-orange-100 text-orange-600">
-                                    {{ group.advisor?.charAt(0) }}
+                                    {{ group.manager?.charAt(0) }}
                                 </AvatarFallback>
                             </Avatar>
-                            <span class="text-sm font-medium">{{ group.advisor }}</span>
+                            <span class="text-sm font-medium">{{ group.manager }}</span>
                         </div>
                     </div>
                 </div>
@@ -70,15 +70,15 @@
     interface Group {
         id: number
         name: string
-        advisor: string
+        manager: string
         description: string
     }
 
     const groups = ref<Group[]>([])
 
-    const getMyStudyGroup = async () => {
+    const getMyTeam = async () => {
         try {
-            const res = await axios.get("/api/group")
+            const res = await axios.get("/api/team")
             groups.value = res.data.data
         } catch (e) {
             console.error("获取学习组失败:", e)
@@ -86,6 +86,6 @@
     }
 
     onMounted(() => {
-        getMyStudyGroup()
+        getMyTeam()
     })
 </script>

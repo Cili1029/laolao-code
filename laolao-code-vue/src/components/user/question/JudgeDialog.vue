@@ -76,6 +76,6 @@
     const examStore = useExamStore()
 
     const targetRecord = computed<JudgeRecord | null>(() => {
-        return examStore.advisorJudgeRecord ?? examStore.judgeRecord
+        return examStore.managerJudgeRecord ?? examStore.judgeRecord
     })
 </script>

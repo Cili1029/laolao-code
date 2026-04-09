@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @ToString
 @Builder
-public class JudgeMemberResult implements Serializable {
+public class JudgeUserResult implements Serializable {
 
     /**
      * 主键ID

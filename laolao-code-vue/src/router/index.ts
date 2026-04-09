@@ -2,13 +2,13 @@ import SignIn from "@/components/common/SignIn.vue";
 import SignUp from "@/components/common/SignUp.vue";
 import Test from "@/components/common/Test.vue";
 import ExamTool from "@/components/user/exam/ExamTool.vue";
-import MemberExamReport from "@/components/user/report/MemberExamReport.vue";
+import UserExamReport from "@/components/user/report/UserExamReport.vue";
 import Group from "@/components/user/group/Group.vue";
 import { createRouter, createWebHistory, type RouteRecordRaw } from "vue-router";
 import ExamInfo from "@/components/user/exam/ExamInfo.vue";
 import CreateExam from "@/components/user/exam/CreateExam.vue";
 import GradeExam from "@/components/user/exam/GradeExam.vue";
-import MyStudyGroup from "@/components/user/group/MyStudyGroup.vue";
+import MyTeam from "@/components/user/group/MyTeam.vue";
 import MyExam from "@/components/user/exam/MyExam.vue";
 import MyReport from "@/components/user/report/MyReport.vue";
 import UserLayout from "@/components/user/UserLayout.vue";
@@ -35,7 +35,7 @@ const routes: Array<RouteRecordRaw> = [
         children: [
             {
                 path: 'group',
-                component: MyStudyGroup,
+                component: MyTeam,
             },
             {
                 path: 'group/:id',
@@ -62,12 +62,12 @@ const routes: Array<RouteRecordRaw> = [
                 component: GradeExam,
             },
             {
-                path: 'member-report',
+                path: 'user-report',
                 component: MyReport,
             },
             {
-                path: 'member-report/:id',
-                component: MemberExamReport,
+                path: 'user-report/:id',
+                component: UserExamReport,
             },
         ]
     }

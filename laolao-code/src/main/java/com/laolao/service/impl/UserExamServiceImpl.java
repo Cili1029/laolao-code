@@ -7,7 +7,7 @@ import com.laolao.mapper.*;
 import com.laolao.pojo.dto.*;
 import com.laolao.pojo.entity.*;
 import com.laolao.pojo.vo.*;
-import com.laolao.service.MemberExamService;
+import com.laolao.service.UserExamService;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.core.RocketMQClientTemplate;
@@ -18,7 +18,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class MemberExamServiceImpl implements MemberExamService {
+public class UserExamServiceImpl implements UserExamService {
     @Resource
     private ExamMapper examMapper;
     @Resource
@@ -79,7 +79,7 @@ public class MemberExamServiceImpl implements MemberExamService {
                 .build();
 
         // 发送队列
-        rocketMQClientTemplate.convertAndSend("JudgeTopic:MEMBER", examIdAndJudgeRecordIdDTO);
+        rocketMQClientTemplate.convertAndSend("JudgeTopic:USER", examIdAndJudgeRecordIdDTO);
         // 返回记录Id
         return Result.success(judgeRecord.getId());
     }

@@ -31,7 +31,7 @@
                         <div class="flex items-center text-sm text-gray-500 space-x-3">
                             <span class="flex items-center">
                                 <Users class="h-3.5 w-3.5 mr-1" />
-                                {{ exam.studyGroup }}
+                                {{ exam.team }}
                             </span>
                             <span class="text-gray-300">|</span>
                             <p class="max-w-xs">{{ exam.description }}</p>
@@ -79,7 +79,7 @@
     interface Exam {
         id: number
         name: string
-        studyGroup: string
+        team: string
         description: string
         startTime: string
         endTime: string

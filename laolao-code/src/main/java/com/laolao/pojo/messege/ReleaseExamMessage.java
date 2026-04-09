@@ -13,7 +13,7 @@ import java.util.List;
 public class ReleaseExamMessage implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private Integer advisorId;
+    private Integer managerId;
     private Integer examId;
     private List<Integer> questionIds;
 }

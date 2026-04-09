@@ -13,7 +13,7 @@ public class CreateExamDTO {
     /**
      * 组ID
      */
-    private Integer studyGroupId;
+    private Integer teamId;
 
     /**
      * 考试标题

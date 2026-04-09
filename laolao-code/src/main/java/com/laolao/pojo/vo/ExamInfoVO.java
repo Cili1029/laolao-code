@@ -40,12 +40,12 @@ public class ExamInfoVO implements Serializable {
     /**
      * 所属组Id
      */
-    private String studyGroupId;
+    private String teamId;
 
     /**
      * 所属组
      */
-    private String studyGroup;
+    private String team;
 
     /**
      * 题目数量

@@ -18,14 +18,14 @@
                                         <CircleUserRound class="h-8 w-8" />
                                     </AvatarFallback>
                                 </Avatar>
-                                <p class="text-sm ml-2">{{ group?.advisorName }}</p>
+                                <p class="text-sm ml-2">{{ group?.managerName }}</p>
                             </div>
                         </div>
                     </HoverCardTrigger>
                     <HoverCardContent>
                         <div class="space-y-1">
                             <h4 class="text-sm font-semibold">
-                                {{ group?.advisorName }}
+                                {{ group?.managerName }}
                             </h4>
                             <p class="text-sm">
                                 账号：{{ group?.username }}
@@ -41,7 +41,7 @@
                 </HoverCard>
                 <div class="text-right">
                     <p class="text-xs h-4 mb-2 text-gray-500">班级人数</p>
-                    <p>{{ group?.memberCount }}</p>
+                    <p>{{ group?.userCount }}</p>
                 </div>
                 <div class="text-right">
                     <p class="text-xs h-4 mb-2 text-gray-500">考试数</p>
@@ -52,7 +52,7 @@
         <div class="space-y-2">
             <div class="flex justify-between pb-2">
                 <p class="text-lg">考试列表</p>
-                <CreateOrUpdateExamDialog v-if="userStore.user.role === 1 && group?.advisorName === userStore.user.name" />
+                <CreateOrUpdateExamDialog v-if="userStore.user.role === 1 && group?.managerName === userStore.user.name" />
             </div>
 
             <RouterLink :to="'/exam/' + exam.id" v-for="exam in exams" :key="exam.id"
@@ -87,7 +87,7 @@
                         <p class="text-sm text-gray-500">{{ group?.name }}</p>
                         <p class="flex items-center text-sm text-gray-500">
                             <User class="h-4 w-4" />
-                            {{ group?.advisorName }}
+                            {{ group?.managerName }}
                         </p>
                     </div>
                 </div>
@@ -129,18 +129,18 @@
         name: string
         description: string
         inviteCode: string
-        memberCount: number
+        userCount: number
         username: string
-        advisorName: string
+        managerName: string
     }
 
     const group = ref<DetailGroup>()
 
     const getDetailGroup = async () => {
         try {
-            const res = await axios.get("/api/group/detail-base", {
+            const res = await axios.get("/api/team/detail-base", {
                 params: {
-                    studyGroupId: route.params.id
+                    teamId: route.params.id
                 }
             })
             group.value = res.data.data
@@ -160,9 +160,9 @@
     const exams = ref<GroupExam[]>([])
     const getGroupExam = async () => {
         try {
-            const res = await axios.get("/api/group/detail-exam", {
+            const res = await axios.get("/api/team/detail-exam", {
                 params: {
-                    studyGroupId: route.params.id
+                    teamId: route.params.id
                 }
             })
             exams.value = res.data.data

@@ -35,8 +35,8 @@ public class AiTutorController {
      * @return 报告
      */
     @GetMapping(value = "/exam-record", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> generateMemberExamReport(@RequestParam Integer examId, @RequestParam Integer examRecordId) {
-        return aiTutorService.generateMemberExamReport(examId, examRecordId);
+    public Flux<String> generateUserExamReport(@RequestParam Integer examId, @RequestParam Integer examRecordId) {
+        return aiTutorService.generateUserExamReport(examId, examRecordId);
     }
 
     /**
@@ -46,7 +46,7 @@ public class AiTutorController {
      * @return 报告
      */
     @GetMapping(value = "/exam-report", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<String> generateAdvisorExamReport(@RequestParam Integer examId) {
-        return aiTutorService.generateAdvisorExamReport(examId);
+    public Flux<String> generateManagerExamReport(@RequestParam Integer examId) {
+        return aiTutorService.generateManagerExamReport(examId);
     }
 }

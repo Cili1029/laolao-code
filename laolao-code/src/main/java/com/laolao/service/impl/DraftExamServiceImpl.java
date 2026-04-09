@@ -2,7 +2,6 @@ package com.laolao.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.laolao.common.constant.ExamConstant;
-import com.laolao.common.docker.JudgeService;
 import com.laolao.common.result.Result;
 import com.laolao.common.util.MapStruct;
 import com.laolao.common.util.SecurityUtils;
@@ -34,8 +33,6 @@ public class DraftExamServiceImpl implements DraftExamService {
     @Resource
     private ExamMapper examMapper;
     @Resource
-    private JudgeService judgeService;
-    @Resource
     private MapStruct mapStruct;
     @Resource
     private QuestionTestCaseMapper questionTestCaseMapper;
@@ -46,7 +43,7 @@ public class DraftExamServiceImpl implements DraftExamService {
     @Resource
     private ExamQuestionConfigMapper examQuestionConfigMapper;
     @Resource
-    private StudyGroupMapper studyGroupMapper;
+    private TeamMapper teamMapper;
     @Resource
     private RocketMQClientTemplate rocketMQClientTemplate;
 
@@ -58,8 +55,8 @@ public class DraftExamServiceImpl implements DraftExamService {
         Exam exam = Exam.builder()
                 .title(createExamDTO.getTitle())
                 .description(createExamDTO.getDescription())
-                .advisorId(SecurityUtils.getUserId())
-                .studyGroupId(createExamDTO.getStudyGroupId())
+                .managerId(SecurityUtils.getUserId())
+                .teamId(createExamDTO.getTeamId())
                 .startTime(createExamDTO.getStartTime())
                 .endTime(createExamDTO.getEndTime())
                 .build();
@@ -70,7 +67,7 @@ public class DraftExamServiceImpl implements DraftExamService {
     @Override
     public Result<String> judgeTestCase(Integer questionId) {
         // 发送队列
-        rocketMQClientTemplate.convertAndSend("JudgeTopic:ADVISOR", questionId);
+        rocketMQClientTemplate.convertAndSend("JudgeTopic:MANAGER", questionId);
         return Result.success();
     }
 
@@ -166,8 +163,8 @@ public class DraftExamServiceImpl implements DraftExamService {
         }
 
         // 至少要有一个考生
-        Integer memberCount = studyGroupMapper.selectMemberCountByExamId(examId);
-        if (memberCount == 0) {
+        Integer userCount = teamMapper.selectUserCountByExamId(examId);
+        if (userCount == 0) {
             return Result.error("学习组只少要有一名成员才可以发布考试");
         }
 

@@ -1,14 +1,14 @@
 package com.laolao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.laolao.pojo.entity.JudgeMemberResult;
+import com.laolao.pojo.entity.JudgeUserResult;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface JudgeMemberResultMapper extends BaseMapper<JudgeMemberResult> {
+public interface JudgeUserResultMapper extends BaseMapper<JudgeUserResult> {
     @Insert("""
-            INSERT INTO judge_member_result
+            INSERT INTO judge_user_result
             (exam_id, exam_record_id, user_id, question_id, best_judge_record_id, score, status, submit_time)
             VALUES (#{examId}, #{examRecordId}, #{userId}, #{questionId}, #{bestJudgeRecordId}, #{score}, #{status}, #{submitTime})
                        ON DUPLICATE KEY UPDATE
@@ -18,5 +18,5 @@ public interface JudgeMemberResultMapper extends BaseMapper<JudgeMemberResult> {
                           status = IF(VALUES(score) >= score, VALUES(status), status),
                           submit_time = IF(VALUES(score) >= score, VALUES(submit_time), submit_time)
             """)
-    void updateResult(JudgeMemberResult result);
+    void updateResult(JudgeUserResult result);
 }

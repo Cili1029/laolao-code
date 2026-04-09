@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class MemberReportVO implements Serializable {
+public class UserReportVO implements Serializable {
     /**
      * 主键ID
      */
@@ -50,7 +50,7 @@ public class MemberReportVO implements Serializable {
     /**
      * 作答情况
      */
-    private List<MemberExamJudgeRecordVO> judgeRecords;
+    private List<UserExamJudgeRecordVO> judgeRecords;
 
     /**
      * ai报告

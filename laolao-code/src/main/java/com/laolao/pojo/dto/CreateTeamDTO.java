@@ -9,7 +9,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class CreateStudyGroupDTO implements Serializable {
+public class CreateTeamDTO implements Serializable {
 
     /**
      * 组名
@@ -24,7 +24,7 @@ public class CreateStudyGroupDTO implements Serializable {
     /**
      * 创建导师的ID
      */
-    private Integer advisorId;
+    private Integer managerId;
 
     /**
      * 组邀请码

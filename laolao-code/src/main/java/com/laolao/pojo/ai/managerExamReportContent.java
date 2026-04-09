@@ -5,7 +5,7 @@ import lombok.Builder;
 import java.util.List;
 
 @Builder
-public record AdvisorExamReportContent (
+public record managerExamReportContent(
         // 学生的实考、缺勤和得分情况
         List<ExamScoreDataContent> attendanceAndScores,
 
@@ -13,6 +13,6 @@ public record AdvisorExamReportContent (
         List<ExamQuestionDataContent> examQuestions,
 
         // 所有学生对各题的具体作答代码
-        List<MemberAnswerDataContent> memberAnswers
+        List<UserAnswerDataContent> userAnswers
 ) {}
 

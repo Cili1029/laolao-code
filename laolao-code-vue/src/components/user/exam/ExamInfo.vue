@@ -10,7 +10,7 @@
                     <div class="w-1/2 space-y-2">
                         <p class="font-bold">考试信息</p>
                         <p class="text-gray-600">{{ exam?.title }}</p>
-                        <p class="text-gray-600">{{ exam?.studyGroup }}</p>
+                        <p class="text-gray-600">{{ exam?.team }}</p>
                         <p class="text-gray-600">{{ exam?.description }}</p>
                     </div>
                     <div class="w-1/2 flex flex-col">
@@ -96,7 +96,7 @@
                 class="h-full w-4/5 shadow rounded-lg p-2 bg-white overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                 <div v-if="exam?.status === 3 && userStore.user.role === 1">
                     <div class="flex" v-if="!report?.aiReport">
-                        <div @click="aiAdvisorExamReport()"
+                        <div @click="aiManagerExamReport()"
                             class="flex cursor-pointer text-green-600 items-center px-2 py-2 mb-2 bg-gray-100 text-sm hover:bg-gray-200 rounded">
                             <Spinner v-if="isGenerating" class="mr-1" />
                             <Rocket v-else class="h-4 w-4 mr-1" />
@@ -199,14 +199,14 @@
 
     onMounted(() => {
         getExamInfo()
-        getAdvisorReport()
+        getManagerReport()
     })
 
     watch(
         () => route.params.id,
         async () => {
             getExamInfo()
-            getAdvisorReport()
+            getManagerReport()
         }
     )
 
@@ -216,8 +216,8 @@
         status: number
         studentStatus: number
         description: string
-        studyGroupId: number
-        studyGroup: string
+        teamId: number
+        team: string
         questions: number
         startTime: string
         endTime: string
@@ -242,7 +242,7 @@
 
     const startExam = async () => {
         try {
-            const res = await axios.post("/api/exam/member/start", {}, {
+            const res = await axios.post("/api/exam/user/start", {}, {
                 params: {
                     examId: route.params.id
                 }
@@ -310,7 +310,7 @@
 
     const report = ref<ExamCompleteReport>()
 
-    const getAdvisorReport = async () => {
+    const getManagerReport = async () => {
         try {
             const res = await axios.get("/api/exam/complete-report", {
                 params: {
@@ -323,7 +323,7 @@
         }
     }
 
-    const aiAdvisorExamReport = () => {
+    const aiManagerExamReport = () => {
         if (isGenerating.value) return
         isGenerating.value = true
         report.value!.aiReport = ''

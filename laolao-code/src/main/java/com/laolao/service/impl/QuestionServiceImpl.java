@@ -37,7 +37,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Transactional(rollbackFor = Exception.class)
     public Result<Integer> addOrUpdateQuestion(AddQuestionDTO addQuestionDTO) {
         Question question = mapStruct.addQuestionDTOtoQuestion(addQuestionDTO);
-        question.setAdvisorId(SecurityUtils.getUserId());
+        question.setCreatorId(SecurityUtils.getUserId());
         if (question.getId() != null) {
             // 这是旧题，做更新
             questionMapper.updateById(question);
@@ -95,7 +95,7 @@ public class QuestionServiceImpl implements QuestionService {
     public Result<DraftQuestionVO> copyQuestion(Integer questionId, Integer examId) {
         // 题目
         Question question = questionMapper.selectCopyQuestion(questionId);
-        question.setAdvisorId(SecurityUtils.getUserId());
+        question.setCreatorId(SecurityUtils.getUserId());
         questionMapper.insert(question);
 
         // 测试实例

@@ -7,7 +7,7 @@ import lombok.*;
 import java.io.Serializable;
 
 /**
- * 组成员关联表
+ * 组表
  */
 @Getter
 @Setter
@@ -15,7 +15,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @ToString
 @Builder
-public class StudyGroupMember implements Serializable {
+public class Team implements Serializable {
 
     /**
      * 主键ID
@@ -24,12 +24,22 @@ public class StudyGroupMember implements Serializable {
     private Integer id;
 
     /**
-     * 组ID
+     * 组名
      */
-    private Integer studyGroupId;
+    private String name;
 
     /**
-     * 成员ID
+     * 组描述
      */
-    private Integer memberId;
+    private String description;
+
+    /**
+     * 创建老师的ID
+     */
+    private Integer managerId;
+
+    /**
+     * 组邀请码
+     */
+    private String inviteCode;
 }

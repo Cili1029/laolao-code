@@ -2,7 +2,7 @@ package com.laolao.controller;
 
 import com.laolao.common.result.Result;
 import com.laolao.pojo.dto.UpdateScoreDTO;
-import com.laolao.pojo.vo.GradeMemberVO;
+import com.laolao.pojo.vo.GradeUserVO;
 import com.laolao.service.GradeExamService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +21,8 @@ public class GradeExamController {
      * @return 考生数据
      */
     @GetMapping
-    public Result<List<GradeMemberVO>> getGradeMember(@RequestParam Integer examId) {
-        return gradeExamService.getGradeMember(examId);
+    public Result<List<GradeUserVO>> getGradeUser(@RequestParam Integer examId) {
+        return gradeExamService.getGradeUser(examId);
     }
 
     /**

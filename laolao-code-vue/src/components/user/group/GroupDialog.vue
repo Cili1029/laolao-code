@@ -80,7 +80,7 @@
     const inviteCode = ref("")
     const JoinGroup = async () => {
         try {
-            await axios.post("/api/group/join", {
+            await axios.post("/api/team/join", {
                 inviteCode: inviteCode.value
             })
             // const res = await axios.post("/api")
@@ -105,7 +105,7 @@
     // 老师创建
     const createGroup = async () => {
         try {
-            await axios.post("/api/group/create", {
+            await axios.post("/api/team/create", {
                 name: group.value?.name,
                 description: group.value?.description
             })

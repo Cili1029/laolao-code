@@ -10,7 +10,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @ToString
 @Builder
-public class MemberExamJudgeRecordVO implements Serializable {
+public class UserExamJudgeRecordVO implements Serializable {
 
     /**
      * 主键ID
@@ -30,7 +30,7 @@ public class MemberExamJudgeRecordVO implements Serializable {
     /**
      * 考生得分
      */
-    private Integer memberScore;
+    private Integer userScore;
 
     /**
      * 学生提交的代码快照

@@ -13,7 +13,7 @@ import com.laolao.common.util.MapStruct;
 import com.laolao.common.websocket.NotificationHandler;
 import com.laolao.mapper.*;
 import com.laolao.pojo.dto.ExamIdAndJudgeRecordIdDTO;
-import com.laolao.pojo.entity.JudgeMemberResult;
+import com.laolao.pojo.entity.JudgeUserResult;
 import com.laolao.pojo.entity.JudgeRecord;
 import com.laolao.pojo.entity.Question;
 import com.laolao.pojo.entity.QuestionTestCase;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
         endpoints = "127.0.0.1:9081",
         topic = "JudgeTopic",
         consumerGroup = "judge_consumer_group",
-        tag = "*", // 监听 MEMBER, ADVISOR, RELEASE
+        tag = "*", // 监听 USER, MANAGER, RELEASE
         consumptionThreadCount = 10,
         requestTimeout = 6000
 )
@@ -56,16 +56,16 @@ public class JudgeListener implements RocketMQListener {
     @Resource
     private ObjectMapper objectMapper;
     @Resource
-    private JudgeMemberResultMapper judgeMemberResultMapper;
+    private JudgeUserResultMapper judgeUserResultMapper;
     @Resource
     private QuestionMapper questionMapper;
 
     @Override
     public ConsumeResult consume(MessageView messageView) {
-        String tag = messageView.getTag().orElse("MEMBER");
+        String tag = messageView.getTag().orElse("USER");
         switch (tag) {
-            case "MEMBER" -> memberJudge(messageView);
-            case "ADVISOR" -> advisorTestJudge(messageView);
+            case "USER" -> userJudge(messageView);
+            case "MANAGER" -> managerTestJudge(messageView);
             case "RELEASE" -> releaseExam(messageView);
             default ->
                 // 其他标签不处理，直接消费掉
@@ -74,7 +74,7 @@ public class JudgeListener implements RocketMQListener {
         return ConsumeResult.SUCCESS;
     }
 
-    private void memberJudge(MessageView messageView) {
+    private void userJudge(MessageView messageView) {
         Integer judgeRecordId, examId;
         ExamIdAndJudgeRecordIdDTO data;
         // 获取记录json反序列化
@@ -126,7 +126,7 @@ public class JudgeListener implements RocketMQListener {
             notificationHandler.sendToUser(judgeRecord.getUserId(), WsResult.of("JUDGE_RESULT", judgeRecordVO));
 
             // 更新最优答案
-            JudgeMemberResult memberResult = JudgeMemberResult.builder()
+            JudgeUserResult userResult = JudgeUserResult.builder()
                     .examId(examId)
                     .examRecordId(judgeRecord.getExamRecordId())
                     .userId(judgeRecord.getUserId())
@@ -136,7 +136,7 @@ public class JudgeListener implements RocketMQListener {
                     .status(judgeRecord.getStatus())
                     .submitTime(judgeRecord.getSubmitTime())
                     .build();
-            judgeMemberResultMapper.updateResult(memberResult);
+            judgeUserResultMapper.updateResult(userResult);
         } catch (Exception e) {
             e.printStackTrace();
             // 失败了更新状态为“异常”
@@ -145,7 +145,7 @@ public class JudgeListener implements RocketMQListener {
         }
     }
 
-    private void advisorTestJudge(MessageView messageView) {
+    private void managerTestJudge(MessageView messageView) {
         Integer questionId;
         // 获取记录json反序列化
         String json = StandardCharsets.UTF_8.decode((messageView.getBody())).toString();
@@ -177,7 +177,7 @@ public class JudgeListener implements RocketMQListener {
 
             // 调用rocketmq传结果
             JudgeRecordVO judgeRecordVO = mapStruct.JudgeResultToJudgeRecordVO(judgeResult);
-            notificationHandler.sendToUser(question.getAdvisorId(), WsResult.of("JUDGE_RESULT", judgeRecordVO));
+            notificationHandler.sendToUser(question.getCreatorId(), WsResult.of("JUDGE_RESULT", judgeRecordVO));
         } catch (Exception e) {
             // 判题失败
             e.printStackTrace();
@@ -194,7 +194,7 @@ public class JudgeListener implements RocketMQListener {
             return;
         }
 
-        Integer advisorId = msg.getAdvisorId();
+        Integer managerId = msg.getManagerId();
         List<Integer> questionIds = msg.getQuestionIds();
 
         // 批量查询未校验的题目（已跳过 is_validated=1）
@@ -223,7 +223,7 @@ public class JudgeListener implements RocketMQListener {
                 List<QuestionTestCase> questionTestCases = testCaseMap.get(question.getId());
                 if (questionTestCases == null) {
                     allPass = false;
-                    notificationHandler.sendToUser(question.getAdvisorId(),
+                    notificationHandler.sendToUser(question.getCreatorId(),
                             WsResult.of("RELEASE_RESULT", "题目 [" + question.getTitle() + "] 缺少测试用例，无法判题"));
                     continue;
                 }
@@ -240,7 +240,7 @@ public class JudgeListener implements RocketMQListener {
                     // 遇到错误，不继续判题，返回发布结果
                     // 调用rocketmq传结果
                     allPass = false;
-                    notificationHandler.sendToUser(question.getAdvisorId(),
+                    notificationHandler.sendToUser(question.getCreatorId(),
                             WsResult.of("RELEASE_RESULT", "题目 [" + question.getTitle() + "] 未通过判题"));
                 }
             } catch (Exception e) {
@@ -254,11 +254,11 @@ public class JudgeListener implements RocketMQListener {
         if (allPass) {
             examMapper.updateExamStatus(msg.getExamId(), ExamConstant.PUBLISHED);
             // 通知用户：考试发布成功
-            notificationHandler.sendToUser(advisorId, WsResult.of("RELEASE_RESULT", "考试已成功发布"));
+            notificationHandler.sendToUser(managerId, WsResult.of("RELEASE_RESULT", "考试已成功发布"));
         } else {
             // 回退到草稿
             examMapper.updateExamStatus(msg.getExamId(), ExamConstant.DRAFT);
-            notificationHandler.sendToUser(advisorId, WsResult.of("RELEASE_RESULT", "考试发布失败，部分题目未通过校验"));
+            notificationHandler.sendToUser(managerId, WsResult.of("RELEASE_RESULT", "考试发布失败，部分题目未通过校验"));
         }
     }
 }

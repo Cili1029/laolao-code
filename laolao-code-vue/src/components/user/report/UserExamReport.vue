@@ -67,7 +67,7 @@
                             {{ judgeRecord.isGenerating ? 'AI 正在思考...' : '生成 AI 诊断报告' }}
                         </div>
                         <p v-else></p>
-                        <p>得分：{{ judgeRecord.memberScore }}</p>
+                        <p>得分：{{ judgeRecord.userScore }}</p>
                     </div>
 
                     <div v-if="judgeRecord.aiReport || judgeRecord.isGenerating"
@@ -110,7 +110,7 @@
         id: number
         title: string
         totalScore: number
-        memberScore: number
+        userScore: number
         answerCode: string
         standardSolution: string
         status: number
@@ -119,7 +119,7 @@
         isGenerating?: boolean
     }
 
-    interface Member {
+    interface User {
         id: number
         name: string
         score: number
@@ -133,11 +133,11 @@
         isGenerating?: boolean
     }
 
-    const report = ref<Member>()
+    const report = ref<User>()
 
     const getReport = async () => {
         try {
-            const res = await axios.get("/api/member-report/detail", {
+            const res = await axios.get("/api/user-report/detail", {
                 params: {
                     recordId: route.params.id
                 }

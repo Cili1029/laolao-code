@@ -58,7 +58,7 @@ export const useExamStore = defineStore('sidebar', {
         judgeLoading: false,       // 自动判题加载状态
         judgeDialog: false,        // 判题结果弹窗显隐
         judgeRecord: null as JudgeRecord | null,     // 判题结果
-        advisorJudgeRecord: null as JudgeRecord | null,  // 老师编辑考试时判题结果
+        managerJudgeRecord: null as JudgeRecord | null,  // 老师编辑考试时判题结果
 
         // ===================== 交卷相关 =====================
         submitLoading: false       // 交卷操作加载状态
@@ -66,7 +66,7 @@ export const useExamStore = defineStore('sidebar', {
 
     getters: {
         statusText(): string {
-            const targetRecord = this.judgeRecord ?? this.advisorJudgeRecord;
+            const targetRecord = this.judgeRecord ?? this.managerJudgeRecord;
 
             if (!targetRecord) return '未判题';
             return statusTextMap.get(targetRecord.status) || '未知状态';
@@ -95,7 +95,7 @@ export const useExamStore = defineStore('sidebar', {
 
                 const questionId = this.currentQuestion.id
 
-                await axios.post("/api/exam/member/judge", {
+                await axios.post("/api/exam/user/judge", {
                     examId: this.examId,
                     recordId: this.recordId,
                     questionId: questionId,
@@ -111,7 +111,7 @@ export const useExamStore = defineStore('sidebar', {
         async submitExam() {
             try {
                 this.submitLoading = true
-                const res = await axios.put("/api/exam/member/submit", {}, {
+                const res = await axios.put("/api/exam/user/submit", {}, {
                     params: {
                         recordId: this.recordId
                     }

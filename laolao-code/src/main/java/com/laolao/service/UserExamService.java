@@ -5,7 +5,7 @@ import com.laolao.pojo.dto.*;
 import com.laolao.pojo.vo.*;
 
 
-public interface MemberExamService {
+public interface UserExamService {
 
     Result<Integer> startExam(Integer examId);
 

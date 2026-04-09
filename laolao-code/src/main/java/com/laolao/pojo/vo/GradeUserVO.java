@@ -11,7 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class GradeMemberVO implements Serializable {
+public class GradeUserVO implements Serializable {
     /**
      * 主键ID
      */

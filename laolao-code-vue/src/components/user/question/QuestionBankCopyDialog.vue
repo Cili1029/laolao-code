@@ -54,7 +54,7 @@
                     <TableBody>
                         <TableRow v-for="question in questions" :key="question.id">
                             <TableCell>{{ question.title }}</TableCell>
-                            <TableCell>{{ question.advisor }}</TableCell>
+                            <TableCell>{{ question.manager }}</TableCell>
                             <TableCell v-if="currentType === 0">{{ question.isPublic === 0 ? '私有' : '公开' }}</TableCell>
                             <TableCell class="flex justify-end space-x-2">
                                 <div v-if="currentType === 0" @click="changeQuestionStatus(question)"
@@ -117,7 +117,7 @@
     interface QuestionBank {
         id: number
         title: string
-        advisor: string
+        manager: string
         isPublic: number
     }
 

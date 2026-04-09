@@ -58,7 +58,7 @@ public class AiTutorServiceImpl implements AiTutorService {
     }
 
     @Override
-    public Flux<String> generateMemberExamReport(Integer examId, Integer examRecordId) {
+    public Flux<String> generateUserExamReport(Integer examId, Integer examRecordId) {
         // 先查库里有没有这个报告
         AiReport report = aiReportMapper.selectOne(Wrappers.<AiReport>lambdaQuery()
                 .eq(AiReport::getTargetType, 2)
@@ -100,7 +100,7 @@ public class AiTutorServiceImpl implements AiTutorService {
     }
 
     @Override
-    public Flux<String> generateAdvisorExamReport(Integer examId) {
+    public Flux<String> generateManagerExamReport(Integer examId) {
         // 先查库里有没有这个报告
         AiReport report = aiReportMapper.selectOne(Wrappers.<AiReport>lambdaQuery()
                 .eq(AiReport::getTargetType, 3)

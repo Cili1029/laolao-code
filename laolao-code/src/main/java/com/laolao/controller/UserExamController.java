@@ -3,16 +3,16 @@ package com.laolao.controller;
 import com.laolao.common.result.Result;
 import com.laolao.pojo.dto.*;
 import com.laolao.pojo.vo.*;
-import com.laolao.service.MemberExamService;
+import com.laolao.service.UserExamService;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/api/exam/member")
-public class MemberExamController {
+@RequestMapping("/api/exam/user")
+public class UserExamController {
     @Resource
-    private MemberExamService memberExamService;
+    private UserExamService userExamService;
 
     /**
      * 开始考试
@@ -22,7 +22,7 @@ public class MemberExamController {
      */
     @PostMapping("/start")
     public Result<Integer> startExam(@RequestParam Integer examId) {
-        return memberExamService.startExam(examId);
+        return userExamService.startExam(examId);
     }
 
     /**
@@ -33,7 +33,7 @@ public class MemberExamController {
      */
     @GetMapping("/begin")
     public Result<ExamBeginVO> getExamQuestion(@RequestParam Integer recordId) {
-        return memberExamService.getExamQuestion(recordId);
+        return userExamService.getExamQuestion(recordId);
     }
 
     /**
@@ -44,7 +44,7 @@ public class MemberExamController {
      */
     @PostMapping("/judge")
     public Result<Integer> judge(@RequestBody JudgeDTO judgeDTO) {
-        return memberExamService.judge(judgeDTO);
+        return userExamService.judge(judgeDTO);
     }
 
     /**
@@ -55,6 +55,6 @@ public class MemberExamController {
      */
     @PutMapping("/submit")
     public Result<String> submit(@RequestParam Integer recordId) {
-        return memberExamService.submit(recordId);
+        return userExamService.submit(recordId);
     }
 }

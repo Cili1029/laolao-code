@@ -3,8 +3,8 @@ package com.laolao.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.laolao.pojo.entity.ExamRecord;
 import com.laolao.pojo.vo.ExamRecordVO;
-import com.laolao.pojo.vo.GradeMemberVO;
-import com.laolao.pojo.vo.MemberReportVO;
+import com.laolao.pojo.vo.GradeUserVO;
+import com.laolao.pojo.vo.UserReportVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -21,10 +21,10 @@ public interface ExamRecordMapper extends BaseMapper<ExamRecord> {
     ExamRecord selectExamRecord(Integer userId, Integer examId);
 
     @Select("""
-            select er.id, concat(e.title,'考试报告') as name, g.name as studyGroup, er.enter_time as time
+            select er.id, concat(e.title,'考试报告') as name, g.name as team, er.enter_time as time
             from exam_record er
                      join exam e on e.id = er.exam_id
-                     join study_group g on g.id = e.study_group_id
+                     join team g on g.id = e.team_id
             where er.user_id = #{userId} and e.status = 3
             """)
     List<ExamRecordVO> selectSimpleExamRecord(Integer userId);
@@ -38,7 +38,7 @@ public interface ExamRecordMapper extends BaseMapper<ExamRecord> {
                      join user u on er.user_id = u.id
             where exam_id = #{examId};
             """)
-    List<GradeMemberVO> selectRecordIdAndMemberByExamId(Integer examId);
+    List<GradeUserVO> selectRecordIdAndUserByExamId(Integer examId);
 
     @Update("update exam_record set score = score + #{diffScore} where id = #{examRecordId}")
     void updateScoreByDiff(Integer examRecordId, Integer diffScore);
@@ -51,13 +51,13 @@ public interface ExamRecordMapper extends BaseMapper<ExamRecord> {
                      left join ai_report ai on ai.target_id = er.id
             where er.id = #{recordId};
             """)
-    MemberReportVO selectMemberInfoByRecordId(Integer recordId);
+    UserReportVO selectUserInfoByRecordId(Integer recordId);
 
     @Update("""
             UPDATE exam_record er
                 LEFT JOIN (
                     SELECT exam_record_id, SUM(score) as total_score
-                    FROM judge_member_result
+                    FROM judge_user_result
                     WHERE exam_id = #{examId}
                     GROUP BY exam_record_id) AS score_table ON er.id = score_table.exam_record_id
             

@@ -5,15 +5,15 @@ import com.laolao.common.util.SecurityUtils;
 import com.laolao.mapper.ExamRecordMapper;
 import com.laolao.mapper.JudgeRecordMapper;
 import com.laolao.pojo.vo.ExamRecordVO;
-import com.laolao.pojo.vo.MemberReportVO;
-import com.laolao.service.MemberExamReportService;
+import com.laolao.pojo.vo.UserReportVO;
+import com.laolao.service.UserExamReportService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class MemberExamReportServiceImpl implements MemberExamReportService {
+public class UserExamReportServiceImpl implements UserExamReportService {
     @Resource
     private ExamRecordMapper examRecordMapper;
     @Resource
@@ -27,9 +27,9 @@ public class MemberExamReportServiceImpl implements MemberExamReportService {
     }
 
     @Override
-    public Result<MemberReportVO> getExamReport(Integer recordId) {
-        MemberReportVO memberReportVO = examRecordMapper.selectMemberInfoByRecordId(recordId);
-        memberReportVO.setJudgeRecords(judgeRecordMapper.selectMemberExamReportByRecordId(memberReportVO.getId()));
-        return Result.success(memberReportVO);
+    public Result<UserReportVO> getExamReport(Integer recordId) {
+        UserReportVO userReportVO = examRecordMapper.selectUserInfoByRecordId(recordId);
+        userReportVO.setJudgeRecords(judgeRecordMapper.selectUserExamReportByRecordId(userReportVO.getId()));
+        return Result.success(userReportVO);
     }
 }

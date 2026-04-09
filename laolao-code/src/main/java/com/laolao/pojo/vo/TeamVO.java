@@ -9,7 +9,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class StudyGroupVO implements Serializable {
+public class TeamVO implements Serializable {
 
     /**
      * 主键ID
@@ -24,7 +24,7 @@ public class StudyGroupVO implements Serializable {
     /**
      * 创建老师
      */
-    private String advisor;
+    private String manager;
 
     /**
      * 组描述

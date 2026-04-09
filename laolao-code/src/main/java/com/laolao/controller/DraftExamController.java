@@ -24,7 +24,7 @@ public class DraftExamController {
      * @return 考试Id
      */
     @PostMapping("/create-exam")
-    @PreAuthorize("hasRole('ADVISOR')")
+    @PreAuthorize("hasRole('MANAGER')")
     public Result<Integer> createExam(@RequestBody CreateExamDTO createExamDTO) {
         return examService.createExam(createExamDTO);
     }
@@ -36,7 +36,7 @@ public class DraftExamController {
      * @return 消息结果
      */
     @PutMapping("/update-exam")
-    @PreAuthorize("hasRole('ADVISOR')")
+    @PreAuthorize("hasRole('MANAGER')")
     public Result<Integer> updateDraft(@RequestBody UpdateDraftDTO draftDTO) {
         return examService.updateDraft(draftDTO);
     }
@@ -48,7 +48,7 @@ public class DraftExamController {
      * @return 判题结果
      */
     @PostMapping("/judge")
-    @PreAuthorize("hasRole('ADVISOR')")
+    @PreAuthorize("hasRole('MANAGER')")
     public Result<String> judgeTestCase(@RequestParam Integer questionId) {
         return examService.judgeTestCase(questionId);
     }
@@ -60,7 +60,7 @@ public class DraftExamController {
      * @return 题目数据
      */
     @GetMapping("/get-question")
-    @PreAuthorize("hasRole('ADVISOR')")
+    @PreAuthorize("hasRole('MANAGER')")
     public Result<List<DraftQuestionVO>> getQuestion(@RequestParam Integer examId) {
         return examService.getDraftQuestion(examId);
     }
@@ -72,7 +72,7 @@ public class DraftExamController {
      * @return 题目Id
      */
     @PostMapping("/add-question")
-    @PreAuthorize("hasRole('ADVISOR')")
+    @PreAuthorize("hasRole('MANAGER')")
     public Result<Integer> saveAndAddToExam(@RequestBody SaveAndAddToExamDTO saveAndAddToExamDTO) {
         return examService.saveAndAddToExam(saveAndAddToExamDTO);
     }
@@ -85,7 +85,7 @@ public class DraftExamController {
      * @return 结果信息
      */
     @DeleteMapping("/remove-question")
-    @PreAuthorize("hasRole('ADVISOR')")
+    @PreAuthorize("hasRole('MANAGER')")
     public Result<String> removeQuestion(@RequestParam Integer examId, @RequestParam Integer questionId) {
         return examService.removeQuestion(examId, questionId);
     }
@@ -97,7 +97,7 @@ public class DraftExamController {
      * @return 结果信息
      */
     @DeleteMapping("/delete-draft")
-    @PreAuthorize("hasRole('ADVISOR')")
+    @PreAuthorize("hasRole('MANAGER')")
     public Result<String> deleteDraft(@RequestParam Integer examId) {
         return examService.deleteDraft(examId);
     }
@@ -109,7 +109,7 @@ public class DraftExamController {
      * @return 消息结果
      */
     @PostMapping("/release-exam")
-    @PreAuthorize("hasRole('ADVISOR')")
+    @PreAuthorize("hasRole('MANAGER')")
     public Result<Integer> releaseExam(@RequestParam Integer examId) {
         return examService.releaseExam(examId);
     }

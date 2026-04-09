@@ -5,7 +5,7 @@ import com.laolao.common.result.WsResult;
 import com.laolao.common.websocket.NotificationHandler;
 import com.laolao.mapper.ExamMapper;
 import com.laolao.pojo.entity.Exam;
-import com.laolao.service.impl.MemberExamServiceImpl;
+import com.laolao.service.impl.UserExamServiceImpl;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.annotation.RocketMQMessageListener;
@@ -30,7 +30,7 @@ public class ExamEndListener implements RocketMQListener {
     @Resource
     private NotificationHandler notificationHandler;
     @Resource
-    private MemberExamServiceImpl memberExamService;
+    private UserExamServiceImpl userExamService;
 
     @Override
     public ConsumeResult consume(MessageView messageView) {
@@ -50,7 +50,7 @@ public class ExamEndListener implements RocketMQListener {
                 return ConsumeResult.SUCCESS;
             }
             // 执行交卷
-            memberExamService.submitBatch(examId);
+            userExamService.submitBatch(examId);
             // 通过 WebSocket 发送通知给前端
             notificationHandler.sendToAllUsersInExam(examId, WsResult.of("EXAM_SUBMIT", null));
             return ConsumeResult.SUCCESS;

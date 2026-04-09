@@ -9,7 +9,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class DetailBaseStudyGroupVO implements Serializable {
+public class DetailBaseTeamVO implements Serializable {
 
     /**
      * 组名
@@ -29,7 +29,7 @@ public class DetailBaseStudyGroupVO implements Serializable {
     /**
      * 组员数
      */
-    private Integer memberCount;
+    private Integer userCount;
 
     /**
      * 导师账号
@@ -39,5 +39,5 @@ public class DetailBaseStudyGroupVO implements Serializable {
     /**
      * 导师名字
      */
-    private String advisorName;
+    private String managerName;
 }

@@ -32,7 +32,7 @@ public class ExamQueryQueryServiceImpl implements ExamQueryService {
     public Result<ExamInfoVO> getExamInfo(Integer examId) {
         ExamInfoVO examInfoVO = examMapper.selectExamInfo(examId);
         // 如果是导师
-        if (SecurityUtils.hasAuthority("ADVISOR")) {
+        if (SecurityUtils.hasAuthority("MANAGER")) {
             // 不用填写时间和学生状态，直接返回
             return Result.success(examInfoVO);
         }

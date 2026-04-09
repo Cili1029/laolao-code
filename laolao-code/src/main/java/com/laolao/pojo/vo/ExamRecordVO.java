@@ -31,7 +31,7 @@ public class ExamRecordVO implements Serializable {
     /**
      * 所属组
      */
-    private String studyGroup;
+    private String team;
 
     /**
      * 开始时间

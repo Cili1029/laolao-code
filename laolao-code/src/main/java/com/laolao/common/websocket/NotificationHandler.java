@@ -24,7 +24,7 @@ public class NotificationHandler extends TextWebSocketHandler {
     private static final Map<Integer, WebSocketSession> userSessions = new ConcurrentHashMap<>();
 
     // 考试分组索引：ExamID -> Set<UserID> (仅用于考试广播)
-    private static final Map<Integer, Set<Integer>> examMembers = new ConcurrentHashMap<>();
+    private static final Map<Integer, Set<Integer>> examUsers = new ConcurrentHashMap<>();
 
     // ObjectMapper
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
@@ -47,11 +47,11 @@ public class NotificationHandler extends TextWebSocketHandler {
         String name = (String) session.getAttributes().get("name");
 
         if (examId != null && userId != null) {
-            Set<Integer> members = examMembers.get(examId);
-            if (members != null) {
-                members.remove(userId);
+            Set<Integer> users = examUsers.get(examId);
+            if (users != null) {
+                users.remove(userId);
                 log.info("用户 {} 离开考试 {}", name, examId);
-                if (members.isEmpty()) examMembers.remove(examId);
+                if (users.isEmpty()) examUsers.remove(examId);
             }
         }
 
@@ -83,11 +83,11 @@ public class NotificationHandler extends TextWebSocketHandler {
                 // 处理“换场”情况
                 Integer oldExamId = (Integer) session.getAttributes().get("examId");
                 if (oldExamId != null && !oldExamId.equals(newExamId)) {
-                    Set<Integer> oldMembers = examMembers.get(oldExamId);
-                    if (oldMembers != null) {
-                        oldMembers.remove(userId);
-                        if (oldMembers.isEmpty()) {
-                            examMembers.remove(oldExamId); // 清理空的考试 Key
+                    Set<Integer> oldUsers = examUsers.get(oldExamId);
+                    if (oldUsers != null) {
+                        oldUsers.remove(userId);
+                        if (oldUsers.isEmpty()) {
+                            examUsers.remove(oldExamId); // 清理空的考试 Key
                         }
                     }
                 }
@@ -95,7 +95,7 @@ public class NotificationHandler extends TextWebSocketHandler {
                 session.getAttributes().put("examId", newExamId);
 
                 // 更新索引映射（原本是空的，现在加进去）
-                examMembers.computeIfAbsent(newExamId, k -> ConcurrentHashMap.newKeySet()).add(userId);
+                examUsers.computeIfAbsent(newExamId, k -> ConcurrentHashMap.newKeySet()).add(userId);
                 log.info("用户 {} 进入考试 {}", name, newExamId);
             }
 
@@ -111,11 +111,11 @@ public class NotificationHandler extends TextWebSocketHandler {
                 }
 
                 // 安全移除考试成员
-                Set<Integer> members = examMembers.get(examId);
-                if (members != null) {
-                    members.remove(userId);
-                    if (members.isEmpty()) {
-                        examMembers.remove(examId);
+                Set<Integer> users = examUsers.get(examId);
+                if (users != null) {
+                    users.remove(userId);
+                    if (users.isEmpty()) {
+                        examUsers.remove(examId);
                     }
                 }
 
@@ -143,9 +143,9 @@ public class NotificationHandler extends TextWebSocketHandler {
      * 发送给整场考试的所有人（考试结束指令、全场公告）
      */
     public void sendToAllUsersInExam(Integer examId, String message) {
-        Set<Integer> members = examMembers.get(examId);
-        if (members != null) {
-            members.forEach(uid -> sendToUser(uid, message));
+        Set<Integer> users = examUsers.get(examId);
+        if (users != null) {
+            users.forEach(uid -> sendToUser(uid, message));
         }
     }
 

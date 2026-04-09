@@ -48,9 +48,9 @@ public class User implements Serializable {
         if (this.role == 0) {
             return "ADMIN";
         } else if (this.role == 1) {
-            return "ADVISOR";
+            return "MANAGER";
         } else if (this.role == 2) {
-            return "MEMBER";
+            return "USER";
         } else {
             return "ERROR";
         }

@@ -9,7 +9,7 @@
     <!-- 报告列表 -->
     <div v-if="reports.length !== 0" class="space-y-4">
       <!-- 报告卡片 -->
-      <RouterLink v-for="report in reports" :key="report.id" :to="'/member-report/' + report.id"
+      <RouterLink v-for="report in reports" :key="report.id" :to="'/user-report/' + report.id"
         class="flex flex-col md:flex-row justify-between border shadow-sm rounded-xl p-5 cursor-pointer hover:bg-indigo-50/30 transition-all group">
         <div class="flex items-start space-x-4">
           <!-- 报告图标 -->
@@ -29,7 +29,7 @@
             <div class="flex items-center text-sm text-gray-500 space-x-3">
               <span class="flex items-center">
                 <Users class="h-3.5 w-3.5 mr-1 text-gray-400" />
-                {{ report.studyGroup }}
+                {{ report.team }}
               </span>
               <span class="text-gray-300">|</span>
               <p class="max-w-md text-gray-400 italic">
@@ -76,7 +76,7 @@
   interface Report {
     id: number
     name: string
-    studyGroup: string
+    team: string
     description: string
     time: string
   }
@@ -85,7 +85,7 @@
 
   const getReport = async () => {
     try {
-      const res = await axios.get("/api/member-report")
+      const res = await axios.get("/api/user-report")
       reports.value = res.data.data
     } catch (e) {
       console.error("获取报告失败:", e)

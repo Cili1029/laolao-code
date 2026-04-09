@@ -9,7 +9,7 @@ import com.laolao.pojo.dto.UpdateScoreDTO;
 import com.laolao.pojo.entity.Exam;
 import com.laolao.pojo.entity.JudgeRecord;
 import com.laolao.pojo.vo.GradeJudgeRecordVO;
-import com.laolao.pojo.vo.GradeMemberVO;
+import com.laolao.pojo.vo.GradeUserVO;
 import com.laolao.service.GradeExamService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -27,17 +27,17 @@ public class GradeExamServiceImpl implements GradeExamService {
     private ExamMapper examMapper;
 
     @Override
-    public Result<List<GradeMemberVO>> getGradeMember(Integer examId) {
+    public Result<List<GradeUserVO>> getGradeUser(Integer examId) {
         // 只获取有进入考试的考生信息
-        List<GradeMemberVO> gradeMemberVOList = examRecordMapper.selectRecordIdAndMemberByExamId(examId);
-        if (gradeMemberVOList == null || gradeMemberVOList.isEmpty()) {
-            return Result.success(gradeMemberVOList);
+        List<GradeUserVO> gradeUserVOList = examRecordMapper.selectRecordIdAndUserByExamId(examId);
+        if (gradeUserVOList == null || gradeUserVOList.isEmpty()) {
+            return Result.success(gradeUserVOList);
         }
         // 获取第一个考生作答情况
-        List<GradeJudgeRecordVO> gradeJudgeRecordVOList = judgeRecordMapper.selectGradeInfoByRecordId(gradeMemberVOList.get(0).getId());
-        gradeMemberVOList.get(0).setJudgeRecords(gradeJudgeRecordVOList);
+        List<GradeJudgeRecordVO> gradeJudgeRecordVOList = judgeRecordMapper.selectGradeInfoByRecordId(gradeUserVOList.get(0).getId());
+        gradeUserVOList.get(0).setJudgeRecords(gradeJudgeRecordVOList);
         // 放置
-        return Result.success(gradeMemberVOList);
+        return Result.success(gradeUserVOList);
     }
 
     @Override

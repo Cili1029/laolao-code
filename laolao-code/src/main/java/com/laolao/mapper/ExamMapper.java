@@ -2,7 +2,6 @@ package com.laolao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.laolao.pojo.ai.ExamScoreDataContent;
-import com.laolao.pojo.dto.WebSocketExamDTO;
 import com.laolao.pojo.entity.Exam;
 import com.laolao.pojo.vo.ExamInfoVO;
 import com.laolao.pojo.vo.ExamQuestionVO;
@@ -16,17 +15,17 @@ import java.util.List;
 public interface ExamMapper extends BaseMapper<Exam> {
 
     @Select("""
-            select e.id, e.title as name, e.description, g.name study_group, e.start_time, e.end_time
+            select e.id, e.title as name, e.description, g.name team, e.start_time, e.end_time
             from exam e
-                     join study_group g on g.id = e.study_group_id
+                     join team g on g.id = e.team_id
             where
                -- 条件1：成员且状态为已发布
                 exists (select 1
-                        from study_group_member gm
-                        where gm.study_group_id = e.study_group_id
-                          and gm.member_id = #{userId}) and e.status = 1
+                        from team_user gm
+                        where gm.team_id = e.team_id
+                          and gm.user_id = #{userId}) and e.status = 1
                -- 条件2：导师，全部其创建的考试
-               or e.advisor_id = #{userId} order by e.start_time desc;
+               or e.manager_id = #{userId} order by e.start_time desc;
             """)
     List<ExamVO> selectSimpleExam(Integer userId);
 
@@ -36,16 +35,16 @@ public interface ExamMapper extends BaseMapper<Exam> {
                    e.status,
                    e.title,
                    e.description,
-                   g.id              as study_group_id,
-                   g.name              as study_group,
+                   g.id              as team_id,
+                   g.name              as team,
                    (select count(*)
                     from exam_question_config
                     where exam_id = #{examId}) as questions,
                    e.start_time,
                    e.end_time
             from exam e
-                     join study_group g
-                          on g.id = e.study_group_id
+                     join team g
+                          on g.id = e.team_id
             where e.id = #{examId};
             """)
     ExamInfoVO selectExamInfo(Integer examId);
@@ -99,16 +98,13 @@ public interface ExamMapper extends BaseMapper<Exam> {
                 -- 通过考试ID找到对应的学习组
                 exam e
                     -- 关联该学习组的所有成员
-                    JOIN study_group_member gm ON gm.study_group_id = e.study_group_id
+                    JOIN team_user gm ON gm.team_id = e.team_id
                     -- 关联成员的用户信息
-                    JOIN user u ON u.id = gm.member_id
+                    JOIN user u ON u.id = gm.user_id
                     -- 左连接该考试的成绩（缺考则score为NULL）
-                    LEFT JOIN exam_record er ON er.user_id = gm.member_id AND er.exam_id = e.id
+                    LEFT JOIN exam_record er ON er.user_id = gm.user_id AND er.exam_id = e.id
             -- 只需要指定考试ID，无需指定组ID
             WHERE e.id = #{examId};
             """)
     List<ExamScoreDataContent> selectAttendanceAndScores(Integer examId);
-
-    @Select("select start_time, end_time from exam where id = #{examId}")
-    WebSocketExamDTO selectWebSocketExamInfo(int examId);
 }

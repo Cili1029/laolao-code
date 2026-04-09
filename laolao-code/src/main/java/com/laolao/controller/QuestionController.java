@@ -24,7 +24,7 @@ public class QuestionController {
      * @return 主键Id
      */
     @PostMapping("/add")
-    @PreAuthorize("hasRole('ADVISOR')")
+    @PreAuthorize("hasRole('MANAGER')")
     public Result<Integer> addOrUpdateQuestion(@RequestBody AddQuestionDTO addQuestionDTO) {
         return questionService.addOrUpdateQuestion(addQuestionDTO);
     }
@@ -35,7 +35,7 @@ public class QuestionController {
      * @return 主键Id
      */
     @GetMapping("/private")
-    @PreAuthorize("hasRole('ADVISOR')")
+    @PreAuthorize("hasRole('MANAGER')")
     public Result<Page<QuestionBankVO>> getPrivateQuestions(Integer pageNum, Integer pageSize, String content) {
         return questionService.getPrivateQuestions(pageNum, pageSize, content);
     }
@@ -46,7 +46,7 @@ public class QuestionController {
      * @return 主键Id
      */
     @GetMapping("/public")
-    @PreAuthorize("hasRole('ADVISOR')")
+    @PreAuthorize("hasRole('MANAGER')")
     public Result<Page<QuestionBankVO>> getPublicQuestions(Integer pageNum, Integer pageSize, String content) {
         return questionService.getPublicQuestions(pageNum, pageSize, content);
     }
@@ -58,7 +58,7 @@ public class QuestionController {
      * @return 结果信息
      */
     @PostMapping("/status")
-    @PreAuthorize("hasRole('ADVISOR')")
+    @PreAuthorize("hasRole('MANAGER')")
     public Result<String> changeStatus(@RequestBody QuestionIdDTO questionIdDTO) {
         return questionService.changeStatus(questionIdDTO);
     }
@@ -70,7 +70,7 @@ public class QuestionController {
      * @return 结果信息
      */
     @DeleteMapping("/delete")
-    @PreAuthorize("hasRole('ADVISOR')")
+    @PreAuthorize("hasRole('MANAGER')")
     public Result<String> delete(@RequestParam Integer questionId) {
         return questionService.delete(questionId);
     }
@@ -79,7 +79,7 @@ public class QuestionController {
      * 拷贝所选题
      */
     @GetMapping("/copy")
-    @PreAuthorize("hasRole('ADVISOR')")
+    @PreAuthorize("hasRole('MANAGER')")
     public Result<DraftQuestionVO> copyQuestion(@RequestParam Integer questionId, @RequestParam Integer examId) {
         return questionService.copyQuestion(questionId, examId);
     }

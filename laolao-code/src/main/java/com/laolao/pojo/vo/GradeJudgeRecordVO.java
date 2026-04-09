@@ -30,7 +30,7 @@ public class GradeJudgeRecordVO implements Serializable {
     /**
      * 考生得分
      */
-    private Integer memberScore;
+    private Integer userScore;
 
     /**
      * 学生提交的代码快照

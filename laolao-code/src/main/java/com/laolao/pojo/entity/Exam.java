@@ -39,7 +39,7 @@ public class Exam implements Serializable {
     /**
      * 导师ID
      */
-    private Integer advisorId;
+    private Integer managerId;
 
     /**
      * 状态（0-草稿，1-已发布）
@@ -49,7 +49,7 @@ public class Exam implements Serializable {
     /**
      * 所属组ID
      */
-    private Integer studyGroupId;
+    private Integer teamId;
 
     /**
      * 开始时间

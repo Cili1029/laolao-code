@@ -60,9 +60,9 @@ public class Question implements Serializable {
     private String standardSolution;
 
     /**
-     * 创建者ID（导师ID）
+     * 创建者ID
      */
-    private Integer advisorId;
+    private Integer creatorId;
 
     /**
      * 父题目ID(0-祖宗模板题，非0-考试属子题快照)

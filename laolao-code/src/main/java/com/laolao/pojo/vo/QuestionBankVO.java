@@ -24,7 +24,7 @@ public class QuestionBankVO implements Serializable {
     /**
      * 作者
      */
-    private String advisor;
+    private String manager;
 
     /**
      * 是否公开

@@ -34,12 +34,12 @@
                                     <RadioGroup v-model="role" class="h-full">
                                         <div class="flex items-center justify-between w-full">
                                             <div class="flex items-center gap-1">
-                                                <RadioGroupItem id="member" :value="2" class="h-full" />
-                                                <Label for="member">成员</Label>
+                                                <RadioGroupItem id="user" :value="2" class="h-full" />
+                                                <Label for="user">成员</Label>
                                             </div>
                                             <div class="flex items-center gap-1">
-                                                <RadioGroupItem id="advisor" :value="1" class="h-full" />
-                                                <Label for="advisor">导师</Label>
+                                                <RadioGroupItem id="manager" :value="1" class="h-full" />
+                                                <Label for="manager">导师</Label>
                                             </div>
                                         </div>
                                     </RadioGroup>

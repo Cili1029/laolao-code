@@ -116,7 +116,7 @@
 
     interface Exam {
         id?: number
-        studyGroupId: number
+        teamId: number
         title: string
         description: string
         startTime: string
@@ -132,7 +132,7 @@
 
     // 响应式表单数据
     const exam = ref<Exam>({
-        studyGroupId: Number(route.params.id),
+        teamId: Number(route.params.id),
         title: '',
         description: '',
         startTime: '',
@@ -153,7 +153,7 @@
             // 显式提取需要的字段，过滤掉 parent 传过来的冗余数据
             exam.value = {
                 id: props.initialData.id,
-                studyGroupId: props.initialData.studyGroupId,
+                teamId: props.initialData.teamId,
                 title: props.initialData.title || '',
                 description: props.initialData.description || '',
                 startTime: props.initialData.startTime || '',

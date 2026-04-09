@@ -78,7 +78,7 @@
       },
       {
         title: "考试报告",
-        url: "/member-report",
+        url: "/user-report",
         icon: NotebookText,
       },
       {
