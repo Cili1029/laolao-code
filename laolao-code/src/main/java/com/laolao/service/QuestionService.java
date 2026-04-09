@@ -18,5 +18,5 @@ public interface QuestionService {
 
     Result<String> delete(Integer questionId);
 
-    Result<DraftQuestionVO> copyQuestion(Integer questionId);
+    Result<DraftQuestionVO> copyQuestion(Integer questionId, Integer examId);
 }

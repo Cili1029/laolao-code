@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.laolao.pojo.ai.ExamQuestionDataContent;
 import com.laolao.pojo.entity.Question;
-import com.laolao.pojo.vo.DraftQuestionVO;
 import com.laolao.pojo.vo.QuestionBankVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -24,13 +23,6 @@ public interface QuestionMapper extends BaseMapper<Question> {
     @Update("update question set is_deleted = 1 where advisor_id = #{userId} and id = #{questionId}")
     void deleteQuestion(Integer userId, Integer questionId);
 
-    @Select("""
-            select id, title, content, difficulty, time_limit, memory_limit, template_code, standard_solution
-            from question
-            where id = #{questionId};
-            """)
-    DraftQuestionVO selectQuestionById(Integer questionId);
-
     void deleteDraft(List<Integer> questionIds);
 
     @Select("""
@@ -40,4 +32,14 @@ public interface QuestionMapper extends BaseMapper<Question> {
             where qc.exam_id = #{examId};
             """)
     List<ExamQuestionDataContent> selectQuestionsByExamId(Integer examId);
+
+    @Select("""
+            select title, content, difficulty,
+                   time_limit, memory_limit,
+                   template_code, standard_solution,
+                   id as parent_id, is_validated
+            from question
+            where id = #{questionId}
+            """)
+    Question selectCopyQuestion(Integer questionId);
 }

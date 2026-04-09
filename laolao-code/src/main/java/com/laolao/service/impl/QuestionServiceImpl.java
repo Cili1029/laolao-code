@@ -5,10 +5,12 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.laolao.common.result.Result;
 import com.laolao.common.util.MapStruct;
 import com.laolao.common.util.SecurityUtils;
+import com.laolao.mapper.ExamQuestionConfigMapper;
 import com.laolao.mapper.QuestionMapper;
 import com.laolao.mapper.QuestionTestCaseMapper;
 import com.laolao.pojo.dto.AddQuestionDTO;
 import com.laolao.pojo.dto.QuestionIdDTO;
+import com.laolao.pojo.entity.ExamQuestionConfig;
 import com.laolao.pojo.entity.Question;
 import com.laolao.pojo.entity.QuestionTestCase;
 import com.laolao.pojo.vo.DraftQuestionVO;
@@ -28,6 +30,8 @@ public class QuestionServiceImpl implements QuestionService {
     private QuestionTestCaseMapper questionTestCaseMapper;
     @Resource
     private MapStruct mapStruct;
+    @Resource
+    private ExamQuestionConfigMapper examQuestionConfigMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -35,7 +39,7 @@ public class QuestionServiceImpl implements QuestionService {
         Question question = mapStruct.addQuestionDTOtoQuestion(addQuestionDTO);
         question.setAdvisorId(SecurityUtils.getUserId());
         if (question.getId() != null) {
-            // 这是旧题（可能是修改祖宗，也可能是修改子题），做更新
+            // 这是旧题，做更新
             questionMapper.updateById(question);
             // 测试示例直接全量删除
             questionTestCaseMapper.delete(new LambdaQueryWrapper<QuestionTestCase>()
@@ -51,7 +55,7 @@ public class QuestionServiceImpl implements QuestionService {
         List<QuestionTestCase> testCases = addQuestionDTO.getTestCases();
         if (testCases != null && !testCases.isEmpty()) {
             for (QuestionTestCase testCase : testCases) {
-                testCase.setQuestionId(question.getId()); // 绑定新的题目ID
+                testCase.setQuestionId(question.getId());
             }
             // 批量插入测试用例
             questionTestCaseMapper.insertBatch(testCases);
@@ -87,11 +91,32 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Result<DraftQuestionVO> copyQuestion(Integer questionId) {
-        DraftQuestionVO questionVO = questionMapper.selectQuestionById(questionId);
+    @Transactional(rollbackFor = Exception.class)
+    public Result<DraftQuestionVO> copyQuestion(Integer questionId, Integer examId) {
+        // 题目
+        Question question = questionMapper.selectCopyQuestion(questionId);
+        question.setAdvisorId(SecurityUtils.getUserId());
+        questionMapper.insert(question);
+
+        // 测试实例
+        List<QuestionTestCase> questionTestCase = questionTestCaseMapper.selectCopyTestCase(questionId);
+        questionTestCase.forEach(
+                testCase -> testCase.setQuestionId(question.getId())
+        );
+        questionTestCaseMapper.insertBatch(questionTestCase);
+
+        // 写入考试表
+        ExamQuestionConfig questionConfig = ExamQuestionConfig.builder()
+                .examId(examId)
+                .questionId(question.getId())
+                .score(0).build();
+        examQuestionConfigMapper.insert(questionConfig);
+
+        // 转
+        DraftQuestionVO questionVO = mapStruct.questionToDraftQuestionVO(question);
         questionVO.setQuestionScore(0);
         // 测试示例
-        questionVO.setTestCases(questionTestCaseMapper.selectBatchByQuestionIds(List.of(questionId)));
-        return Result.success(questionVO);
+        questionVO.setTestCases(questionTestCase);
+        return Result.success("克隆成功！", questionVO);
     }
 }

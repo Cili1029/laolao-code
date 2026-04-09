@@ -1,8 +1,10 @@
 package com.laolao.listener;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.laolao.common.constant.ExamConstant;
 import com.laolao.common.constant.JudgeConstant;
 import com.laolao.common.docker.JudgeService;
 import com.laolao.common.result.JudgeResult;
@@ -16,6 +18,7 @@ import com.laolao.pojo.entity.JudgeRecord;
 import com.laolao.pojo.entity.Question;
 import com.laolao.pojo.entity.QuestionTestCase;
 import com.laolao.pojo.vo.JudgeRecordVO;
+import com.laolao.pojo.messege.ReleaseExamMessage;
 import jakarta.annotation.Resource;
 import org.apache.rocketmq.client.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.client.apis.consumer.ConsumeResult;
@@ -25,6 +28,8 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RocketMQMessageListener(
@@ -58,13 +63,13 @@ public class JudgeListener implements RocketMQListener {
     @Override
     public ConsumeResult consume(MessageView messageView) {
         String tag = messageView.getTag().orElse("MEMBER");
-        if ("MEMBER".equals(tag)) {
-            memberJudge(messageView);
-        } else if ("ADVISOR".equals(tag)) {
-            advisorTestJudge(messageView);
-        } else {
-            // 其他标签不处理，直接消费掉
-            System.out.println("未识别的消息标签：" + tag);
+        switch (tag) {
+            case "MEMBER" -> memberJudge(messageView);
+            case "ADVISOR" -> advisorTestJudge(messageView);
+            case "RELEASE" -> releaseExam(messageView);
+            default ->
+                // 其他标签不处理，直接消费掉
+                    System.out.println("未识别的消息标签：" + tag);
         }
         return ConsumeResult.SUCCESS;
     }
@@ -164,13 +169,96 @@ public class JudgeListener implements RocketMQListener {
 
             JudgeResult judgeResult = judgeService.judge(question.getStandardSolution(), questionTestCases);
 
+            // 修改验证状态
+            new LambdaUpdateChainWrapper<>(questionMapper)
+                    .eq(Question::getId, questionId)
+                    .set(Question::getIsValidated, judgeResult.getStatus() == JudgeConstant.STATUS_AC ? 1 : 0)
+                    .update();
+
             // 调用rocketmq传结果
             JudgeRecordVO judgeRecordVO = mapStruct.JudgeResultToJudgeRecordVO(judgeResult);
             notificationHandler.sendToUser(question.getAdvisorId(), WsResult.of("JUDGE_RESULT", judgeRecordVO));
-
         } catch (Exception e) {
             // 判题失败
             e.printStackTrace();
+        }
+    }
+
+    private void releaseExam(MessageView messageView) {
+        ReleaseExamMessage msg;
+        String json = StandardCharsets.UTF_8.decode(messageView.getBody()).toString();
+        try {
+            msg = objectMapper.readValue(json, ReleaseExamMessage.class);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        Integer advisorId = msg.getAdvisorId();
+        List<Integer> questionIds = msg.getQuestionIds();
+
+        // 批量查询未校验的题目（已跳过 is_validated=1）
+        List<Question> questionList = questionMapper.selectList(
+                Wrappers.lambdaQuery(Question.class)
+                        .in(Question::getId, questionIds) // 批量传入 id 列表
+        );
+
+        // 获取所有需要判题的 questionId
+        List<Integer> needJudgeIds = questionList.stream()
+                .map(Question::getId).collect(Collectors.toList());
+        // 一次性查询所有测试用例，并按 questionId 分组
+        Map<Integer, List<QuestionTestCase>> testCaseMap = questionTestCaseMapper.selectList(
+                        Wrappers.lambdaQuery(QuestionTestCase.class)
+                                .in(QuestionTestCase::getQuestionId, needJudgeIds))
+                .stream()
+                .collect(Collectors.groupingBy(QuestionTestCase::getQuestionId));
+
+        boolean allPass = true;
+
+        // 批量处理每个题目ID
+        for (Question question : questionList) {
+            System.out.println("题目 " + question.getId() + " 开始判题");
+            try {
+                // 获取测试用例
+                List<QuestionTestCase> questionTestCases = testCaseMap.get(question.getId());
+                if (questionTestCases == null) {
+                    allPass = false;
+                    notificationHandler.sendToUser(question.getAdvisorId(),
+                            WsResult.of("RELEASE_RESULT", "题目 [" + question.getTitle() + "] 缺少测试用例，无法判题"));
+                    continue;
+                }
+
+                JudgeResult judgeResult = judgeService.judge(question.getStandardSolution(), questionTestCases);
+
+                // 修改验证状态(0 -> 1)
+                if (judgeResult.getStatus() == JudgeConstant.STATUS_AC) {
+                    new LambdaUpdateChainWrapper<>(questionMapper)
+                            .eq(Question::getId, question.getId())
+                            .set(Question::getIsValidated, 1)
+                            .update();
+                } else {
+                    // 遇到错误，不继续判题，返回发布结果
+                    // 调用rocketmq传结果
+                    allPass = false;
+                    notificationHandler.sendToUser(question.getAdvisorId(),
+                            WsResult.of("RELEASE_RESULT", "题目 [" + question.getTitle() + "] 未通过判题"));
+                }
+            } catch (Exception e) {
+                // 判题失败
+                allPass = false;
+                e.printStackTrace();
+            }
+        }
+
+        // 全部通过
+        if (allPass) {
+            examMapper.updateExamStatus(msg.getExamId(), ExamConstant.PUBLISHED);
+            // 通知用户：考试发布成功
+            notificationHandler.sendToUser(advisorId, WsResult.of("RELEASE_RESULT", "考试已成功发布"));
+        } else {
+            // 回退到草稿
+            examMapper.updateExamStatus(msg.getExamId(), ExamConstant.DRAFT);
+            notificationHandler.sendToUser(advisorId, WsResult.of("RELEASE_RESULT", "考试发布失败，部分题目未通过校验"));
         }
     }
 }

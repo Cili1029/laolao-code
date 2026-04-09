@@ -2,15 +2,14 @@ package com.laolao.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.laolao.common.constant.ExamConstant;
-import com.laolao.common.constant.JudgeConstant;
 import com.laolao.common.docker.JudgeService;
-import com.laolao.common.result.JudgeResult;
 import com.laolao.common.result.Result;
 import com.laolao.common.util.MapStruct;
 import com.laolao.common.util.SecurityUtils;
 import com.laolao.mapper.*;
 import com.laolao.pojo.dto.*;
 import com.laolao.pojo.entity.*;
+import com.laolao.pojo.messege.ReleaseExamMessage;
 import com.laolao.pojo.vo.*;
 import com.laolao.service.DraftExamService;
 import com.laolao.service.QuestionService;
@@ -18,6 +17,8 @@ import jakarta.annotation.Resource;
 import org.apache.rocketmq.client.core.RocketMQClientTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -153,8 +154,8 @@ public class DraftExamServiceImpl implements DraftExamService {
         if (exam == null) {
             return Result.error("考试不存在");
         }
-        if (exam.getStatus() == ExamConstant.PUBLISHED) {
-            return Result.error("考试已发布，请勿重复操作");
+        if (exam.getStatus() != ExamConstant.DRAFT) {
+            return Result.error("当前考试状态不可发布");
         }
         LocalDateTime now = LocalDateTime.now();
         if (exam.getStartTime().isBefore(now)) {
@@ -185,28 +186,29 @@ public class DraftExamServiceImpl implements DraftExamService {
             return Result.error("分数不满足要求（100），当前分数：" + totalScore);
         }
 
-        // 题目校验，先查出这些题目的测试案例
-        // 提取 ID 并批量获取测试用例
-        setTestCasesToQuestions(questions, ReleaseExamQuestionVO::getId, ReleaseExamQuestionVO::setTestCases);
-        // 依次判题
-        try {
-            for (ReleaseExamQuestionVO q : questions) {
-                // 检查是否有测试用例
-                if (q.getTestCases() == null || q.getTestCases().isEmpty()) {
-                    return Result.error("题目 [" + q.getTitle() + "] 缺少测试用例，无法判题");
-                }
-                JudgeResult judge = judgeService.judge(q.getCode(), q.getTestCases());
-                if (judge.getStatus() != JudgeConstant.STATUS_AC) {
-                    return Result.error("题目 [" + q.getTitle() + "] 未通过判题");
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Result.error("判题失败！练习管理员！");
+        // 排除已经测试通过的
+        List<Integer> questionIds = questions.stream()
+                .filter(question -> question.getIsValidated() != 1)
+                .map(ReleaseExamQuestionVO::getId).toList();
+        if (questionIds.isEmpty()) {
+            // 均通过，修改状态
+            examMapper.updateExamStatus(exam.getId(), ExamConstant.PUBLISHED);
+            return Result.success("发布成功");
         }
-        // 均通过，修改状态
-        examMapper.updateExamStatus(exam.getId(), ExamConstant.PUBLISHED);
-        return Result.success("发布成功");
+
+        // 需要异步判题，修改状态为 PUBLISHING
+        examMapper.updateExamStatus(examId, ExamConstant.PUBLISHING);
+
+        // 事务提交后发送 MQ
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                // 封装消息对象
+                ReleaseExamMessage message = new ReleaseExamMessage(SecurityUtils.getUserId(), examId, questionIds);
+                rocketMQClientTemplate.convertAndSend("JudgeTopic:RELEASE", message);
+            }
+        });
+        return Result.success("后台判题中，耐心等待");
     }
 
     @Override

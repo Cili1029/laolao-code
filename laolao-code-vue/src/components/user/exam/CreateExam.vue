@@ -19,21 +19,29 @@
                         ]">
                             <Plus />
                         </div>
-                        <QuestionBank :type="1" @question-data="getBankQuestion" />
+                        <QuestionBank :exam-id="Number(route.params.id)" @question-data="getBankQuestion" />
                     </div>
 
                     <div v-if="questions.length > 0" class="h-full w-full flex flex-col bg-white border space-y-2">
                         <div class="flex px-2 pt-2 justify-between">
                             <div @click="saveAndAddToExam()"
-                                class="flex cursor-pointer items-center px-2 py-1 text-sm rounded transition-colors"
-                                :class="[isDirty ? 'text-orange-600 bg-orange-50 hover:bg-orange-100'
-                                    : 'text-green-600 bg-gray-100 hover:bg-gray-200'
-                                ]">
-                                <Rocket v-if="!examStore.judgeLoading" class="h-4 w-4 mr-1" />
-                                <Spinner v-else class="mr-1" />
-                                <span>{{ isDirty ? '保存并测试' : '测试' }}</span>
-                                <span v-if="isDirty"
-                                    class="ml-1 w-2 h-2 bg-orange-500 rounded-full animate-pulse"></span>
+                                class="flex cursor-pointer items-center px-2 py-1 text-sm rounded transition-all"
+                                :class="testStatus.class">
+
+                                <!-- 加载中状态 -->
+                                <Spinner v-if="examStore.judgeLoading" class="mr-1" />
+
+                                <!-- 图标逻辑 -->
+                                <template v-else>
+                                    <CheckCircle2 v-if="testStatus.icon === 'check'" class="h-4 w-4 mr-1" />
+                                    <Rocket v-else class="h-4 w-4 mr-1" />
+                                </template>
+
+                                <span>{{ testStatus.text }}</span>
+
+                                <!-- 只有在未保存修改时显示小红点 -->
+                                <span v-if="isDirty" class="ml-1 w-2 h-2 bg-orange-500 rounded-full animate-pulse">
+                                </span>
                             </div>
                             <div @click="deleteQuestion()"
                                 class="flex cursor-pointer text-red-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
@@ -205,7 +213,7 @@
     import axios from "@/utils/myAxios"
     import { useExamStore } from "@/stores/ExamStore"
     const examStore = useExamStore()
-    import { CirclePlus, Ghost, Plus, Rocket, Trash } from 'lucide-vue-next'
+    import { CirclePlus, Ghost, Plus, Rocket, Trash, CheckCircle2 } from 'lucide-vue-next'
     import { Textarea } from '@/components/ui/textarea'
     import { Input } from '@/components/ui/input'
     import { Label } from '@/components/ui/label'
@@ -214,7 +222,7 @@
     import Spinner from '@/components/ui/spinner/Spinner.vue'
     import { useRoute } from 'vue-router'
     import { toast } from 'vue-sonner'
-    import QuestionBank from '../question/QuestionBankDialog.vue'
+    import QuestionBank from '../question/QuestionBankCopyDialog.vue'
     const route = useRoute()
     import { cloneDeep, isEqual } from 'lodash-es' // 引入 lodash 工具
 
@@ -240,6 +248,7 @@
         memoryLimit: number
         templateCode: string
         standardSolution: string
+        isValidated: number
         testCases: TestCase[]
     }
 
@@ -292,6 +301,7 @@
             memoryLimit: 0,
             templateCode: '',
             standardSolution: '',
+            isValidated: 0,
             testCases: [{
                 id: null,
                 questionId: null,
@@ -335,6 +345,11 @@
     const saveAndAddToExam = async () => {
         if (!currentQuestion.value || examStore.judgeLoading) return
 
+        if (!isDirty.value && currentQuestion.value.isValidated === 1) {
+            toast.success("题目已通过测试，无需重复运行");
+            return;
+        }
+
         examStore.judgeLoading = true
 
         // 如果数据没变且已有 ID，直接运行
@@ -345,6 +360,7 @@
 
         // 数据有变动，先执行保存
         try {
+            // 修改状态为测试中
             const res = await axios.post("/api/exam/draft/add-question", {
                 examId: Number(route.params.id),
                 question: currentQuestion.value
@@ -415,6 +431,28 @@
             console.log(e);
         }
     }
+
+    const testStatus = computed(() => {
+        if (isDirty.value) {
+            return {
+                text: '保存并测试',
+                class: 'text-orange-600 bg-orange-50 hover:bg-orange-100',
+                icon: 'rocket'
+            }
+        }
+        if (currentQuestion.value?.isValidated === 1) {
+            return {
+                text: '测试通过',
+                class: 'text-green-600 bg-green-50 hover:bg-green-100',
+                icon: 'check'
+            }
+        }
+        return {
+            text: '测试',
+            class: 'text-blue-600 bg-gray-100 hover:bg-gray-200',
+            icon: 'rocket'
+        }
+    })
 
     const getBankQuestion = (question: Question) => {
         questions.value.push(question)

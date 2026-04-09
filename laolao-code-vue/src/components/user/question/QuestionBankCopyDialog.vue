@@ -26,7 +26,7 @@
                         <FileKey class="h-4 w-4 mr-1" />
                         我的题库
                     </div>
-                    <div v-if="type !== 0" @click="handleSwitchType(1)"
+                    <div @click="handleSwitchType(1)"
                         class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded"
                         :class="currentType === 1 ? 'bg-gray-200' : ''">
                         <File class="h-4 w-4 mr-1" />
@@ -63,7 +63,7 @@
                                     <Spinner v-if="false" class="mr-1" />
                                     {{ question.isPublic ? '转私有' : '转公共' }}
                                 </div>
-                                <div v-if="type !== 0" @click="copyQuestion(question.id)"
+                                <div @click="copyQuestion(question.id)"
                                     class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
                                     <Copy class="h-4 w-4 mr-1" />
                                     <Spinner v-if="false" class="mr-1" />
@@ -201,10 +201,12 @@
     }
 
     const copyQuestion = async (id: number) => {
+        console.log(props.examId)
         try {
             const res = await axios.get("/api/question/copy", {
                 params: {
-                    questionId: id
+                    questionId: id,
+                    examId: props.examId
                 }
             })
             question.value = res.data.data
@@ -232,6 +234,7 @@
         memoryLimit: number
         templateCode: string
         standardSolution: string
+        isValidated: number
         testCases: TestCase[]
     }
 
@@ -242,7 +245,9 @@
     }>()
 
     // 0为主页，1为编辑页可克隆
-    const props = withDefaults(defineProps<{ type?: number }>(), {
-        type: 0
+    const props = withDefaults(defineProps<{
+        examId?: number
+    }>(), {
+        examId: undefined
     })
 </script>

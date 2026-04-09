@@ -21,7 +21,7 @@
       <SidebarGroup>
         <SidebarMenu>
           <SidebarMenuItem v-for="item in data.navMain" :key="item.title">
-            <SidebarMenuButton as-child :tooltip="item.title">
+            <SidebarMenuButton as-child :tooltip="item.title" :is-active="route.path.startsWith(item.url)">
               <RouterLink :to="item.url">
                 <component :is="item.icon" v-if="item.icon" />
                 <span>{{ item.title }}</span>
@@ -49,6 +49,8 @@
   import { SidebarGroup, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar'
   import { useExamStore } from '@/stores/ExamStore'
   import { computed } from 'vue'
+  import { useRoute } from 'vue-router'
+  const route = useRoute()
   const examStore = useExamStore()
 
   const props = defineProps<SidebarProps>()

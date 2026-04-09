@@ -82,7 +82,7 @@ public interface ExamMapper extends BaseMapper<Exam> {
     void insertOrUpdateQConfig(Integer examId, Integer questionId, Integer score);
 
     @Select("""
-            select q.id, q.title, q.standard_solution as code, qc.score
+            select q.id, q.title, q.standard_solution as code, qc.score, is_validated
             from question q
                      join exam_question_config qc on qc.question_id = q.id
             where qc.exam_id = #{examId}

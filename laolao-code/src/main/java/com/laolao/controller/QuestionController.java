@@ -80,7 +80,7 @@ public class QuestionController {
      */
     @GetMapping("/copy")
     @PreAuthorize("hasRole('ADVISOR')")
-    public Result<DraftQuestionVO> copyQuestion(@RequestParam Integer questionId) {
-        return questionService.copyQuestion(questionId);
+    public Result<DraftQuestionVO> copyQuestion(@RequestParam Integer questionId, @RequestParam Integer examId) {
+        return questionService.copyQuestion(questionId, examId);
     }
 }

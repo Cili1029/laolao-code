@@ -1,7 +1,5 @@
 package com.laolao.pojo.vo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.laolao.pojo.entity.QuestionTestCase;
 import lombok.*;
 
@@ -59,6 +57,11 @@ public class DraftQuestionVO implements Serializable {
      * 标准答案代码 (供 AI 参考)
      */
     private String standardSolution;
+
+    /**
+     * 是否以通过判题(0-否, 1-是)
+     */
+    private Integer isValidated;
 
     /**
      * 测试示例
