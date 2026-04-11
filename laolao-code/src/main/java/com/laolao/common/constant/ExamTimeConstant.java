@@ -1,6 +1,6 @@
 package com.laolao.common.constant;
 
-public class StudentExamConstant {
+public class ExamTimeConstant {
     public static final int NOT_STARTED = 0;   // 未开始（考试尚未启动，学生无法进入）
     public static final int STARTED = 1;       // 已开始（考试已启动，学生可进入答题）
     public static final int ENTERED = 2;       // 已进入（学生进入答题页面，正在作答）

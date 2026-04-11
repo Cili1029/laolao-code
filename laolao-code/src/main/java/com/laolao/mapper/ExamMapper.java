@@ -36,7 +36,7 @@ public interface ExamMapper extends BaseMapper<Exam> {
                    e.title,
                    e.description,
                    g.id              as team_id,
-                   g.name              as team,
+                   g.name              as teamName,
                    (select count(*)
                     from exam_question_config
                     where exam_id = #{examId}) as questions,

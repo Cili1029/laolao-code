@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.laolao.pojo.entity.ExamRecord;
 import com.laolao.pojo.vo.ExamRecordVO;
 import com.laolao.pojo.vo.GradeUserVO;
+import com.laolao.pojo.vo.UserExamRecord;
 import com.laolao.pojo.vo.UserReportVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -29,8 +30,8 @@ public interface ExamRecordMapper extends BaseMapper<ExamRecord> {
             """)
     List<ExamRecordVO> selectSimpleExamRecord(Integer userId);
 
-    @Select("select status, enter_time, submit_time from exam_record where exam_id = #{examId} and user_id = #{userId}")
-    ExamRecord selectStatusByExamId(Integer examId, Integer userId);
+    @Select("select id, user_id, status, enter_time, submit_time from exam_record where exam_id = #{examId} and user_id = #{userId}")
+    UserExamRecord selectStatusByExamId(Integer examId, Integer userId);
 
     @Select("""
             select er.id, u.name, er.score, er.enter_time, er.submit_time

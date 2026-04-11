@@ -23,12 +23,7 @@ public class ExamInfoVO implements Serializable {
     private String title;
 
     /**
-     * 考试状态（给老师看）
-     */
-    private Integer studentStatus;
-
-    /**
-     * 学生状态
+     * 考试状态
      */
     private Integer status;
 
@@ -45,7 +40,7 @@ public class ExamInfoVO implements Serializable {
     /**
      * 所属组
      */
-    private String team;
+    private String teamName;
 
     /**
      * 题目数量
@@ -63,13 +58,11 @@ public class ExamInfoVO implements Serializable {
     private LocalDateTime endTime;
 
     /**
-     * 考生进入时间
+     * 考生情况（如果考试了）
      */
-    private LocalDateTime enterTime;
+    private UserExamRecord userExamRecord;
 
-    /**
-     * 学生提交时间
-     */
-    private LocalDateTime submitTime;
+
+    private ExamPermissionsVO examPermissions;
 }
 
