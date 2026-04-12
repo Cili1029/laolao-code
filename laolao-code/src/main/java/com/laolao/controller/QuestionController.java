@@ -3,7 +3,6 @@ package com.laolao.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.laolao.common.result.Result;
 import com.laolao.pojo.dto.AddQuestionDTO;
-import com.laolao.pojo.dto.QuestionIdDTO;
 import com.laolao.pojo.vo.DraftQuestionVO;
 import com.laolao.pojo.vo.QuestionBankVO;
 import com.laolao.service.QuestionService;
@@ -49,18 +48,6 @@ public class QuestionController {
     @PreAuthorize("hasRole('MANAGER')")
     public Result<Page<QuestionBankVO>> getPublicQuestions(Integer pageNum, Integer pageSize, String content) {
         return questionService.getPublicQuestions(pageNum, pageSize, content);
-    }
-
-    /**
-     * 修改题目为公共/私有
-     *
-     * @param questionIdDTO 题目数据
-     * @return 结果信息
-     */
-    @PostMapping("/status")
-    @PreAuthorize("hasRole('MANAGER')")
-    public Result<String> changeStatus(@RequestBody QuestionIdDTO questionIdDTO) {
-        return questionService.changeStatus(questionIdDTO);
     }
 
     /**

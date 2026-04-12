@@ -1,6 +1,7 @@
 package com.laolao.common.task;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.laolao.common.constant.ExamConstant;
 import com.laolao.mapper.ExamMapper;
 import com.laolao.pojo.entity.Exam;
 import jakarta.annotation.Resource;
@@ -29,7 +30,8 @@ public class ExamEndTask {
         List<Exam> exams = examMapper.selectList(new LambdaQueryWrapper<Exam>()
                 .gt(Exam::getEndTime, now)   // 必须还没结束
                 .le(Exam::getEndTime, threshold)  // 且在10分钟内结束
-                .eq(Exam::getIsQueued, 0));      // 不在队列中
+                .eq(Exam::getIsQueued, 0) // 不在队列中
+                .eq(Exam::getStatus, ExamConstant.PUBLISHED));  // 发布状态
 
         for (Exam exam : exams) {
             // 更新为在队列

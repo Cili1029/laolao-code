@@ -1,10 +1,13 @@
 package com.laolao.controller;
 
+import com.laolao.common.constant.ExamRecordConstant;
 import com.laolao.common.result.Result;
+import com.laolao.mapper.ExamRecordMapper;
 import com.laolao.pojo.dto.UpdateScoreDTO;
 import com.laolao.pojo.vo.GradeUserVO;
 import com.laolao.service.GradeExamService;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

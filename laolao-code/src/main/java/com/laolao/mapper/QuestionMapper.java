@@ -17,9 +17,6 @@ public interface QuestionMapper extends BaseMapper<Question> {
 
     Page<QuestionBankVO> selectPublicBank(Page<QuestionBankVO> page, String content);
 
-    @Update("update question set is_public = 1 - is_public where creator_id = #{userId} and id = #{questionId}")
-    void updateStatus(Integer userId, Integer questionId);
-
     @Update("update question set is_deleted = 1 where question.creator_id = #{userId} and id = #{questionId}")
     void deleteQuestion(Integer userId, Integer questionId);
 

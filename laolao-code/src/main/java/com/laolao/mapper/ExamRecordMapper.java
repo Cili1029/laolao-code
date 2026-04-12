@@ -69,6 +69,12 @@ public interface ExamRecordMapper extends BaseMapper<ExamRecord> {
             """)
     void batchSubmitAndCalculateScore(Integer examId);
 
-    @Select("update exam_record set status = 1, submit_time = now() where id = #{recordId} and user_id = #{userId}")
+    @Update("update exam_record set status = 1, submit_time = now() where id = #{recordId} and user_id = #{userId}")
     void updateStatusToSubmitted(Integer recordId, Integer userId);
+
+    @Update("update exam_record set status = 3 where exam_id = #{examId}")
+    void cancelExam(Integer examId);
+
+    @Update("update exam_record set status = #{newStatus} where exam_id = #{examId} and status = #{oldStatus}")
+    void updateStatus(Integer examId, int oldStatus, int newStatus);
 }

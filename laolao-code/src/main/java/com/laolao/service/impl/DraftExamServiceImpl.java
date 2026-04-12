@@ -189,12 +189,12 @@ public class DraftExamServiceImpl implements DraftExamService {
                 .map(ReleaseExamQuestionVO::getId).toList();
         if (questionIds.isEmpty()) {
             // 均通过，修改状态
-            examMapper.updateExamStatus(exam.getId(), ExamConstant.PUBLISHED);
+            examMapper.updateExamStatus(exam.getId(), ExamConstant.DRAFT,  ExamConstant.PUBLISHED);
             return Result.success("发布成功");
         }
 
         // 需要异步判题，修改状态为 PUBLISHING
-        examMapper.updateExamStatus(examId, ExamConstant.PUBLISHING);
+        examMapper.updateExamStatus(examId, ExamConstant.DRAFT,  ExamConstant.PUBLISHING);
 
         // 事务提交后发送 MQ
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {

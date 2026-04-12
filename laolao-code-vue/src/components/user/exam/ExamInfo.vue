@@ -40,13 +40,13 @@
                                         </template>
                                     </CreateExamDialog>
 
-                                    <!-- 继续选题按钮 (新增) -->
+                                    <!-- 继续选题按钮 -->
                                     <Button v-if="exam?.examPermissions.canSelectQuestions"
                                         @click="router.push(`/exam/create/${exam.id}`)" variant="outline">
                                         继续选题
                                     </Button>
 
-                                    <!-- 主动作按钮（如：去改卷） -->
+                                    <!-- 主动作按钮 -->
                                     <Button v-if="mainAction" @click="mainAction.action" variant="outline"
                                         :disabled="mainAction.disabled">
                                         {{ mainAction.text }}
@@ -58,7 +58,8 @@
                                         发布考试
                                     </Button>
 
-                                    <Button v-if="exam?.examPermissions.published" @click="" variant="outline">
+                                    <Button v-if="exam?.examPermissions.canCancel" @click="cancelExam()"
+                                        variant="outline">
                                         取消考试
                                     </Button>
 
@@ -219,16 +220,19 @@
     interface ExamPermissions {
         // 基础状态开关
         draft: boolean;        // 草稿
+        publishing: boolean
         published: boolean;    // 已发布
         grading: boolean;      // 改卷中
         completed: boolean;    // 已完成/已出分
+        canceled: boolean      // 已取消
 
         // 老师权限
         canEdit: boolean;        // 可编辑
         canRelease: boolean;     // 可发布
         canDelete: boolean;      // 可删除
         canGrade: boolean;       // 可批改
-        canSelectQuestions: boolean; // 是否可以进入选题页面
+        canSelectQuestions: boolean; // 可选题
+        canCancel: boolean; // 可取消
 
         // 学生权限
         canStart: boolean;       // 首次进入考试
@@ -255,36 +259,69 @@
     }
 
 
-    // 1. 状态 UI 映射：只负责颜色和文案
+    // 状态 UI 映射
     const statusUI = computed(() => {
         const p = exam.value?.examPermissions;
-        if (!p) return { text: '加载中', color: 'bg-gray-400' };
+        if (!p) return { text: '加载中', color: 'bg-gray-400' }
 
-        if (p.draft) return { text: '草稿', color: 'bg-orange-500' };
-        if (p.published) return { text: '进行中', color: 'bg-blue-500' };
-        if (p.grading) return { text: '阅卷中', color: 'bg-purple-500' };
-        if (p.completed) return { text: '已结束', color: 'bg-gray-400' };
+        if (p.canceled) return { text: '已取消', color: 'bg-red-500' }
 
-        return { text: '未知', color: 'bg-gray-200' };
-    });
+        if (p.draft) return { text: '草稿', color: 'bg-orange-500' }
 
-    // 2. 按钮逻辑映射：只负责主按钮的点击行为
+        if (p.publishing) return { text: '发布中', color: 'bg-orange-500' }
+
+        if (p.published) {
+            const now = dayjs();
+            const start = dayjs(exam.value?.startTime)
+            const end = dayjs(exam.value?.endTime)
+
+            if (now.isBefore(start)) return { text: '未开始', color: 'bg-gray-400' }
+            if (now.isAfter(end)) return { text: '已截止', color: 'bg-gray-600' }
+            return { text: '进行中', color: 'bg-blue-500' }
+        }
+
+        if (p.grading) return { text: '阅卷中', color: 'bg-purple-500' }
+        if (p.completed) return { text: '已结束', color: 'bg-gray-400' }
+
+        return { text: '未知', color: 'bg-gray-200' }
+    })
+
+    // 按钮逻辑映射
     const mainAction = computed(() => {
-        const p = exam.value?.examPermissions;
-        const role = userStore.user.role;
-        if (!p) return null;
+        const p = exam.value?.examPermissions
+        const role = userStore.user.role
+        if (!p) return null
 
         if (role === 2) { // 学生
-            if (p.canStart) return { text: '开始答题', disabled: false, action: startExam };
-            if (p.canContinue) return { text: '继续答题', disabled: false, action: startExam };
-            if (p.published && !p.canStart && !p.canContinue) return { text: '已提交', disabled: true };
-            if (p.completed) return { text: '查看结果', disabled: false, action: () => { } };
+            if (p.canceled) return { text: '考试已取消', disabled: true }
+            if (p.canStart) return { text: '开始答题', disabled: false, action: startExam }
+            if (p.canContinue) return { text: '继续答题', disabled: false, action: startExam }
+
+            // 逻辑修正：
+            if (p.published) {
+                const now = dayjs()
+                const start = dayjs(exam.value?.startTime)
+
+                // 时间还没到
+                if (now.isBefore(start)) {
+                    return { text: '等待开始', disabled: true }
+                }
+                // 时间到了，但后端说不能答题（说明已经有记录且提交了）
+                if (exam.value?.userExamRecord) {
+                    return { text: '已提交', disabled: true }
+                }
+                // 既没开始，也没记录
+                return { text: '已截止', disabled: true }
+            }
+
+            if (p.completed) return { text: '查看结果', disabled: false, action: () => { } }
         } else { // 老师
-            if (p.canGrade) return { text: '去改卷', disabled: false, action: () => router.push(`/exam/grade/${exam.value?.id}`) };
-            if (p.published) return { text: '发布中', disabled: true };
-            if (p.completed) return { text: '已批改', disabled: true };
+            if (p.publishing) return { text: '发布中', disabled: true }
+            if (p.canGrade) return { text: '去改卷', disabled: false, action: () => router.push(`/exam/grade/${exam.value?.id}`) }
+            if (p.published) return { text: '进行中', disabled: true } // 老师看的是考试大状态
+            if (p.completed) return { text: '已批改', disabled: true }
         }
-        return null;
+        return null
     });
 
     const startExam = async () => {
@@ -332,7 +369,6 @@
     }
 
     // 导师改完卷后显示
-
     const isGenerating = ref<boolean>(false)
 
     interface ExamCompleteReport {
@@ -349,6 +385,18 @@
                 }
             })
             report.value = res.data.data
+        } catch (e) {
+            console.log(e)
+        }
+    }
+
+    const cancelExam = async () => {
+        try {
+            await axios.post("/api/exam/manager/cancel", {}, {
+                params: {
+                    examId: route.params.id
+                }
+            })
         } catch (e) {
             console.log(e)
         }

@@ -88,8 +88,8 @@ public interface ExamMapper extends BaseMapper<Exam> {
             """)
     List<ReleaseExamQuestionVO> selectQuestionsCodeByExamId(Integer examId);
 
-    @Select("update exam set status = #{status} where id = #{id}")
-    void updateExamStatus(Integer id, Integer status);
+    @Update("update exam set status = #{newStatus} where id = #{id} and status = #{oldStatus}")
+    void updateExamStatus(Integer id, Integer oldStatus, Integer newStatus);
 
     @Select("""
             SELECT u.name                                 AS username,
@@ -107,4 +107,10 @@ public interface ExamMapper extends BaseMapper<Exam> {
             WHERE e.id = #{examId};
             """)
     List<ExamScoreDataContent> selectAttendanceAndScores(Integer examId);
+
+    @Update("update exam set status = #{status}, is_queued = 0 where id = #{examId} and status = 1")
+    int examEndConsume(Integer examId, Integer status);
+
+    @Update("update exam set status = #{canceled}, is_queued = 0 where id = #{examId} and (status = 1 or status = 2)")
+    void cancelExam(Exam examId, int canceled);
 }

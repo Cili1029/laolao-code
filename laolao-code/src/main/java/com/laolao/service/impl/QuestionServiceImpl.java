@@ -9,7 +9,6 @@ import com.laolao.mapper.ExamQuestionConfigMapper;
 import com.laolao.mapper.QuestionMapper;
 import com.laolao.mapper.QuestionTestCaseMapper;
 import com.laolao.pojo.dto.AddQuestionDTO;
-import com.laolao.pojo.dto.QuestionIdDTO;
 import com.laolao.pojo.entity.ExamQuestionConfig;
 import com.laolao.pojo.entity.Question;
 import com.laolao.pojo.entity.QuestionTestCase;
@@ -76,12 +75,6 @@ public class QuestionServiceImpl implements QuestionService {
         Page<QuestionBankVO> page = new Page<>(pageNum, pageSize);
         Page<QuestionBankVO> res = questionMapper.selectPublicBank(page, content);
         return Result.success(res);
-    }
-
-    @Override
-    public Result<String> changeStatus(QuestionIdDTO questionIdDTO) {
-        questionMapper.updateStatus(SecurityUtils.getUserId(), questionIdDTO.getQuestionId());
-        return Result.success("更新状态成功！");
     }
 
     @Override

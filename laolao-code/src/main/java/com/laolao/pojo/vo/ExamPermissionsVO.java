@@ -9,20 +9,22 @@ import lombok.*;
 @ToString
 public class ExamPermissionsVO {
     // 基础状态开关
-    private boolean draft;      // 0: 草稿
-    private boolean published;  // 1: 已发布
-    private boolean grading;    // 2: 改卷中
-    private boolean completed;  // 3: 已完成/已出分
+    private boolean draft;      // 草稿
+    private boolean publishing; // 发布中
+    private boolean published;  // 已发布
+    private boolean grading;    // 改卷中
+    private boolean completed;  // 已完成/已出分
+    private boolean canceled;   // 已取消
 
-    // 动作开关 (老师)
+    // 老师
     private boolean canEdit;
+    private boolean canSelectQuestions;
     private boolean canRelease;
     private boolean canDelete;
     private boolean canGrade;
-    private boolean canSelectQuestions;
+    private boolean canCancel;
 
-
-    // 动作开关 (学生)
+    // 学生
     private boolean canStart;     // 首次进入
     private boolean canContinue;  // 继续答题
     private boolean canViewResult;// 查看成绩

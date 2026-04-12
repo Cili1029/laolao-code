@@ -4,7 +4,6 @@ import com.laolao.common.constant.ExamConstant;
 import com.laolao.common.result.WsResult;
 import com.laolao.common.websocket.NotificationHandler;
 import com.laolao.mapper.ExamMapper;
-import com.laolao.pojo.entity.Exam;
 import com.laolao.service.impl.UserExamServiceImpl;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
@@ -37,16 +36,9 @@ public class ExamEndListener implements RocketMQListener {
         try {
             // 获取考试ID
             int examId = Integer.parseInt(StandardCharsets.UTF_8.decode(messageView.getBody()).toString());
-            // 更新数据库状态
-            Exam exam = Exam.builder()
-                    .id(examId)
-                    .status(ExamConstant.ENDED_GRADING)
-                    .isQueued(0)
-                    .build();
-
-            int rows = examMapper.updateById(exam);
+            int rows = examMapper.examEndConsume(examId, ExamConstant.GRADING);
             if (rows <= 0) {
-                log.warn("【考试结束通知】考试ID {} 数据库更新失败（可能已被手动处理）", examId);
+                log.warn("【考试结束通知】考试ID {} 数据库更新失败（可能已被取消）", examId);
                 return ConsumeResult.SUCCESS;
             }
             // 执行交卷

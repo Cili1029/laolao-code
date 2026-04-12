@@ -57,12 +57,6 @@
                             <TableCell>{{ question.manager }}</TableCell>
                             <TableCell v-if="currentType === 0">{{ question.isPublic === 0 ? '私有' : '公开' }}</TableCell>
                             <TableCell class="flex justify-end space-x-2">
-                                <div v-if="currentType === 0" @click="changeQuestionStatus(question)"
-                                    class="flex cursor-pointer text-orange-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
-                                    <Copy class="h-4 w-4 mr-1" />
-                                    <Spinner v-if="false" class="mr-1" />
-                                    {{ question.isPublic ? '转私有' : '转公共' }}
-                                </div>
                                 <div @click="copyQuestion(question.id)"
                                     class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
                                     <Copy class="h-4 w-4 mr-1" />
@@ -172,19 +166,6 @@
         currentType.value = type
         pageNum.value = 1
         searchContent.value = ''
-    }
-
-    const changeQuestionStatus = async (question: QuestionBank) => {
-        try {
-            const res = await axios.post("/api/question/status", {
-                questionId: question.id
-            })
-            if (res.data.code === 1) {
-                question.isPublic = 1 - question.isPublic
-            }
-        } catch (e) {
-            console.error(e)
-        }
     }
 
     const deleteQuestion = async (question: QuestionBank) => {

@@ -252,12 +252,12 @@ public class JudgeListener implements RocketMQListener {
 
         // 全部通过
         if (allPass) {
-            examMapper.updateExamStatus(msg.getExamId(), ExamConstant.PUBLISHED);
+            examMapper.updateExamStatus(msg.getExamId(), ExamConstant.PUBLISHING, ExamConstant.PUBLISHED);
             // 通知用户：考试发布成功
             notificationHandler.sendToUser(managerId, WsResult.of("RELEASE_RESULT", "考试已成功发布"));
         } else {
             // 回退到草稿
-            examMapper.updateExamStatus(msg.getExamId(), ExamConstant.DRAFT);
+            examMapper.updateExamStatus(msg.getExamId(), ExamConstant.PUBLISHING, ExamConstant.DRAFT);
             notificationHandler.sendToUser(managerId, WsResult.of("RELEASE_RESULT", "考试发布失败，部分题目未通过校验"));
         }
     }

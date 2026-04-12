@@ -1,12 +1,12 @@
 package com.laolao.service.impl;
 
 import com.laolao.common.constant.ExamConstant;
+import com.laolao.common.constant.ExamRecordConstant;
 import com.laolao.common.result.Result;
 import com.laolao.mapper.ExamMapper;
 import com.laolao.mapper.ExamRecordMapper;
 import com.laolao.mapper.JudgeRecordMapper;
 import com.laolao.pojo.dto.UpdateScoreDTO;
-import com.laolao.pojo.entity.Exam;
 import com.laolao.pojo.entity.JudgeRecord;
 import com.laolao.pojo.vo.GradeJudgeRecordVO;
 import com.laolao.pojo.vo.GradeUserVO;
@@ -63,14 +63,10 @@ public class GradeExamServiceImpl implements GradeExamService {
     }
 
     @Override
+    @Transactional
     public Result<Integer> graded(Integer examId) {
-        // 以后接入rocketmq后应该先不改status，ai逐个写完报告再修改status
-        // TODO
-        Exam exam = Exam.builder()
-                .id(examId)
-                .status(ExamConstant.GRADING_COMPLETED)
-                .build();
-        examMapper.updateById(exam);
+        examRecordMapper.updateStatus(examId, ExamRecordConstant.SUBMITTED, ExamRecordConstant.GRADING_COMPLETE);
+        examMapper.updateExamStatus(examId, ExamConstant.GRADING, ExamConstant.COMPLETED);
         return Result.success("改卷已结束");
     }
 }
