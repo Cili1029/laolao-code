@@ -30,7 +30,17 @@ public class ExamVO implements Serializable {
     /**
      * 所属组
      */
-    private String team;
+    private String teamName;
+
+    /**
+     * 状态
+     */
+    private Integer status;
+
+    /**
+     * 权限
+     */
+    private ExamSummaryPermissionsVO summaryPermissions;
 
     /**
      * 开始时间

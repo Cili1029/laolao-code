@@ -1,13 +1,26 @@
 package com.laolao.common.util;
 
 import com.laolao.common.constant.ExamConstant;
-import com.laolao.pojo.vo.ExamPermissionsVO;
+import com.laolao.pojo.vo.ExamDetailPermissionsVO;
+import com.laolao.pojo.vo.ExamSummaryPermissionsVO;
 import com.laolao.pojo.vo.UserExamRecord;
 
 import java.time.LocalDateTime;
 
 // 计算考试的各种权限（组管理员/考试看到的按钮、状态、步骤）
 public class ExamHelper {
+
+    /**
+     * @param status 考试状态
+     * @return 前端需要的所有权限对象
+     */
+    public static ExamSummaryPermissionsVO calculateSummary(Integer status) {
+        ExamSummaryPermissionsVO p = new ExamSummaryPermissionsVO();
+        // 填充基础考试状态
+        fillBaseStatus(p, status);
+        return p; // 返回所有权限给前端
+    }
+
     /**
      * @param role   角色 1=组管理员，2=考生
      * @param status 考试状态
@@ -16,18 +29,12 @@ public class ExamHelper {
      * @param record 考试的考试记录（有没有进入、有没有交卷）
      * @return 前端需要的所有权限对象
      */
-    public static ExamPermissionsVO calculate(Integer role, Integer status, LocalDateTime start, LocalDateTime end, UserExamRecord record) {
-        ExamPermissionsVO p = new ExamPermissionsVO();
+    public static ExamDetailPermissionsVO calculateDetail(Integer role, Integer status, LocalDateTime start, LocalDateTime end, UserExamRecord record) {
+        ExamDetailPermissionsVO p = new ExamDetailPermissionsVO();
         LocalDateTime now = LocalDateTime.now();
 
-        // 基础考试状态
-        p.setDraft(status == ExamConstant.DRAFT);           // 是否草稿
-        p.setPublishing(status == ExamConstant.PUBLISHING); // 是否发布中
-        p.setPublished(status == ExamConstant.PUBLISHED);   // 是否已发布
-        p.setGrading(status == ExamConstant.GRADING);       // 是否批改中
-        p.setCompleted(status == ExamConstant.COMPLETED);   // 是否已完成
-        p.setCanceled(status == ExamConstant.CANCELED);     // 是否被取消
-
+        // 1. 填充基础考试状态 (整合了原本 calculateSummary 的逻辑)
+        fillBaseStatus(p, status);
 
         // 组管理员权限（role == 1）
         if (role == 1) {
@@ -72,5 +79,17 @@ public class ExamHelper {
         }
 
         return p; // 返回所有权限给前端
+    }
+
+    /**
+     * 基础考试状态
+     */
+    private static void fillBaseStatus(ExamSummaryPermissionsVO p, Integer status) {
+        p.setDraft(status == ExamConstant.DRAFT);           // 是否草稿
+        p.setPublishing(status == ExamConstant.PUBLISHING); // 是否发布中
+        p.setPublished(status == ExamConstant.PUBLISHED);   // 是否已发布
+        p.setGrading(status == ExamConstant.GRADING);       // 是否批改中
+        p.setCompleted(status == ExamConstant.COMPLETED);   // 是否已完成
+        p.setCanceled(status == ExamConstant.CANCELED);     // 是否被取消
     }
 }

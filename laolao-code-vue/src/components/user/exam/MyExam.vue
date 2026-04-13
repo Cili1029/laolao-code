@@ -14,24 +14,21 @@
                 <div class="flex items-center space-x-4">
                     <!-- 状态图标 -->
                     <div class="bg-slate-100 p-3 rounded-lg group-hover:bg-blue-50 transition-colors">
-                        <Bug v-if="exam.name.includes('代码') || exam.name.includes('Debug')"
-                            class="h-6 w-6 text-blue-600" />
-                        <ClipboardList v-else class="h-6 w-6 text-slate-600 group-hover:text-blue-600" />
+                        <ClipboardList class="h-6 w-6 text-slate-600 group-hover:text-blue-600" />
                     </div>
 
                     <div class="space-y-1">
                         <div class="flex items-center gap-2">
                             <h3 class="text-lg font-semibold">{{ exam.name }}</h3>
-                            <Badge variant="secondary" class="border-none" :class="dayjs().isBetween(exam.startTime, exam.endTime, null, '[]') ?
-                                'bg-green-100 text-green-700' : 'bg-gray-100'">
-                                {{ dayjs().isBetween(exam.startTime, exam.endTime, null, '[]') ? '进行中' :
-                                    dayjs().isAfter(exam.startTime) ? "已结束" : dayjs(exam.startTime).fromNow() }}
+                            <Badge variant="secondary" class="border-none"
+                                :class="['border-none text-white', getExamStatusUI(exam).color]">
+                                {{ getExamStatusUI(exam).text }}
                             </Badge>
                         </div>
                         <div class="flex items-center text-sm text-gray-500 space-x-3">
                             <span class="flex items-center">
                                 <Users class="h-3.5 w-3.5 mr-1" />
-                                {{ exam.team }}
+                                {{ exam.teamName }}
                             </span>
                             <span class="text-gray-300">|</span>
                             <p class="max-w-xs">{{ exam.description }}</p>
@@ -70,7 +67,7 @@
 <script setup lang="ts">
     import { onMounted, ref } from 'vue'
     import axios from "@/utils/myAxios"
-    import { ClipboardList, CalendarDays, Users, Bug, ChevronRight, Ghost } from "lucide-vue-next"
+    import { ClipboardList, CalendarDays, Users, ChevronRight, Ghost } from "lucide-vue-next"
     import { Badge } from '@/components/ui/badge'
     import { useUserStore } from '@/stores/UserStore'
     const UserStore = useUserStore()
@@ -79,10 +76,47 @@
     interface Exam {
         id: number
         name: string
-        team: string
+        teamName: string
         description: string
+        summaryPermissions: SummaryPermissions
         startTime: string
         endTime: string
+    }
+
+    interface SummaryPermissions {
+        // 基础状态开关
+        draft: boolean;        // 草稿
+        publishing: boolean
+        published: boolean;    // 已发布
+        grading: boolean;      // 改卷中
+        completed: boolean;    // 已完成/已出分
+        canceled: boolean      // 已取消
+    }
+
+    const getExamStatusUI = (exam: Exam) => {
+        const p = exam.summaryPermissions;
+        if (!p) return { text: '加载中', color: 'bg-gray-400' }
+
+        if (p.canceled) return { text: '已取消', color: 'bg-red-500' }
+
+        if (p.draft) return { text: '草稿', color: 'bg-orange-500' }
+
+        if (p.publishing) return { text: '发布中', color: 'bg-orange-500' }
+
+        if (p.published) {
+            const now = dayjs();
+            const start = dayjs(exam.startTime)
+            const end = dayjs(exam.endTime)
+
+            if (now.isBefore(start)) return { text: '未开始', color: 'bg-gray-400' }
+            if (now.isAfter(end)) return { text: '已截止', color: 'bg-gray-600' }
+            return { text: '进行中', color: 'bg-blue-500' }
+        }
+
+        if (p.grading) return { text: '阅卷中', color: 'bg-purple-500' }
+        if (p.completed) return { text: '已结束', color: 'bg-gray-400' }
+
+        return { text: '未知', color: 'bg-gray-200' }
     }
 
     const exams = ref<Exam[]>([])

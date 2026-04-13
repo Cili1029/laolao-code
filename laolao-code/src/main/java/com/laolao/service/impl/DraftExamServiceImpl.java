@@ -121,7 +121,7 @@ public class DraftExamServiceImpl implements DraftExamService {
 
     @Override
     @Transactional(rollbackFor = Exception.class)
-    public Result<String> removeQuestion(Integer examId, Integer questionId) {
+    public Result<String> removeQuestion(Integer questionId) {
         // 删除题目，题目测试示例，考试题目配置
         questionMapper.deleteById(questionId);
         questionTestCaseMapper.delete(

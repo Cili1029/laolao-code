@@ -20,7 +20,7 @@
       <!-- 列表 -->
       <SidebarGroup>
         <SidebarMenu>
-          <SidebarMenuItem v-for="item in data.navMain" :key="item.title">
+          <SidebarMenuItem v-for="item in filteredNavMain" :key="item.title">
             <SidebarMenuButton as-child :tooltip="item.title" :is-active="route.path.startsWith(item.url)">
               <RouterLink :to="item.url">
                 <component :is="item.icon" v-if="item.icon" />
@@ -50,10 +50,47 @@
   import { useExamStore } from '@/stores/ExamStore'
   import { computed } from 'vue'
   import { useRoute } from 'vue-router'
+  import { useUserStore } from '@/stores/UserStore'
+  const userStore = useUserStore()
   const route = useRoute()
   const examStore = useExamStore()
 
   const props = defineProps<SidebarProps>()
+
+
+
+  const navMainData = [
+    {
+      title: "我的学习组",
+      url: "/group",
+      icon: UsersRound,
+      roles: [1, 2],
+    },
+    {
+      title: "我的考试",
+      url: "/exam",
+      icon: BugPlay,
+      roles: [1, 2],
+    },
+    {
+      title: "考试报告",
+      url: "/user-report",
+      icon: NotebookText,
+      roles: [2],
+    },
+    {
+      title: "人工智障",
+      url: "#",
+      icon: Brain,
+      roles: [1, 2],
+    },
+  ]
+
+  const filteredNavMain = computed(() => {
+    return navMainData.filter(item => {
+      return item.roles.includes(userStore.user.role)
+    })
+  })
 
   const computedSidebarProps = computed(() => {
     return {
@@ -62,30 +99,4 @@
       collapsible: (examStore.examBegin ? "offcanvas" : "icon") as SidebarProps['collapsible']
     }
   })
-
-  const data = {
-    navMain: [
-      {
-        title: "我的学习组",
-        url: "/group",
-        icon: UsersRound,
-        isActive: true,
-      },
-      {
-        title: "我的考试",
-        url: "/exam",
-        icon: BugPlay,
-      },
-      {
-        title: "考试报告",
-        url: "/user-report",
-        icon: NotebookText,
-      },
-      {
-        title: "人工智障",
-        url: "#",
-        icon: Brain,
-      },
-    ]
-  }
 </script>

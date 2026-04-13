@@ -1,7 +1,5 @@
 package com.laolao.pojo.dto;
 
-import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.extension.handlers.JacksonTypeHandler;
 import com.laolao.pojo.entity.QuestionTestCase;
 import lombok.*;
 

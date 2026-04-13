@@ -80,14 +80,13 @@ public class DraftExamController {
     /**
      * 从草稿中移除题目
      *
-     * @param examId 考试id
      * @param questionId 题目id
      * @return 结果信息
      */
     @DeleteMapping("/remove-question")
     @PreAuthorize("hasRole('MANAGER')")
-    public Result<String> removeQuestion(@RequestParam Integer examId, @RequestParam Integer questionId) {
-        return examService.removeQuestion(examId, questionId);
+    public Result<String> removeQuestion(@RequestParam Integer questionId) {
+        return examService.removeQuestion(questionId);
     }
 
     /**

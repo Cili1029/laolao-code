@@ -45,7 +45,7 @@
     import { ref, watch } from "vue"
     const examStore = useExamStore()
 
-    const isSidebarOpen = ref(true)
+    const isSidebarOpen = ref(false)
 
     watch(() => examStore.examBegin, (isBegin) => {
         if (isBegin) {

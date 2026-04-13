@@ -63,6 +63,6 @@ public class ExamInfoVO implements Serializable {
     private UserExamRecord userExamRecord;
 
 
-    private ExamPermissionsVO examPermissions;
+    private ExamDetailPermissionsVO examPermissions;
 }
 

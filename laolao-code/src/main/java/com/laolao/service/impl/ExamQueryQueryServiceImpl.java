@@ -26,6 +26,10 @@ public class ExamQueryQueryServiceImpl implements ExamQueryService {
     public Result<List<ExamVO>> getSimpleExam() {
         Integer userId = SecurityUtils.getUserId();
         List<ExamVO> examVOList = examMapper.selectSimpleExam(userId);
+        examVOList.forEach(examVO -> {
+            ExamSummaryPermissionsVO permissions = ExamHelper.calculateSummary(examVO.getStatus());
+            examVO.setSummaryPermissions(permissions);
+        });
         return Result.success(examVOList);
     }
 
@@ -42,7 +46,7 @@ public class ExamQueryQueryServiceImpl implements ExamQueryService {
             examInfoVO.setUserExamRecord(record);
         }
 
-        ExamPermissionsVO calculate = ExamHelper.calculate(role, examInfoVO.getStatus(), examInfoVO.getStartTime(), examInfoVO.getEndTime(), record);
+        ExamDetailPermissionsVO calculate = ExamHelper.calculateDetail(role, examInfoVO.getStatus(), examInfoVO.getStartTime(), examInfoVO.getEndTime(), record);
         examInfoVO.setExamPermissions(calculate);
         return Result.success(examInfoVO);
     }

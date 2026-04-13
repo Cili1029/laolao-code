@@ -16,7 +16,7 @@ public interface DraftExamService {
 
     Result<Integer> saveAndAddToExam(SaveAndAddToExamDTO saveAndAddToExamDTO);
 
-    Result<String> removeQuestion(Integer examId, Integer questionId);
+    Result<String> removeQuestion(Integer questionId);
 
     Result<List<DraftQuestionVO>> getDraftQuestion(Integer examId);
 

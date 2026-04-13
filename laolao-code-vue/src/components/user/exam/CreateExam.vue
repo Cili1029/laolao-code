@@ -323,7 +323,6 @@
             try {
                 await axios.delete("/api/exam/draft/remove-question", {
                     params: {
-                        examId: Number(route.params.id),
                         questionId: currentQuestion.value?.id
                     }
                 })

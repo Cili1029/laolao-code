@@ -15,7 +15,7 @@ import java.util.List;
 public interface ExamMapper extends BaseMapper<Exam> {
 
     @Select("""
-            select e.id, e.title as name, e.description, g.name team, e.start_time, e.end_time
+            select e.id, e.title as name, e.description, g.name teamName, e.status, e.start_time, e.end_time
             from exam e
                      join team g on g.id = e.team_id
             where
