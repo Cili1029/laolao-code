@@ -163,6 +163,14 @@
             <artifactId>docker-java-transport-httpclient5</artifactId>
             <version>3.7.0</version>
         </dependency>
+
+        <!--    用于判题机参数解析    -->
+        <dependency>
+            <groupId>com.github.javaparser</groupId>
+            <artifactId>javaparser-core</artifactId>
+            <version>3.28.0</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
     <dependencyManagement>
         <dependencies>

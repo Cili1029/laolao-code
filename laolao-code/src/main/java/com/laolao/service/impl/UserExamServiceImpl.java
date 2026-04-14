@@ -1,5 +1,6 @@
 package com.laolao.service.impl;
 
+import com.laolao.common.constant.ExamRecordConstant;
 import com.laolao.common.constant.JudgeConstant;
 import com.laolao.common.result.Result;
 import com.laolao.common.util.SecurityUtils;
@@ -33,7 +34,7 @@ public class UserExamServiceImpl implements UserExamService {
         // 查看记录里是否有正在考试的记录
         Integer userId = SecurityUtils.getUserId();
         ExamRecord examRecord = examRecordMapper.selectExamRecord(userId, examId);
-        if (examRecord != null && examRecord.getStatus() == 0) {
+        if (examRecord != null && examRecord.getStatus() == ExamRecordConstant.ONGOING) {
             // 考试进行中，不用创建新记录，直接返回所记录的记录Id
             return Result.success(examRecord.getId());
         }
