@@ -36,7 +36,7 @@ public class JudgeService {
     // 判题时从这里取，用完后销毁，再补新的，保证用户请求判题秒开
     private final BlockingQueue<String> containerQueue = new LinkedBlockingQueue<>(10);
     // 定义池子的大小
-    private final int POOL_SIZE = 10;
+    private final int POOL_SIZE = 3;
 
     // 构造函数：Spring 自动注入配置好的 dockerClient
     public JudgeService(DockerClient dockerClient) {
@@ -89,13 +89,13 @@ public class JudgeService {
     private void createNewContainerToPool() {
         CompletableFuture.runAsync(() -> {
             try {
-                String containerName = "laolao-judge-" + containerIdx.getAndIncrement();
+                String containerName = "judger-" + containerIdx.getAndIncrement();
                 // 创建容器并进行安全配置
-                CreateContainerResponse container = dockerClient.createContainerCmd("eclipse-temurin:17-jdk-alpine")
+                CreateContainerResponse container = dockerClient.createContainerCmd("judger")
                         .withName(containerName)
                         .withLabels(Collections.singletonMap(JudgeConstant.LABEL_KEY, JudgeConstant.LABEL_VALUE)) // 给容器打标签
                         .withNetworkDisabled(true)    // 禁用网络
-                        .withWorkingDir("/app")                     // 设置容器内的工作目录
+                        .withWorkingDir("/judger")                  // 设置容器内的工作目录
                         .withHostConfig(HostConfig.newHostConfig()
                                 .withMemory(256 * 1024 * 1024L)     // 限制内存 256MB
                                 .withCpuQuota(50000L)               // 限制 CPU 使用率 (0.5核)
@@ -126,7 +126,7 @@ public class JudgeService {
 
         try {
             // 上传代码
-            uploadFile(containerId, JudgeConstant.commonImports + userCode, "Main.java");
+            uploadFile(containerId, JudgeConstant.COMMON_IMPORTS + userCode, "Main.java");
             // 编译
             String compileError = compile(containerId);
             // 为空，直接返回失败信息
@@ -184,7 +184,7 @@ public class JudgeService {
     private void uploadFile(String containerId, String content, String fileName) throws IOException {
         dockerClient.copyArchiveToContainerCmd(containerId)
                 .withTarInputStream(toTarStream(content, fileName))
-                .withRemotePath("/app")
+                .withRemotePath("/judger")
                 .exec();
     }
 
