@@ -13,15 +13,13 @@ import java.util.List;
 
 public class JudgeUnits {
 
-
     /**
      * 生成方法信息
      * 调用方需自己处理异常（考生修改模板）
-     *
      * @param code 代码
      * @return 方法信息
      */
-    public MethodInfo paramParsing(String code) {
+    public static MethodInfo paramParsing(String code) {
         CompilationUnit cu = StaticJavaParser.parse(code);
         return cu.getClassByName("Solution")
                 .flatMap(solution -> solution.getMethods().stream()
@@ -43,12 +41,11 @@ public class JudgeUnits {
 
     /**
      * 生成完整代码
-     *
      * @param userCode 用户代码
      * @param info 方法信息
      * @return 完整代码
      */
-    public String generateMain(String userCode, MethodInfo info) {
+    public static String generateMain(String userCode, MethodInfo info) {
         StringBuilder sb = new StringBuilder();
 
         // 导包
@@ -73,7 +70,10 @@ public class JudgeUnits {
                         Scanner sc = new Scanner(System.in);
                         Solution sol = new Solution();
                         int testCount = Integer.parseInt(sc.nextLine());
+                        int curTest = -1;
+                        ArrayList<String> outputs = new ArrayList<>();
                         for (int i = 0; i < testCount; i++) {
+                            curTest++;
                             try {
                 """);
 
@@ -91,27 +91,27 @@ public class JudgeUnits {
             // 原地修改模式：调用后序列化第一个参数 arg0
             sb.append("""
                                     sol.%s(%s);
-                                    System.out.println(mapper.writeValueAsString(arg0));
+                                    outputs.add(mapper.writeValueAsString(arg0));
                     """.formatted(info.methodName, appendArgs(info.paramTypes.size())));
         } else {
             // 返回值模式：直接序列化结果
             sb.append("""
-                                    Object result = sol.%s(%s);
+                                    Object output = sol.%s(%s);
                     """.formatted(info.methodName, appendArgs(info.paramTypes.size())));
 
             // 特殊处理：如果返回的是 ListNode 或 TreeNode，需要转成数组/List再打印
             if (info.returnType.equals("ListNode")) {
                 sb.append("""
-                                        System.out.println(mapper.writeValueAsString(ListNode.toList(result)));
+                                        outputs.add(mapper.writeValueAsString(ListNode.toList(output)));
                         """);
             } else if (info.returnType.equals("TreeNode")) {
                 sb.append("""
-                                        System.out.println(mapper.writeValueAsString(TreeNode.toList(result)));
+                                        outputs.add(mapper.writeValueAsString(TreeNode.toList(output)));
                         """);
             } else {
                 // 普通类型直接打印
                 sb.append("""
-                                        System.out.println(mapper.writeValueAsString(result));
+                                        outputs.add(mapper.writeValueAsString(output));
                         """);
             }
         }
@@ -119,10 +119,15 @@ public class JudgeUnits {
         // Main逻辑后半部分
         sb.append("""
                             } catch (Exception e) {
-                                e.printStackTrace();
+                                StringWriter sw = new StringWriter();
+                                e.printStackTrace(new PrintWriter(sw));
+                                JudgeResult judgeResult = new JudgeResult(1, sw.toString(), curTest, null);
+                                System.out.println(mapper.writeValueAsString(judgeResult));
                                 System.exit(1);
                             }
                         }
+                        JudgeResult judgeResult = new JudgeResult(0, null, curTest, outputs);
+                        System.out.println(mapper.writeValueAsString(judgeResult));
                     }
                 }
                 """);
@@ -134,26 +139,32 @@ public class JudgeUnits {
 
     /**
      * 类型转换
-     *
      * @param type 参数类型（int[] / ListNode / TreeNode / ...）
      * @return 一段可执行的 Java 代码字符串
      */
-    private String generateSingleParam(String type, int index) {
+    private static String generateSingleParam(String type, int index) {
         String varName = "arg" + index;
         String line = "line" + index;
+        // 链表
         if (type.equals("ListNode")) {
             return """
                                     ListNode %s = ListNode.fromArray(mapper.readValue(%s, int[].class));
                     """.formatted(varName, line);
-        } else if (type.equals("TreeNode")) {
+        }
+        // 二叉树
+        else if (type.equals("TreeNode")) {
             return """
                                     TreeNode %s = TreeNode.fromArray(mapper.readValue(%s, Integer[].class));
                     """.formatted(varName, line);
-        } else if (type.contains("<")) {
+        }
+        // 泛型集合（List<Integer> 等）
+        else if (type.contains("<")) {
             return """
                                     %s %s = mapper.readValue(%s, new TypeReference<%s>(){});
                     """.formatted(type, varName, line, type);
-        } else {
+        }
+        // 其他基本类型（int, boolean 等）
+        else {
             return """
                                     %s %s = mapper.readValue(%s, %s.class);
                     """.formatted(type, varName, line, type);
@@ -162,11 +173,10 @@ public class JudgeUnits {
 
     /**
      * 方法入参拼接: arg0, arg1...
-     *
      * @param count 个数
      * @return 拼接后的字符串
      */
-    private String appendArgs(int count) {
+    private static String appendArgs(int count) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < count; i++) {
             sb.append("arg%d%s".formatted(i, i == count - 1 ? "" : ", "));
@@ -176,11 +186,10 @@ public class JudgeUnits {
 
     /**
      * 判断是否需要链表
-     *
      * @param info 方法信息
      * @return 结果
      */
-    private boolean needsListNode(MethodInfo info) {
+    private static boolean needsListNode(MethodInfo info) {
         // 检查返回值
         if (info.returnType.contains("ListNode")) return true;
         // 检查参数列表
@@ -189,11 +198,10 @@ public class JudgeUnits {
 
     /**
      * 判断是否需要二叉树
-     *
      * @param info 方法信息
      * @return 结果
      */
-    private boolean needsTreeNode(MethodInfo info) {
+    private static boolean needsTreeNode(MethodInfo info) {
         if (info.returnType.contains("TreeNode")) return true;
         return info.paramTypes.stream().anyMatch(t -> t.contains("TreeNode"));
     }

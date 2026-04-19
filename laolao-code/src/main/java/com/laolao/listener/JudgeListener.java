@@ -6,7 +6,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.laolao.common.constant.ExamConstant;
 import com.laolao.common.constant.JudgeConstant;
-import com.laolao.common.docker.JudgeService;
+import com.laolao.judge.JudgeService;
 import com.laolao.common.result.JudgeResult;
 import com.laolao.common.result.WsResult;
 import com.laolao.common.util.MapStruct;

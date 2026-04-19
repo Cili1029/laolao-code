@@ -1,13 +1,6 @@
 package com.laolao.common.constant;
 
 public class JudgeConstant {
-    public static final String COMMON_IMPORTS =
-            """
-            import java.util.*;
-            import com.fasterxml.jackson.databind.ObjectMapper;
-            import com.fasterxml.jackson.core.type.TypeReference;
-            """;
-
     // 定义标签常量，用于标识哪些容器是本项目创建的
     public static final String LABEL_KEY = "owner";
     public static final String LABEL_VALUE = "laolao-judge";
@@ -24,23 +17,37 @@ public class JudgeConstant {
     public static final int STATUS_SE = 6;   // 系统错误
     public static final int STATUS_UNKNOWN = 7;// 未知错误（未覆盖的异常）
 
+    // 导包
+    public static final String COMMON_IMPORTS =
+            """
+            import java.io.PrintWriter;
+            import java.io.StringWriter;
+            import java.util.*;
+            import com.fasterxml.jackson.databind.ObjectMapper;
+            import com.fasterxml.jackson.core.type.TypeReference;
+            """;
+
+    // 通用结构
     public static final String COMMON_STRUCTS =
             """
             class JudgeResult {
-                public String status;
+                public Integer status;
                 public String errorMessage;
-                public int caseIndex;
-                public long time;
-                public long memory;
-                public String output;
+                public Integer caseIndex;
+                public List<String> output;
+            
+                public JudgeResult(Integer status, String errorMessage, Integer caseIndex, List<String> output) {
+                    this.status = status;
+                    this.errorMessage = errorMessage;
+                    this.caseIndex = caseIndex;
+                    this.output = output;
+                }
             }
             """;
 
+    // 链表
     public static final String LIST_NODE_STRUCT =
             """
-            /**
-             * 单链表
-             */
             class ListNode {
                 public int val;
                 public ListNode next;
@@ -50,12 +57,6 @@ public class JudgeConstant {
                     next = null;
                 }
         
-                /**
-                 * 数组转链表
-                 *
-                 * @param arr 数组（不可为空）
-                 * @return 链表
-                 */
                 public static ListNode fromArray(int[] arr) {
                     if (arr == null || arr.length == 0) {
                         return null;
@@ -69,12 +70,6 @@ public class JudgeConstant {
                     return dummy.next;
                 }
         
-                /**
-                  * 数组转回数组
-                  *
-                  * @param nodeObj 链表
-                  * @return 数组
-                  */
                 public static List<Integer> toList(Object nodeObj) {
                     List<Integer> res = new ArrayList<>();
                     ListNode node = (ListNode) nodeObj;
@@ -87,11 +82,9 @@ public class JudgeConstant {
             }
             """;
 
+    // 二叉树
     public static final String TREE_NODE_STRUCT =
             """
-            /**
-             * 二叉树
-             */
             class TreeNode {
                 public int val;
                 public TreeNode left;
@@ -103,12 +96,6 @@ public class JudgeConstant {
                     right = null;
                 }
         
-                /**
-                 * 数组转二叉树
-                 *
-                 * @param arr 数组（可为空）
-                 * @return 二叉树
-                 */
                 public static TreeNode fromArray(Integer[] arr) {
                     if (arr == null || arr.length == 0) {
                         return null;
@@ -119,13 +106,11 @@ public class JudgeConstant {
                     int i = 1;
                     while (!q.isEmpty() && i < arr.length) {
                         TreeNode curr = q.poll();
-                        // 左节点
                         if (arr[i] != null) {
                             curr.left = new TreeNode(arr[i]);
                             q.add(curr.left);
                         }
                         i++;
-                        // 右节点
                         if (i < arr.length && arr[i] != null) {
                             curr.right = new TreeNode(arr[i]);
                             q.add(curr.right);
@@ -135,12 +120,6 @@ public class JudgeConstant {
                     return root;
                 }
         
-                /**
-                 * 叉树转回数组
-                 *
-                 * @param rootObj 二叉树
-                 * @return 数组
-                 */
                 public static List<Integer> toList(Object rootObj) {
                     List<Integer> result = new java.util.ArrayList<>();
                     if (rootObj == null) {
@@ -159,7 +138,6 @@ public class JudgeConstant {
                             result.add(null);
                         }
                     }
-                    // 移除末尾连续的 null，符合 LeetCode 标准输出格式
                     while (!result.isEmpty() && result.get(result.size() - 1) == null) {
                         result.remove(result.size() - 1);
                     }
