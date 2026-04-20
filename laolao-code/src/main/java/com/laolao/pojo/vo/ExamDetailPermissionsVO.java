@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @ToString
 public class ExamDetailPermissionsVO extends ExamSummaryPermissionsVO {
-    // 老师
+    // 组管理员
     private boolean canEdit;
     private boolean canSelectQuestions;
     private boolean canRelease;

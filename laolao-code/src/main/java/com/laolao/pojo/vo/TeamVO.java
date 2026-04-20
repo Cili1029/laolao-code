@@ -22,7 +22,7 @@ public class TeamVO implements Serializable {
     private String name;
 
     /**
-     * 创建老师
+     * 创建组管理员
      */
     private String manager;
 

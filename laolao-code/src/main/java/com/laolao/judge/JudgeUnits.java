@@ -151,6 +151,16 @@ public class JudgeUnits {
                                     ListNode %s = ListNode.fromArray(mapper.readValue(%s, int[].class));
                     """.formatted(varName, line);
         }
+        // 链表数组
+        else if (type.equals("ListNode[]")) {
+            return """
+                                    int[][] data%s = mapper.readValue(%s, int[][].class);
+                                    ListNode[] %s = new ListNode[data%s.length];
+                                    for (int j = 0; j < data%s.length; j++) {
+                                        %s[j] = ListNode.fromArray(data%s[j]);
+                                    }
+                    """.formatted(varName, line, varName, varName, varName, varName, varName);
+        }
         // 二叉树
         else if (type.equals("TreeNode")) {
             return """

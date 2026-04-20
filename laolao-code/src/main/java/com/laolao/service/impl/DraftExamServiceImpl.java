@@ -77,7 +77,7 @@ public class DraftExamServiceImpl implements DraftExamService {
         AddQuestionDTO question = saveAndAddToExamDTO.getQuestion();
         Integer finalQuestionId; // 最终要绑定到考试里的题目ID（一定是一个子题ID）
 
-        // 情况A：老师在考试界面点击了“新建题目”
+        // 情况A：组管理员在考试界面点击了“新建题目”
         if (question.getId() == null) {
             // 先建祖宗
             question.setParentId(0);
@@ -93,14 +93,14 @@ public class DraftExamServiceImpl implements DraftExamService {
             // 传了ID，需要去数据库查一下它的身份
             Question existingQuestion = questionMapper.selectById(question.getId());
             if (existingQuestion.getParentId() == 0) {
-                // 情况B：老师从公共题库选了一道“祖宗题”加到考试里
+                // 情况B：组管理员从公共题库选了一道“祖宗题”加到考试里
                 // 需要生成子题
                 question.setId(null); // 清空原ID，强制走 insert 生成新题
                 question.setParentId(existingQuestion.getId()); // 认祖宗
                 Result<Integer> copyResult = questionService.addOrUpdateQuestion(question);
                 finalQuestionId = copyResult.getData();
             } else {
-                // 情况C：老师正在修改当前试卷里已经存在的“子题”
+                // 情况C：组管理员正在修改当前试卷里已经存在的“子题”
                 // 直接更新
                 Result<Integer> updateResult = questionService.addOrUpdateQuestion(question);
                 finalQuestionId = updateResult.getData();
@@ -165,7 +165,7 @@ public class DraftExamServiceImpl implements DraftExamService {
         // 至少要有一个考生
         Integer userCount = teamMapper.selectUserCountByExamId(examId);
         if (userCount == 0) {
-            return Result.error("学习组只少要有一名成员才可以发布考试");
+            return Result.error("小组只少要有一名成员才可以发布考试");
         }
 
         // 分数校验

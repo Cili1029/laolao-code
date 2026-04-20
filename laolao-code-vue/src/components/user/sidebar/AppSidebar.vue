@@ -61,7 +61,7 @@
 
   const navMainData = [
     {
-      title: "我的学习组",
+      title: "我的小组",
       url: "/group",
       icon: UsersRound,
       roles: [1, 2],

@@ -1,13 +1,16 @@
 <template>
     <div>
-        <!-- 学生的加入学习组 -->
+        <!-- 学生的加入小组 -->
         <Dialog v-if="UserStore.user.role === 2">
             <DialogTrigger as-child>
-                <span class="flex justify-end cursor-pointer hover:text-blue-500 text-gray-500 text-sm">加入学习组</span>
+                <div
+                    class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
+                    加入小组
+                </div>
             </DialogTrigger>
             <DialogContent class="sm:max-w-106.25">
                 <DialogHeader>
-                    <DialogTitle>加入学习组</DialogTitle>
+                    <DialogTitle>加入小组</DialogTitle>
                     <DialogDescription>
                         输入导师创建的邀请码
                     </DialogDescription>
@@ -30,13 +33,13 @@
 
         <Dialog v-else-if="UserStore.user.role === 1">
             <DialogTrigger as-child>
-                <span class="flex justify-end cursor-pointer hover:text-blue-500 text-gray-500 text-sm">创建学习组</span>
+                <span class="flex justify-end cursor-pointer hover:text-blue-500 text-gray-500 text-sm">创建小组</span>
             </DialogTrigger>
             <DialogContent class="sm:max-w-106.25">
                 <DialogHeader>
-                    <DialogTitle>创建学习组</DialogTitle>
+                    <DialogTitle>创建小组</DialogTitle>
                     <DialogDescription>
-                        填写基本学习组信息
+                        填写基本小组信息
                     </DialogDescription>
                 </DialogHeader>
                 <div class="grid w-full gap-1.5">
@@ -102,7 +105,7 @@
         description: ''
     })
 
-    // 老师创建
+    // 组管理员创建
     const createGroup = async () => {
         try {
             await axios.post("/api/team/create", {

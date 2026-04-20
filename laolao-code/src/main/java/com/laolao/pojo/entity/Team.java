@@ -34,7 +34,7 @@ public class Team implements Serializable {
     private String description;
 
     /**
-     * 创建老师的ID
+     * 创建组管理员的ID
      */
     private Integer managerId;
 

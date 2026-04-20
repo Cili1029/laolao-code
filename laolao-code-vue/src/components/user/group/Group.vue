@@ -10,7 +10,7 @@
                 <HoverCard>
                     <HoverCardTrigger as-child>
                         <div class="text-right">
-                            <p class="text-xs h-4 mb-2 text-gray-500">学习组导师</p>
+                            <p class="text-xs h-4 mb-2 text-gray-500">小组导师</p>
                             <div class="flex items-center justify-end cursor-pointer">
                                 <Avatar class="h-8 w-8 rounded-4xl">
                                     <AvatarImage :src="group?.avatar || ''" />
@@ -49,13 +49,14 @@
                 </div>
             </div>
         </div>
-        <div class="space-y-2">
+        <div class="space-y-2 flex-1 flex flex-col">
             <div class="flex justify-between pb-2">
                 <p class="text-lg">考试列表</p>
-                <CreateOrUpdateExamDialog v-if="userStore.user.role === 1 && group?.managerName === userStore.user.name" />
+                <CreateOrUpdateExamDialog
+                    v-if="userStore.user.role === 1 && group?.managerName === userStore.user.name" />
             </div>
 
-            <RouterLink :to="'/exam/' + exam.id" v-for="exam in exams" :key="exam.id"
+            <RouterLink v-if="exams.length !== 0" :to="'/exam/' + exam.id" v-for="exam in exams" :key="exam.id"
                 class="flex justify-between border shadow rounded-lg p-3.5 cursor-pointer hover:bg-gray-100">
                 <div class="flex items-center space-x-2">
                     <Bug class="h-8 w-8 text-blue-500" />
@@ -92,6 +93,14 @@
                     </div>
                 </div>
             </RouterLink>
+
+            <div v-else class="flex flex-col flex-1 justify-center items-center text-center">
+                <div class="bg-white p-4 rounded-full shadow inline-block mb-4">
+                    <Ghost class="h-10 w-10 text-gray-600" />
+                </div>
+                <p class="text-gray-600 font-medium">暂无考试</p>
+                <p class="text-sm text-gray-600">{{ userStore.user.role === 2 ? "导师发布后会在此显示" : "你创建的考试会在此显示"}}</p>
+            </div>
         </div>
     </div>
 </template>
@@ -101,7 +110,7 @@
     import { useRoute } from 'vue-router'
     import axios from "@/utils/myAxios"
     import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-    import { CircleUserRound, CalendarDaysIcon, Bug, User } from 'lucide-vue-next'
+    import { CircleUserRound, CalendarDaysIcon, Bug, User, Ghost } from 'lucide-vue-next'
     import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
     import { Badge } from '@/components/ui/badge'
     import dayjs from 'dayjs'

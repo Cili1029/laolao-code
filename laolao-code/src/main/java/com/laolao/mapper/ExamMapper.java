@@ -95,9 +95,9 @@ public interface ExamMapper extends BaseMapper<Exam> {
             SELECT u.name                                 AS username,
                    IF(er.score IS NULL, '缺考', er.score) AS score
             FROM
-                -- 通过考试ID找到对应的学习组
+                -- 通过考试ID找到对应的小组
                 exam e
-                    -- 关联该学习组的所有成员
+                    -- 关联该小组的所有成员
                     JOIN team_user gm ON gm.team_id = e.team_id
                     -- 关联成员的用户信息
                     JOIN user u ON u.id = gm.user_id

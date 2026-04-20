@@ -11,7 +11,7 @@
  Target Server Version : 80039 (8.0.39)
  File Encoding         : 65001
 
- Date: 14/04/2026 16:05:25
+ Date: 20/04/2026 20:33:19
 */
 
 SET NAMES utf8mb4;
@@ -33,8 +33,6 @@ CREATE TABLE `ai_report`  (
 -- ----------------------------
 -- Records of ai_report
 -- ----------------------------
-INSERT INTO `ai_report` VALUES (17, 1, 44, '同学，我看到你在\"有效的括号\"这道题中遇到了困难。你的代码中写着\"这一题我不会，给点分吧\"，这说明你对栈的应用还不够熟悉。这道题的核心思路是使用栈来匹配括号：遇到左括号时压入对应的右括号，遇到右括号时检查栈顶是否匹配。建议你先理解栈的基本操作，然后尝试用栈来解决括号匹配问题。下次遇到类似题目时，可以先画图分析括号的匹配规则，再动手写代码。');
-INSERT INTO `ai_report` VALUES (18, 2, 6, '从这次考试表现来看，你在第一题\"回文串判断\"上完成得相当不错！代码逻辑清晰，考虑了大小写转换，使用了StringBuilder的反转功能，整体实现思路正确。这说明你对字符串处理和回文判断的基本概念掌握得比较扎实。\n\n然而，第二题\"有效的括号\"暴露了你的薄弱环节。你不仅没有完成代码，还在注释中表达了畏难情绪。这道题考察的是栈数据结构的应用，这是算法学习中的一个重要知识点。从你的表现可以看出，你在遇到需要特定数据结构（如栈）来解决问题的题目时，还缺乏足够的解题思路和信心。\n\n建议你重点加强以下几个方面：\n1. **数据结构基础**：系统学习栈、队列等基本数据结构的特性和应用场景\n2. **算法思维训练**：多练习括号匹配这类经典算法题，理解其背后的解题模式\n3. **问题分析能力**：遇到难题时，先分析问题特点，思考适合的数据结构，而不是直接放弃\n\n记住，编程学习是一个循序渐进的过程，遇到困难很正常。保持积极的学习态度，遇到不会的题目先尝试分析，实在不会再看标准答案学习思路。相信通过持续练习，你一定能攻克这些难关！');
 
 -- ----------------------------
 -- Table structure for exam
@@ -56,10 +54,6 @@ CREATE TABLE `exam`  (
 -- ----------------------------
 -- Records of exam
 -- ----------------------------
-INSERT INTO `exam` VALUES (1, '2024年春季 Java 核心技术月考', '本次考试涵盖多线程、JVM、集合类。请在规定时间内独立完成，AI助教将进行逻辑审查。', 1, 1, 1, '2030-03-20 09:00:00', '2030-03-20 11:00:00', 0);
-INSERT INTO `exam` VALUES (2, '【AI生成】动态规划专题练习', '由 Spring AI 根据近期大家的薄弱点自动选取的题目，主要针对背包问题和区间DP。', 1, 2, 1, '2025-03-01 00:00:00', '2027-03-31 23:59:59', 0);
-INSERT INTO `exam` VALUES (10, '测试考试', '这是一个测试考试', 1, 1, 3, '2026-03-07 15:01:00', '2026-03-07 15:30:00', 0);
-INSERT INTO `exam` VALUES (11, '测试2', '测试2', 1, 2, 0, '2026-03-09 00:00:00', '2026-03-10 00:00:00', 0);
 
 -- ----------------------------
 -- Table structure for exam_question_config
@@ -77,18 +71,6 @@ CREATE TABLE `exam_question_config`  (
 -- ----------------------------
 -- Records of exam_question_config
 -- ----------------------------
-INSERT INTO `exam_question_config` VALUES (1, 1, 1, 25);
-INSERT INTO `exam_question_config` VALUES (2, 1, 2, 20);
-INSERT INTO `exam_question_config` VALUES (3, 1, 3, 20);
-INSERT INTO `exam_question_config` VALUES (4, 1, 4, 15);
-INSERT INTO `exam_question_config` VALUES (5, 1, 5, 20);
-INSERT INTO `exam_question_config` VALUES (6, 2, 2, 35);
-INSERT INTO `exam_question_config` VALUES (7, 2, 4, 35);
-INSERT INTO `exam_question_config` VALUES (8, 2, 5, 30);
-INSERT INTO `exam_question_config` VALUES (21, 10, 16, 50);
-INSERT INTO `exam_question_config` VALUES (24, 10, 17, 50);
-INSERT INTO `exam_question_config` VALUES (26, 11, 19, 0);
-INSERT INTO `exam_question_config` VALUES (41, 11, 24, 0);
 
 -- ----------------------------
 -- Table structure for exam_record
@@ -109,9 +91,6 @@ CREATE TABLE `exam_record`  (
 -- ----------------------------
 -- Records of exam_record
 -- ----------------------------
-INSERT INTO `exam_record` VALUES (2, 2, 2, 0, 0, NULL, '2026-02-11 15:20:28', NULL);
-INSERT INTO `exam_record` VALUES (5, 2, 1, 0, 0, NULL, '2026-03-01 15:40:00', NULL);
-INSERT INTO `exam_record` VALUES (6, 10, 2, 40, 1, NULL, '2026-03-07 15:01:13', '2026-03-07 15:26:14');
 
 -- ----------------------------
 -- Table structure for judge_record
@@ -132,47 +111,11 @@ CREATE TABLE `judge_record`  (
   `memory` int NULL DEFAULT NULL COMMENT '内存消耗(MB)',
   `submit_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '提交时间',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 60 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '考生判题记录' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 65 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '考生判题记录' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of judge_record
 -- ----------------------------
-INSERT INTO `judge_record` VALUES (23, 2, 5, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 11, NULL, NULL, '2026-02-25 21:03:26');
-INSERT INTO `judge_record` VALUES (24, 2, 5, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 11, NULL, NULL, '2026-02-25 21:04:11');
-INSERT INTO `judge_record` VALUES (25, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-02-25 21:05:59');
-INSERT INTO `judge_record` VALUES (26, 2, 2, 2, 5, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();123\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', NULL, 'Main.java:13: error: not a statement\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();123\n                                                      ^\nMain.java:13: error: \';\' expected\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();123\n                                                         ^\n2 errors\n', NULL, NULL, NULL, '2026-02-25 21:06:06');
-INSERT INTO `judge_record` VALUES (27, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    // 定义取模的常量，方便维护\n    private static final int MOD = 1000000007;\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        // 调用斐波那契计算函数并输出结果\n        System.out.println(fib(n));\n        sc.close();\n    }\n\n    // 计算斐波那契第n项，取模1e9+7\n    public static int fib(int n) {\n        // 边界条件处理\n        if (n == 0) {\n            return 0;\n        }\n        if (n == 1) {\n            return 1;\n        }\n        // 用两个变量保存前两项，避免数组占用空间\n        long prevPrev = 0; // F(n-2)\n        long prev = 1;     // F(n-1)\n        long current = 0;  // F(n)\n        // 从2开始迭代到n\n        for (int i = 2; i <= n; i++) {\n            current = (prevPrev + prev) % MOD; // 每一步都取模，防止溢出\n            // 迭代更新前两项\n            prevPrev = prev;\n            prev = current;\n        }\n        // 转成int返回（因为取模后结果一定在int范围内）\n        return (int) current;\n    }\n}', '3', NULL, 4, NULL, NULL, '2026-02-25 21:06:13');
-INSERT INTO `judge_record` VALUES (28, 2, 5, 2, 0, 30, 'import java.util.Scanner;\n\npublic class Main {\n    // 定义取模的常量，方便维护\n    private static final int MOD = 1000000007;\n\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        // 调用斐波那契计算函数并输出结果\n        System.out.println(fib(n));\n        sc.close();\n    }\n\n    // 计算斐波那契第n项，取模1e9+7\n    public static int fib(int n) {\n        // 边界条件处理\n        if (n == 0) {\n            return 0;\n        }\n        if (n == 1) {\n            return 1;\n        }\n        // 用两个变量保存前两项，避免数组占用空间\n        long prevPrev = 0; // F(n-2)\n        long prev = 1;     // F(n-1)\n        long current = 0;  // F(n)\n        // 从2开始迭代到n\n        for (int i = 2; i <= n; i++) {\n            current = (prevPrev + prev) % MOD; // 每一步都取模，防止溢出\n            // 迭代更新前两项\n            prevPrev = prev;\n            prev = current;\n        }\n        // 转成int返回（因为取模后结果一定在int范围内）\n        return (int) current;\n    }\n}', NULL, NULL, NULL, 120, 34, '2026-02-25 21:06:25');
-INSERT INTO `judge_record` VALUES (29, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-03 19:51:04');
-INSERT INTO `judge_record` VALUES (30, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-03 19:51:07');
-INSERT INTO `judge_record` VALUES (31, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-03 19:51:13');
-INSERT INTO `judge_record` VALUES (32, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-03 19:54:24');
-INSERT INTO `judge_record` VALUES (33, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-03 19:51:07');
-INSERT INTO `judge_record` VALUES (34, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-03 19:51:07');
-INSERT INTO `judge_record` VALUES (35, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-03 19:51:07');
-INSERT INTO `judge_record` VALUES (36, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-03 19:51:07');
-INSERT INTO `judge_record` VALUES (37, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-03 19:51:07');
-INSERT INTO `judge_record` VALUES (38, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-03 19:51:07');
-INSERT INTO `judge_record` VALUES (39, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-03 19:51:07');
-INSERT INTO `judge_record` VALUES (40, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-03 19:51:07');
-INSERT INTO `judge_record` VALUES (41, 6, 17, 2, 5, 0, 'import java.util.Scanner;\nimport java.util.Stack;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine();\n        // 编写逻辑\n        这一题我不会，给点分吧\n    }\n}', NULL, 'Main.java:14: error: illegal character: \'\\uff0c\'\n        这一题我不会，给点分吧\n              ^\nMain.java:14: error: not a statement\n        这一题我不会，给点分吧\n        ^\nMain.java:14: error: not a statement\n        这一题我不会，给点分吧\n               ^\nMain.java:14: error: \';\' expected\n        这一题我不会，给点分吧\n                   ^\n4 errors\n', NULL, NULL, NULL, '2026-03-07 15:03:17');
-INSERT INTO `judge_record` VALUES (42, 6, 16, 2, 0, 40, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine();\n        \n        // 步骤1：统一转为小写（也可以转大写），消除大小写影响\n        String lowerStr = s.toLowerCase();\n        // 步骤2：反转字符串\n        String reversedStr = new StringBuilder(lowerStr).reverse().toString();\n        // 步骤3：对比原小写字符串和反转后的字符串是否相等\n        boolean isPalindrome = lowerStr.equals(reversedStr);\n        \n        // 输出结果\n        System.out.println(isPalindrome);\n    }\n}', NULL, NULL, NULL, 110, 34, '2026-03-07 15:04:35');
-INSERT INTO `judge_record` VALUES (44, 6, 17, 2, 5, 0, 'import java.util.Scanner;\nimport java.util.Stack;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine();\n        // 编写逻辑\n        这一题我不会，给点分吧\n    }\n}', NULL, 'Main.java:14: error: illegal character: \'\\uff0c\'\n        这一题我不会，给点分吧\n              ^\nMain.java:14: error: not a statement\n        这一题我不会，给点分吧\n        ^\nMain.java:14: error: not a statement\n        这一题我不会，给点分吧\n               ^\nMain.java:14: error: \';\' expected\n        这一题我不会，给点分吧\n                   ^\n4 errors\n', NULL, NULL, NULL, '2026-03-07 15:03:17');
-INSERT INTO `judge_record` VALUES (45, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-16 19:59:24');
-INSERT INTO `judge_record` VALUES (46, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-16 20:04:14');
-INSERT INTO `judge_record` VALUES (47, 2, 2, 2, 5, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();123\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', NULL, 'Main.java:11: error: not a statement\n        int n = sc.nextInt();123\n                             ^\nMain.java:11: error: \';\' expected\n        int n = sc.nextInt();123\n                                ^\n2 errors\n', NULL, NULL, NULL, '2026-03-16 20:15:51');
-INSERT INTO `judge_record` VALUES (48, 2, 2, 2, 5, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];1234\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', NULL, 'Main.java:12: error: not a statement\n        int[] nums = new int[n];1234\n                                ^\nMain.java:12: error: \';\' expected\n        int[] nums = new int[n];1234\n                                    ^\n2 errors\n', NULL, NULL, NULL, '2026-03-16 20:39:18');
-INSERT INTO `judge_record` VALUES (49, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-16 20:41:55');
-INSERT INTO `judge_record` VALUES (50, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-17 20:59:02');
-INSERT INTO `judge_record` VALUES (51, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-17 21:01:34');
-INSERT INTO `judge_record` VALUES (52, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-17 21:06:15');
-INSERT INTO `judge_record` VALUES (53, 2, 5, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 11, NULL, NULL, '2026-03-17 21:11:01');
-INSERT INTO `judge_record` VALUES (54, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-17 21:18:03');
-INSERT INTO `judge_record` VALUES (55, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-03-17 21:18:23');
-INSERT INTO `judge_record` VALUES (56, 2, 5, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 11, NULL, NULL, '2026-03-18 17:52:15');
-INSERT INTO `judge_record` VALUES (57, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-04-06 14:27:41');
-INSERT INTO `judge_record` VALUES (58, 2, 2, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 4, NULL, NULL, '2026-04-06 14:31:47');
-INSERT INTO `judge_record` VALUES (59, 2, 5, 2, 1, 0, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        // 编写逻辑\n    }\n}', '', NULL, 11, NULL, NULL, '2026-04-09 20:45:44');
 
 -- ----------------------------
 -- Table structure for judge_user_result
@@ -190,15 +133,11 @@ CREATE TABLE `judge_user_result`  (
   `submit_time` datetime NULL DEFAULT CURRENT_TIMESTAMP COMMENT '提交时间',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_exam_user_question`(`exam_record_id` ASC, `question_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 11 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '考生考试最终判题结果汇总表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 16 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '考生考试最终判题结果汇总表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of judge_user_result
 -- ----------------------------
-INSERT INTO `judge_user_result` VALUES (1, 2, 2, 2, 2, 58, 0, 1, '2026-04-06 14:31:47');
-INSERT INTO `judge_user_result` VALUES (2, 2, 2, 2, 5, 28, 30, 0, '2026-02-25 21:06:25');
-INSERT INTO `judge_user_result` VALUES (3, 10, 6, 2, 16, 42, 40, 0, '2026-03-07 15:04:35');
-INSERT INTO `judge_user_result` VALUES (4, 10, 6, 2, 17, 44, 0, 5, '2026-03-07 15:03:17');
 
 -- ----------------------------
 -- Table structure for question
@@ -221,19 +160,24 @@ CREATE TABLE `question`  (
   `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   `update_time` datetime NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 25 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '题目表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 14 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '题目表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of question
 -- ----------------------------
-INSERT INTO `question` VALUES (1, '回文串判断', '### 题目描述\n请编写一个程序，判断输入的字符串是否为**回文串**。回文串是指正读和反读都一样的字符串（不考虑大小写）。\n\n### 输入描述\n输入一个字符串。\n\n### 输出描述\n如果是回文串输出 `true`，否则输出 `false`。\n\n### 示例\n**输入**：`Level`  \n**输出**：`true`', 0, 1000, 128, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine();\n        // 请在此处编写逻辑\n    }\n}', 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine().toLowerCase();\n        String rev = new StringBuilder(s).reverse().toString();\n        System.out.print(s.equals(rev));\n    }\n}', 1, 0, 0, 0, 1, '2026-02-11 15:41:16', '2026-04-07 20:51:37');
-INSERT INTO `question` VALUES (2, '两数之和', '### 题目描述\n给定一个整数数组 `nums` 和一个目标值 `target`，请在数组中找出和为目标值的那**两个**整数，并输出它们的下标。\n\n### 输入描述\n第一行输入数组长度 n。  \n第二行输入 n 个整数。  \n第三行输入目标值 target。\n\n### 输出描述\n输出这两个数的下标（空格分隔）。\n\n### 示例\n**输入**：\n3\n3 2 4\n6\n**输出**：\n1 2', 0, 1000, 128, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        // 编写逻辑\n    }\n}', 'import java.util.Scanner;\nimport java.util.HashMap;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        int target = sc.nextInt();\n        HashMap<Integer, Integer> map = new HashMap<>();\n        for(int i=0; i<n; i++) {\n            if(map.containsKey(target - nums[i])) {\n                System.out.print(map.get(target - nums[i]) + \" \" + i);\n                return;\n            }\n            map.put(nums[i], i);\n        }\n    }\n}', 1, 0, 0, 0, 1, '2026-02-11 15:41:26', '2026-04-07 20:51:37');
-INSERT INTO `question` VALUES (3, '有效的括号', '### 题目描述\n给定一个只包括 `(`，`)`，`{`，`}`，`[`，`]` 的字符串，判断字符串是否有效。\n有效字符串需满足：左括号必须用相同类型的右括号闭合；左括号必须以正确的顺序闭合。\n\n### 输入描述\n输入一个括号字符串。\n\n### 输出描述\n输出 `true` 或 `false`。\n\n### 示例\n**输入**：`()[]{}`  \n**输出**：`true`', 1, 1000, 128, 'import java.util.Scanner;\nimport java.util.Stack;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine();\n        // 编写逻辑\n    }\n}', 'import java.util.Scanner;\nimport java.util.Stack;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.next();\n        Stack<Character> stack = new Stack<>();\n        for(char c : s.toCharArray()) {\n            if(c==\'(\') stack.push(\')\');\n            else if(c==\'[\') stack.push(\']\');\n            else if(c==\'{\') stack.push(\'}\');\n            else if(stack.isEmpty() || stack.pop() != c) {\n                System.out.print(\"false\"); return;\n            }\n        }\n        System.out.print(stack.isEmpty());\n    }\n}', 1, 0, 1, 0, 1, '2026-02-11 15:41:37', '2026-04-07 20:51:37');
-INSERT INTO `question` VALUES (4, '最大子数组和', '### 题目描述\n给定一个整数数组 `nums`，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。\n\n### 示例\n**输入**：\n9\n-2 1 -3 4 -1 2 1 -5 4\n**输出**：\n6  \n(解释：连续子数组 [4,-1,2,1] 的和最大)', 1, 1000, 128, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        // 编写逻辑\n    }\n}', 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int currentMax = 0, globalMax = Integer.MIN_VALUE;\n        for(int i=0; i<n; i++) {\n            int x = sc.nextInt();\n            currentMax = Math.max(x, currentMax + x);\n            globalMax = Math.max(globalMax, currentMax);\n        }\n        System.out.print(globalMax);\n    }\n}', 1, 0, 0, 0, 1, '2026-02-11 15:41:46', '2026-04-07 20:51:37');
-INSERT INTO `question` VALUES (5, '斐波那契数列（取模）', '### 题目描述\n写一个函数，输入 n ，求斐波那契（Fibonacci）数列的第 n 项。答案需要取模 1000000007 (1e9+7)。\n\n### 示例\n**输入**：45  \n**输出**：134903163', 1, 1000, 128, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        // 编写逻辑\n    }\n}', 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        if(n < 2) { System.out.print(n); return; }\n        int a = 0, b = 1, sum = 0;\n        for(int i = 2; i <= n; i++) {\n            sum = (a + b) % 1000000007;\n            a = b;\n            b = sum;\n        }\n        System.out.print(b);\n    }\n}', 1, 0, 0, 0, 1, '2026-02-11 15:41:55', '2026-04-07 20:51:37');
-INSERT INTO `question` VALUES (16, '回文串判断', '### 题目描述\n请编写一个程序，判断输入的字符串是否为**回文串**。回文串是指正读和反读都一样的字符串（不考虑大小写）。\n\n### 输入描述\n输入一个字符串。\n\n### 输出描述\n如果是回文串输出 `true`，否则输出 `false`。\n\n### 示例\n**输入**：`Level`  \n**输出**：`true`', 0, 1000, 128, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine();\n        // 请在此处编写逻辑\n    }\n}', 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine().toLowerCase();\n        String rev = new StringBuilder(s).reverse().toString();\n        System.out.print(s.equals(rev));\n    }\n}', 1, 1, 0, 0, 0, '2026-03-04 19:26:52', '2026-03-04 19:26:52');
-INSERT INTO `question` VALUES (17, '有效的括号', '### 题目描述\n给定一个只包括 `(`，`)`，`{`，`}`，`[`，`]` 的字符串，判断字符串是否有效。\n有效字符串需满足：左括号必须用相同类型的右括号闭合；左括号必须以正确的顺序闭合。\n\n### 输入描述\n输入一个括号字符串。\n\n### 输出描述\n输出 `true` 或 `false`。\n\n### 示例\n**输入**：`()[]{}`  \n**输出**：`true`', 1, 1000, 128, 'import java.util.Scanner;\nimport java.util.Stack;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.nextLine();\n        // 编写逻辑\n    }\n}', 'import java.util.Scanner;\nimport java.util.Stack;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        String s = sc.next();\n        Stack<Character> stack = new Stack<>();\n        for(char c : s.toCharArray()) {\n            if(c==\'(\') stack.push(\')\');\n            else if(c==\'[\') stack.push(\']\');\n            else if(c==\'{\') stack.push(\'}\');\n            else if(stack.isEmpty() || stack.pop() != c) {\n                System.out.print(\"false\"); return;\n            }\n        }\n        System.out.print(stack.isEmpty());\n    }\n}', 1, 3, 0, 0, 0, '2026-03-07 14:57:43', '2026-03-07 14:57:43');
-INSERT INTO `question` VALUES (24, '最大子数组和', '### 题目描述\n给定一个整数数组 `nums`，找到一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。\n\n### 示例\n**输入**：\n9\n-2 1 -3 4 -1 2 1 -5 4\n**输出**：\n6  \n(解释：连续子数组 [4,-1,2,1] 的和最大)', 1, 1000, 128, 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        int n = sc.nextInt();\n        int[] nums = new int[n];\n        for(int i=0; i<n; i++) nums[i] = sc.nextInt();\n        // 编写逻辑\n    }\n}', 'import java.util.Scanner;\n\npublic class Main {\n    public static void main(String[] args) {\n        Scanner sc = new Scanner(System.in);\n        \n        int currentMax = 0;\n        int globalMax = Integer.MIN_VALUE;\n        \n        // 直接读完全部输入，不用 n\n        while (sc.hasNextInt()) {\n            int x = sc.nextInt();\n            currentMax = Math.max(x, currentMax + x);\n            globalMax = Math.max(globalMax, currentMax);\n        }\n        \n        System.out.println(globalMax);\n    }\n}', 1, 4, 0, 0, 1, '2026-04-08 15:40:51', '2026-04-08 16:06:38');
+INSERT INTO `question` VALUES (1, '两数之和', '给定一个整数数组 nums 和一个整数目标值 target，请你在该数组中找出 **和为目标值 target** 的那 **两个** 整数，并返回它们的数组下标。\n你可以假设每种输入只会对应一个答案，并且你不能使用两次相同的元素。\n你可以按任意顺序返回答案。\n\n**示例 1：**\n输入：nums = [2,7,11,15], target = 9  \n输出：[0,1]  \n解释：因为 nums[0] + nums[1] == 9 ，返回 [0, 1] 。\n\n**示例 2：**\n输入：nums = [3,2,4], target = 6  \n输出：[1,2]\n\n**示例 3：**\n输入：nums = [3,3], target = 6  \n输出：[0,1]', 0, 1000, 128, 'class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        \n    }\n}', 'class Solution {\n    public int[] twoSum(int[] nums, int target) {\n        Map<Integer, Integer> idx = new HashMap<>(); // 创建一个空哈希表\n        for (int j = 0; ; j++) { // 枚举 j\n            int x = nums[j];\n            // 在左边找 nums[i]，满足 nums[i]+x=target\n            if (idx.containsKey(target - x)) { // 找到了\n                return new int[]{idx.get(target - x), j}; // 返回两个数的下标\n            }\n            idx.put(x, j); // 保存 nums[j] 和 j\n        }\n    }\n}', 4, 0, 1, 0, 1, '2026-04-20 19:12:44', '2026-04-20 19:13:24');
+INSERT INTO `question` VALUES (2, '最长连续序列', '给定一个未排序的整数数组 `nums`，找出数字连续的最长序列（不要求序列元素在原数组中连续）的长度。\n请你设计并实现时间复杂度为 **O(n)** 的算法解决此问题。\n\n**示例 1：**\n输入：nums = [100,4,200,1,3,2]  \n输出：4  \n解释：最长数字连续序列是 [1, 2, 3, 4]。它的长度为 4。\n\n**示例 2：**\n输入：nums = [0,3,7,2,5,8,4,6,0,1]  \n输出：9\n\n**示例 3：**\n输入：nums = [1,0,1,2]  \n输出：3', 1, 1000, 128, 'class Solution {\n    public int longestConsecutive(int[] nums) {\n        \n    }\n}', 'class Solution {\n    public int longestConsecutive(int[] nums) {\n        Set<Integer> st = new HashSet<>();\n        for (int num : nums) {\n            st.add(num); // 把 nums 转成哈希集合\n        }\n        int m = st.size();\n\n        int ans = 0;\n        for (int x : st) { // 遍历哈希集合\n            if (st.contains(x - 1)) { // 如果 x 不是序列的起点，直接跳过\n                continue;\n            }\n            // x 是序列的起点\n            int y = x + 1;\n            while (st.contains(y)) { // 不断查找下一个数是否在哈希集合中\n                y++;\n            }\n            // 循环结束后，y-1 是最后一个在哈希集合中的数\n            ans = Math.max(ans, y - x); // 从 x 到 y-1 一共 y-x 个数\n            if (ans * 2 >= m) {\n                break;\n            }\n        }\n        return ans;\n    }\n}', 4, 0, 1, 0, 1, '2026-04-20 19:15:39', '2026-04-20 19:15:39');
+INSERT INTO `question` VALUES (3, '三数之和', '给你一个整数数组 `nums` ，判断是否存在三元组 `[nums[i], nums[j], nums[k]]` 满足 `i != j`、`i != k` 且 `j != k` ，同时还满足 `nums[i] + nums[j] + nums[k] == 0` 。请你返回所有和为 `0` 且不重复的三元组。\n**注意：** 答案中不可以包含重复的三元组。\n\n**示例 1：**\n输入：nums = [-1,0,1,2,-1,-4]  \n输出：[[-1,-1,2],[-1,0,1]]  \n解释：  \nnums[0] + nums[1] + nums[2] = (-1) + 0 + 1 = 0 。  \nnums[1] + nums[2] + nums[4] = 0 + 1 + (-1) = 0 。  \nnums[0] + nums[3] + nums[4] = (-1) + 2 + (-1) = 0 。  \n不同的三元组是 [-1,0,1] 和 [-1,-1,2] 。  \n注意，输出的顺序和三元组的顺序并不重要。\n\n**示例 2：**\n输入：nums = [0,1,1]  \n输出：[]  \n解释：唯一可能的三元组和不为 0 。\n\n**示例 3：**\n输入：nums = [0,0,0]  \n输出：[[0,0,0]]  \n解释：唯一可能的三元组和为 0 。', 1, 1000, 128, 'class Solution {\n    public List<List<Integer>> threeSum(int[] nums) {\n        \n    }\n}', 'class Solution {\n    public List<List<Integer>> threeSum(int[] nums) {\n        Arrays.sort(nums);\n        List<List<Integer>> ans = new ArrayList<>();\n        int n = nums.length;\n        for (int i = 0; i < n - 2; i++) {\n            int x = nums[i];\n            if (i > 0 && x == nums[i - 1]) continue; // 跳过重复数字\n            if (x + nums[i + 1] + nums[i + 2] > 0) break; // 优化一\n            if (x + nums[n - 2] + nums[n - 1] < 0) continue; // 优化二\n            int j = i + 1;\n            int k = n - 1;\n            while (j < k) {\n                int s = x + nums[j] + nums[k];\n                if (s > 0) {\n                    k--;\n                } else if (s < 0) {\n                    j++;\n                } else { // 三数之和为 0\n                    // j = i+1 表示刚开始双指针，此时 j 左边没有数字\n                    // nums[j] != nums[j-1] 说明与上一轮循环的三元组不同\n                    if (j == i + 1 || nums[j] != nums[j - 1]) {\n                        ans.add(List.of(x, nums[j], nums[k]));\n                    }\n                    j++;\n                    k--;\n                }\n            }\n        }\n        return ans;\n    }\n}', 4, 0, 1, 0, 1, '2026-04-20 19:32:16', '2026-04-20 19:32:16');
+INSERT INTO `question` VALUES (4, '找到字符串中所有字母异位词', '给定两个字符串 s 和 p，找到 s 中所有 p 的异位词的子串，返回这些子串的起始索引。不考虑答案输出的顺序。\n\n**示例 1：**\n输入：s = \"cbaebabacd\", p = \"abc\"  \n输出：[0,6]  \n解释：  \n起始索引等于 0 的子串是 \"cba\"，它是 \"abc\" 的异位词。  \n起始索引等于 6 的子串是 \"bac\"，它是 \"abc\" 的异位词。\n\n**示例 2：**\n输入：s = \"abab\", p = \"ab\"  \n输出：[0,1,2]  \n解释：  \n起始索引等于 0 的子串是 \"ab\"，它是 \"ab\" 的异位词。  \n起始索引等于 1 的子串是 \"ba\"，它是 \"ab\" 的异位词。  \n起始索引等于 2 的子串是 \"ab\"，它是 \"ab\" 的异位词。', 1, 1000, 128, 'class Solution {\n    public List<Integer> findAnagrams(String s, String p) {\n        \n    }\n}', 'class Solution {\n    public List<Integer> findAnagrams(String s, String p) {\n        // 统计 p 的每种字母的出现次数\n        int[] cnt = new int[26]; \n        for (char c : p.toCharArray()) {\n            cnt[c - \'a\']++;\n        }\n\n        List<Integer> ans = new ArrayList<>();\n        int left = 0;\n        for (int right = 0; right < s.length(); right++) {\n            int c = s.charAt(right) - \'a\';\n            cnt[c]--; // 右端点字母进入窗口\n            while (cnt[c] < 0) { // 字母 c 太多了\n                cnt[s.charAt(left) - \'a\']++; // 左端点字母离开窗口\n                left++;\n            }\n            if (right - left + 1 == p.length()) { // t 和 p 的每种字母的出现次数都相同（证明见上）\n                ans.add(left); // t 左端点下标加入答案\n            }\n        }\n        return ans;\n    }\n}', 4, 0, 1, 0, 1, '2026-04-20 19:38:56', '2026-04-20 19:38:56');
+INSERT INTO `question` VALUES (5, '和为 K 的子数组', '给你一个整数数组 `nums` 和一个整数 `k`，请你统计并返回该数组中和为 `k` 的子数组的个数。\n子数组是数组中元素的连续非空序列。\n\n**示例 1：**\n输入：nums = [1,1,1], k = 2  \n输出：2\n\n**示例 2：**\n输入：nums = [1,2,3], k = 3  \n输出：2', 1, 1000, 128, 'class Solution {\n    public int subarraySum(int[] nums, int k) {\n        \n    }\n}', 'class Solution {\n    public int subarraySum(int[] nums, int k) {\n        Map<Integer, Integer> cnt = new HashMap<>(nums.length, 1); // 预分配空间\n        int s = 0;\n        int ans = 0;\n        for (int x : nums) {\n            cnt.merge(s, 1, Integer::sum); // cnt[s]++\n            s += x;\n            ans += cnt.getOrDefault(s - k, 0);\n        }\n        return ans;\n    }\n}', 4, 0, 1, 0, 1, '2026-04-20 19:42:05', '2026-04-20 19:42:05');
+INSERT INTO `question` VALUES (6, '滑动窗口最大值', '给你一个整数数组 `nums`，有一个大小为 `k` 的滑动窗口从数组的最左侧移动到数组的最右侧。你只可以看到在滑动窗口内的 `k` 个数字。滑动窗口每次只向右移动一位。\n返回滑动窗口中的最大值。\n\n**示例 1：**\n输入：nums = [1,3,-1,-3,5,3,6,7], k = 3  \n输出：[3,3,5,5,6,7]  \n解释：\n滑动窗口的位置                 最大值\n----------------------------------\n[1  3  -1] -3  5  3  6  7       3\n 1 [3  -1  -3] 5  3  6  7       3\n 1  3 [-1  -3  5] 3  6  7       5\n 1  3  -1 [-3  5  3] 6  7       5\n 1  3  -1  -3 [5  3  6] 7       6\n 1  3  -1  -3  5 [3  6  7]      7\n\n**示例 2：**\n输入：nums = [1], k = 1  \n输出：[1]', 2, 1000, 128, 'class Solution {\n    public int[] maxSlidingWindow(int[] nums, int k) {\n        \n    }\n}', 'class Solution {\n    public int[] maxSlidingWindow(int[] nums, int k) {\n        int n = nums.length;\n        int[] ans = new int[n - k + 1]; // 窗口个数\n        Deque<Integer> q = new ArrayDeque<>(); // 更快的写法见【Java 数组】\n\n        for (int i = 0; i < n; i++) {\n            // 1. 右边入\n            while (!q.isEmpty() && nums[q.getLast()] <= nums[i]) {\n                q.removeLast(); // 维护 q 的单调性\n            }\n            q.addLast(i); // 注意保存的是下标，这样下面可以判断队首是否离开窗口\n\n            // 2. 左边出\n            int left = i - k + 1; // 窗口左端点\n            if (q.getFirst() < left) { // 队首离开窗口\n                q.removeFirst();\n            }\n\n            // 3. 在窗口左端点处记录答案\n            if (left >= 0) {\n                // 由于队首到队尾单调递减，所以窗口最大值就在队首\n                ans[left] = nums[q.getFirst()];\n            }\n        }\n\n        return ans;\n    }\n}', 4, 0, 1, 0, 1, '2026-04-20 19:45:34', '2026-04-20 19:45:34');
+INSERT INTO `question` VALUES (7, '最大子数组和', '给你一个整数数组 `nums`，请你找出一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。\n子数组是数组中的一个连续部分。\n\n**示例 1：**\n输入：nums = [-2,1,-3,4,-1,2,1,-5,4]  \n输出：6  \n解释：连续子数组 [4,-1,2,1] 的和最大，为 6。\n\n**示例 2：**\n输入：nums = [1]  \n输出：1\n\n**示例 3：**\n输入：nums = [5,4,-1,7,8]  \n输出：23', 1, 1000, 128, 'class Solution {\n    public int maxSubArray(int[] nums) {\n        \n    }\n}', 'class Solution {\n    public int maxSubArray(int[] nums) {\n        int ans = Integer.MIN_VALUE; // 注意答案可以是负数，不能初始化成 0\n        int f = 0;\n        for (int x : nums) {\n            f = Math.max(f, 0) + x;\n            ans = Math.max(ans, f);\n        }\n        return ans;\n    }\n}', 4, 0, 1, 0, 1, '2026-04-20 19:49:40', '2026-04-20 19:49:40');
+INSERT INTO `question` VALUES (8, '缺失的第一个正数', '给你一个未排序的整数数组 `nums`，请你找出其中没有出现的最小的正整数。\n请你实现时间复杂度为 O(n) 并且只使用常数级别额外空间的解决方案。\n\n**示例 1：**\n输入：nums = [1,2,0]  \n输出：3  \n解释：范围 [1,2] 中的数字都在数组中。\n\n**示例 2：**\n输入：nums = [3,4,-1,1]  \n输出：2  \n解释：1 在数组中，但 2 没有。\n\n**示例 3：**\n输入：nums = [7,8,9,11,12]  \n输出：1  \n解释：最小的正数 1 没有出现。', 2, 1000, 128, 'class Solution {\n    public int firstMissingPositive(int[] nums) {\n        \n    }\n}', 'class Solution {\n    public int firstMissingPositive(int[] nums) {\n        int n = nums.length;\n        for (int i = 0; i < n; i++) {\n            // 如果当前学生的学号在 [1,n] 中，但（真身）没有坐在正确的座位上\n            while (1 <= nums[i] && nums[i] <= n && nums[nums[i] - 1] != nums[i]) {\n                // 那么就交换 nums[i] 和 nums[j]，其中 j 是 i 的学号\n                int j = nums[i] - 1; // 减一是因为数组下标从 0 开始\n                int tmp = nums[i];\n                nums[i] = nums[j];\n                nums[j] = tmp;\n            }\n        }\n\n        // 找第一个学号与座位编号不匹配的学生\n        for (int i = 0; i < n; i++) {\n            if (nums[i] != i + 1) {\n                return i + 1;\n            }\n        }\n\n        // 所有学生都坐在正确的座位上\n        return n + 1;\n    }\n}', 4, 0, 1, 0, 1, '2026-04-20 19:51:36', '2026-04-20 19:51:36');
+INSERT INTO `question` VALUES (9, '矩阵置零', '给定一个 m x n 的矩阵，如果一个元素为 0，则将其所在行和列的所有元素都设为 0。请使用 **原地** 算法。\n\n**示例 1：**\n输入：matrix = [[1,1,1],[1,0,1],[1,1,1]]  \n输出：[[1,0,1],[0,0,0],[1,0,1]]\n\n**示例 2：**\n输入：matrix = [[0,1,2,0],[3,4,5,2],[1,3,1,5]]  \n输出：[[0,0,0,0],[0,4,5,0],[0,3,1,0]]', 1, 1000, 128, 'class Solution {\n    public void setZeroes(int[][] matrix) {\n        \n    }\n}', 'class Solution {\n    public void setZeroes(int[][] matrix) {\n        int m = matrix.length;\n        int n = matrix[0].length;\n\n        boolean firstRowHasZero = false;\n        for (int j = 0; j < n; j++) {\n            if (matrix[0][j] == 0) {\n                firstRowHasZero = true;\n                break;\n            }\n        }\n\n        for (int i = 1; i < m; i++) {\n            for (int j = 0; j < n; j++) {\n                if (matrix[i][j] == 0) {\n                    matrix[i][0] = matrix[0][j] = 0;\n                }\n            }\n        }\n\n        for (int i = 1; i < m; i++) {\n            // 倒着遍历，避免提前把 matrix[i][0] 改成 0，误认为这一行要全部变成 0\n            for (int j = n - 1; j >= 0; j--) {\n                if (matrix[i][0] == 0 || matrix[0][j] == 0) {\n                    matrix[i][j] = 0;\n                }\n            }\n        }\n\n        if (firstRowHasZero) {\n            Arrays.fill(matrix[0], 0);\n        }\n    }\n}', 4, 0, 1, 0, 1, '2026-04-20 19:55:33', '2026-04-20 19:55:33');
+INSERT INTO `question` VALUES (10, '旋转图像', '给定一个 n × n 的二维矩阵 `matrix` 表示一个图像。请你将图像顺时针旋转 90 度。\n你必须在 **原地** 旋转图像，这意味着你需要直接修改输入的二维矩阵。请不要使用另一个矩阵来旋转图像。\n\n**示例 1：**\n输入：matrix = [[1,2,3],[4,5,6],[7,8,9]]  \n输出：[[7,4,1],[8,5,2],[9,6,3]]\n\n**示例 2：**\n输入：matrix = [[5,1,9,11],[2,4,8,10],[13,3,6,7],[15,14,12,16]]  \n输出：[[15,13,2,5],[14,3,4,1],[12,6,8,9],[16,7,10,11]]', 1, 1000, 128, 'class Solution {\n    public void rotate(int[][] matrix) {\n        \n    }\n}', 'class Solution {\n    public void rotate(int[][] matrix) {\n        int n = matrix.length;\n        for (int i = 0; i < n; i++) {\n            int[] row = matrix[i];\n            for (int j = i + 1; j < n; j++) { // 遍历对角线上方元素，做转置\n                int tmp = row[j];\n                row[j] = matrix[j][i];\n                matrix[j][i] = tmp;\n            }\n            for (int j = 0; j < n / 2; j++) { // 遍历左半元素，做行翻转\n                int tmp = row[j];\n                row[j] = row[n - 1 - j];\n                row[n - 1 - j] = tmp;\n            }\n        }\n    }\n}', 4, 0, 1, 0, 1, '2026-04-20 19:57:50', '2026-04-20 19:57:50');
+INSERT INTO `question` VALUES (11, '合并 K 个升序链表', '给你一个链表数组，每个链表都已经按升序排列。\n请你将所有链表合并到一个升序链表中，返回合并后的链表。\n\n**示例 1：**\n输入：lists = [[1,4,5],[1,3,4],[2,6]]  \n输出：[1,1,2,3,4,4,5,6]  \n解释：链表数组如下：  \n[\n  1->4->5,\n  1->3->4,\n  2->6\n]  \n将它们合并到一个有序链表中得到：  \n1->1->2->3->4->4->5->6\n\n**示例 2：**\n输入：lists = []  \n输出：[]\n\n**示例 3：**\n输入：lists = [[]]  \n输出：[]', 2, 1000, 128, '/**\n * Definition for singly-linked list.\n * public class ListNode {\n *     int val;\n *     ListNode next;\n *     ListNode() {}\n *     ListNode(int val) { this.val = val; }\n *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }\n * }\n */\nclass Solution {\n    public ListNode mergeKLists(ListNode[] lists) {\n        \n    }\n}', 'class Solution {\n    public ListNode mergeKLists(ListNode[] lists) {\n        int m = lists.length;\n        if (m == 0) {\n            return null;\n        }\n        for (int step = 1; step < m; step *= 2) {\n            for (int i = 0; i < m - step; i += step * 2) {\n                lists[i] = mergeTwoLists(lists[i], lists[i + step]);\n            }\n        }\n        return lists[0];\n    }\n\n    // 21. 合并两个有序链表\n    private ListNode mergeTwoLists(ListNode list1, ListNode list2) {\n        ListNode dummy = new ListNode(); // 用哨兵节点简化代码逻辑\n        ListNode cur = dummy; // cur 指向新链表的末尾\n        while (list1 != null && list2 != null) {\n            if (list1.val < list2.val) {\n                cur.next = list1; // 把 list1 加到新链表中\n                list1 = list1.next;\n            } else { // 注：相等的情况加哪个节点都是可以的\n                cur.next = list2; // 把 list2 加到新链表中\n                list2 = list2.next;\n            }\n            cur = cur.next;\n        }\n        cur.next = list1 != null ? list1 : list2; // 拼接剩余链表\n        return dummy.next;\n    }\n}', 4, 0, 1, 0, 1, '2026-04-20 20:00:29', '2026-04-20 20:00:29');
+INSERT INTO `question` VALUES (12, '二叉树中的最大路径和', '二叉树中的 **路径** 被定义为一条节点序列，序列中每对相邻节点之间都存在一条边。同一个节点在一条路径序列中 **至多出现一次**。该路径 **至少包含一个节点**，且不一定经过根节点。\n**路径和** 是路径中各节点值的总和。\n给你一个二叉树的根节点 `root`，返回其 **最大路径和**。\n\n**示例 1：**\n输入：root = [1,2,3]  \n输出：6  \n解释：最优路径是 `2 -> 1 -> 3`，路径和为 `2 + 1 + 3 = 6`。\n\n**示例 2：**\n输入：root = [-10,9,20,null,null,15,7]  \n输出：42  \n解释：最优路径是 `15 -> 20 -> 7`，路径和为 `15 + 20 + 7 = 42`。', 2, 1000, 128, '/**\n * Definition for a binary tree node.\n * public class TreeNode {\n *     int val;\n *     TreeNode left;\n *     TreeNode right;\n *     TreeNode() {}\n *     TreeNode(int val) { this.val = val; }\n *     TreeNode(int val, TreeNode left, TreeNode right) {\n *         this.val = val;\n *         this.left = left;\n *         this.right = right;\n *     }\n * }\n */\nclass Solution {\n    public int maxPathSum(TreeNode root) {\n        \n    }\n}', 'class Solution {\n    private int ans = Integer.MIN_VALUE;\n\n    public int maxPathSum(TreeNode root) {\n        dfs(root);\n        return ans;\n    }\n\n    private int dfs(TreeNode node) {\n        if (node == null) {\n            return 0; // 没有节点，和为 0\n        }\n        int lVal = dfs(node.left); // 左子树最大链和\n        int rVal = dfs(node.right); // 右子树最大链和\n        ans = Math.max(ans, lVal + rVal + node.val); // 两条链拼成路径\n        return Math.max(Math.max(lVal, rVal) + node.val, 0); // 当前子树最大链和（注意这里和 0 取最大值了）\n    }\n}', 4, 0, 1, 0, 1, '2026-04-20 20:04:36', '2026-04-20 20:04:36');
+INSERT INTO `question` VALUES (13, '课程表', '你这个学期必须选修 `numCourses` 门课程，记为 `0` 到 `numCourses - 1`。\n在选修某些课程之前需要一些先修课程。先修课程按数组 `prerequisites` 给出，其中 `prerequisites[i] = [ai, bi]`，表示如果要学习课程 `ai` 则 **必须** 先学习课程 `bi`。\n例如，先修课程对 `[0, 1]` 表示：想要学习课程 `0`，你需要先完成课程 `1`。\n请你判断是否可能完成所有课程的学习？如果可以，返回 `true`；否则，返回 `false`。\n\n**示例 1：**\n输入：numCourses = 2, prerequisites = [[1,0]]  \n输出：true  \n解释：总共有 2 门课程。学习课程 1 之前，你需要完成课程 0。这是可能的。\n\n**示例 2：**\n输入：numCourses = 2, prerequisites = [[1,0],[0,1]]  \n输出：false  \n解释：总共有 2 门课程。学习课程 1 之前，你需要先完成课程 0；并且学习课程 0 之前，你还应先完成课程 1。这是不可能的。', 1, 1000, 128, 'class Solution {\n    public boolean canFinish(int numCourses, int[][] prerequisites) {\n        \n    }\n}', 'class Solution {\n    public boolean canFinish(int numCourses, int[][] prerequisites) {\n        List<List<Integer>> adjacency = new ArrayList<>();\n        for(int i = 0; i < numCourses; i++)\n            adjacency.add(new ArrayList<>());\n        int[] flags = new int[numCourses];\n        for(int[] cp : prerequisites)\n            adjacency.get(cp[1]).add(cp[0]);\n        for(int i = 0; i < numCourses; i++)\n            if(!dfs(adjacency, flags, i)) return false;\n        return true;\n    }\n    private boolean dfs(List<List<Integer>> adjacency, int[] flags, int i) {\n        if(flags[i] == 1) return false;\n        if(flags[i] == -1) return true;\n        flags[i] = 1;\n        for(Integer j : adjacency.get(i))\n            if(!dfs(adjacency, flags, j)) return false;\n        flags[i] = -1;\n        return true;\n    }\n}', 4, 0, 1, 0, 1, '2026-04-20 20:09:03', '2026-04-20 20:09:03');
 
 -- ----------------------------
 -- Table structure for question_tag
@@ -245,11 +189,25 @@ CREATE TABLE `question_tag`  (
   `tag_id` int NOT NULL COMMENT '标签ID',
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `uk_question_tag`(`question_id` ASC, `tag_id` ASC) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '题目标签中间表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 15 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '题目标签中间表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of question_tag
 -- ----------------------------
+INSERT INTO `question_tag` VALUES (1, 1, 1);
+INSERT INTO `question_tag` VALUES (2, 2, 1);
+INSERT INTO `question_tag` VALUES (3, 3, 2);
+INSERT INTO `question_tag` VALUES (4, 4, 3);
+INSERT INTO `question_tag` VALUES (5, 5, 4);
+INSERT INTO `question_tag` VALUES (7, 6, 3);
+INSERT INTO `question_tag` VALUES (6, 6, 4);
+INSERT INTO `question_tag` VALUES (8, 7, 5);
+INSERT INTO `question_tag` VALUES (9, 8, 5);
+INSERT INTO `question_tag` VALUES (10, 9, 6);
+INSERT INTO `question_tag` VALUES (11, 10, 6);
+INSERT INTO `question_tag` VALUES (12, 11, 7);
+INSERT INTO `question_tag` VALUES (13, 12, 8);
+INSERT INTO `question_tag` VALUES (14, 13, 9);
 
 -- ----------------------------
 -- Table structure for question_test_case
@@ -261,32 +219,43 @@ CREATE TABLE `question_test_case`  (
   `input` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '测试用例输入数据',
   `output` text CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '测试用例预期输出数据',
   PRIMARY KEY (`id`) USING BTREE
-) ENGINE = InnoDB AUTO_INCREMENT = 112 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '题目测试用例表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 33 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '题目测试用例表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of question_test_case
 -- ----------------------------
-INSERT INTO `question_test_case` VALUES (1, 1, 'level', 'true');
-INSERT INTO `question_test_case` VALUES (2, 1, 'hello', 'false');
-INSERT INTO `question_test_case` VALUES (3, 1, 'Aba', 'true');
-INSERT INTO `question_test_case` VALUES (4, 2, '4\n2 7 11 15\n9', '0 1');
-INSERT INTO `question_test_case` VALUES (5, 2, '3\n3 2 4\n6', '1 2');
-INSERT INTO `question_test_case` VALUES (6, 3, '()[]{}', 'true');
-INSERT INTO `question_test_case` VALUES (7, 3, '([)]', 'false');
-INSERT INTO `question_test_case` VALUES (8, 3, '{[]}', 'true');
-INSERT INTO `question_test_case` VALUES (9, 4, '-2 1 -3 4 -1 2 1 -5 4', '6');
-INSERT INTO `question_test_case` VALUES (10, 4, '5', '5');
-INSERT INTO `question_test_case` VALUES (11, 5, '2', '1');
-INSERT INTO `question_test_case` VALUES (12, 5, '5', '5');
-INSERT INTO `question_test_case` VALUES (13, 5, '45', '134903163');
-INSERT INTO `question_test_case` VALUES (41, 17, '()[]{}', 'true');
-INSERT INTO `question_test_case` VALUES (42, 17, '([)]', 'false');
-INSERT INTO `question_test_case` VALUES (43, 17, '{[]}', 'true');
-INSERT INTO `question_test_case` VALUES (44, 16, 'level', 'true');
-INSERT INTO `question_test_case` VALUES (45, 16, 'hello', 'false');
-INSERT INTO `question_test_case` VALUES (46, 16, 'Aba', 'true');
-INSERT INTO `question_test_case` VALUES (110, 24, '-2 1 -3 4 -1 2 1 -5 4', '6');
-INSERT INTO `question_test_case` VALUES (111, 24, '5', '5');
+INSERT INTO `question_test_case` VALUES (1, 1, '[2,7,11,15]\n9', '[0,1]');
+INSERT INTO `question_test_case` VALUES (2, 1, '[3,2,4]\n6', '[1,2]');
+INSERT INTO `question_test_case` VALUES (3, 1, '[3,3]\n6', '[0,1]');
+INSERT INTO `question_test_case` VALUES (4, 2, '[100,4,200,1,3,2]', '4');
+INSERT INTO `question_test_case` VALUES (5, 2, '[0,3,7,2,5,8,4,6,0,1]', '9');
+INSERT INTO `question_test_case` VALUES (6, 2, '[1,0,1,2]', '3');
+INSERT INTO `question_test_case` VALUES (7, 3, '[-1,0,1,2,-1,-4]', '[[-1,-1,2],[-1,0,1]]');
+INSERT INTO `question_test_case` VALUES (8, 3, '[0,1,1]', '[]');
+INSERT INTO `question_test_case` VALUES (9, 3, '[0,0,0]', '[[0,0,0]]');
+INSERT INTO `question_test_case` VALUES (10, 4, '\"cbaebabacd\"\n\"abc\"', '[0,6]');
+INSERT INTO `question_test_case` VALUES (11, 4, '\"abab\"\n\"ab\"', '[0,1,2]');
+INSERT INTO `question_test_case` VALUES (12, 5, '[1,1,1]\n2', '2');
+INSERT INTO `question_test_case` VALUES (13, 5, '[1,2,3]\n3', '2');
+INSERT INTO `question_test_case` VALUES (14, 6, '[1,3,-1,-3,5,3,6,7]\n3', '[3,3,5,5,6,7]');
+INSERT INTO `question_test_case` VALUES (15, 6, '[1]\n1', '[1]');
+INSERT INTO `question_test_case` VALUES (16, 7, '[-2,1,-3,4,-1,2,1,-5,4]', '6');
+INSERT INTO `question_test_case` VALUES (17, 7, '[1]', '1');
+INSERT INTO `question_test_case` VALUES (18, 7, '[5,4,-1,7,8]', '23');
+INSERT INTO `question_test_case` VALUES (19, 8, '[1,2,0]', '3');
+INSERT INTO `question_test_case` VALUES (20, 8, '[3,4,-1,1]', '2');
+INSERT INTO `question_test_case` VALUES (21, 8, '[7,8,9,11,12]', '1');
+INSERT INTO `question_test_case` VALUES (22, 9, '[[1,1,1],[1,0,1],[1,1,1]]', '[[1,0,1],[0,0,0],[1,0,1]]');
+INSERT INTO `question_test_case` VALUES (23, 9, '[[0,1,2,0],[3,4,5,2],[1,3,1,5]]', '[[0,0,0,0],[0,4,5,0],[0,3,1,0]]');
+INSERT INTO `question_test_case` VALUES (24, 10, '[[1,2,3],[4,5,6],[7,8,9]]', '[[7,4,1],[8,5,2],[9,6,3]]');
+INSERT INTO `question_test_case` VALUES (25, 10, '[[5,1,9,11],[2,4,8,10],[13,3,6,7],[15,14,12,16]]', '[[15,13,2,5],[14,3,4,1],[12,6,8,9],[16,7,10,11]]');
+INSERT INTO `question_test_case` VALUES (26, 11, '[[1,4,5],[1,3,4],[2,6]]', '[1,1,2,3,4,4,5,6]');
+INSERT INTO `question_test_case` VALUES (27, 11, '[]', '[]');
+INSERT INTO `question_test_case` VALUES (28, 11, '[[]]', '[]');
+INSERT INTO `question_test_case` VALUES (29, 12, '[1,2,3]', '6');
+INSERT INTO `question_test_case` VALUES (30, 12, '[-10,9,20,null,null,15,7]', '42');
+INSERT INTO `question_test_case` VALUES (31, 13, '2\n[[1,0]]', 'true');
+INSERT INTO `question_test_case` VALUES (32, 13, '2\n[[1,0],[0,1]]', 'false');
 
 -- ----------------------------
 -- Table structure for tag
@@ -298,11 +267,20 @@ CREATE TABLE `tag`  (
   `create_time` datetime NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`) USING BTREE,
   UNIQUE INDEX `name`(`name` ASC) USING BTREE
-) ENGINE = InnoDB CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '标签表' ROW_FORMAT = Dynamic;
+) ENGINE = InnoDB AUTO_INCREMENT = 10 CHARACTER SET = utf8mb4 COLLATE = utf8mb4_0900_ai_ci COMMENT = '标签表' ROW_FORMAT = Dynamic;
 
 -- ----------------------------
 -- Records of tag
 -- ----------------------------
+INSERT INTO `tag` VALUES (1, '哈希', '2026-04-20 19:27:35');
+INSERT INTO `tag` VALUES (2, '双指针', '2026-04-20 19:37:19');
+INSERT INTO `tag` VALUES (3, '滑动窗口', '2026-04-20 19:40:02');
+INSERT INTO `tag` VALUES (4, '子串', '2026-04-20 19:40:27');
+INSERT INTO `tag` VALUES (5, '普通数组', '2026-04-20 19:52:18');
+INSERT INTO `tag` VALUES (6, '矩阵', '2026-04-20 19:53:11');
+INSERT INTO `tag` VALUES (7, '链表', '2026-04-20 20:01:33');
+INSERT INTO `tag` VALUES (8, '二叉树', '2026-04-20 20:01:59');
+INSERT INTO `tag` VALUES (9, '图论', '2026-04-20 20:10:02');
 
 -- ----------------------------
 -- Table structure for team
@@ -321,8 +299,8 @@ CREATE TABLE `team`  (
 -- ----------------------------
 -- Records of team
 -- ----------------------------
-INSERT INTO `team` VALUES (1, 'Java进阶训练营', '专注Java核心技术与JVM调优', 1, 'JAVA2024');
-INSERT INTO `team` VALUES (2, 'AI算法研究组', '基于Spring AI的大模型应用探索', 1, 'AI999');
+INSERT INTO `team` VALUES (1, 'Java测试1组', '用于项目的测试1组', 1, 'JAVA2003');
+INSERT INTO `team` VALUES (2, 'Java测试2组', '用于项目的测试2组', 1, 'JAVA1029');
 
 -- ----------------------------
 -- Table structure for team_user
@@ -361,10 +339,9 @@ CREATE TABLE `user`  (
 -- ----------------------------
 -- Records of user
 -- ----------------------------
-INSERT INTO `user` VALUES (1, 'advisor1', 'E10ADC3949BA59ABBE56E057F20F883E', '张教授', 1);
-INSERT INTO `user` VALUES (2, 'member1', 'E10ADC3949BA59ABBE56E057F20F883E', '小明', 2);
-INSERT INTO `user` VALUES (3, 'member2', 'E10ADC3949BA59ABBE56E057F20F883E', '小红', 2);
-INSERT INTO `user` VALUES (4, 'admin', 'E10ADC3949BA59ABBE56E057F20F883E', '管理', 0);
-INSERT INTO `user` VALUES (5, 'laolao', 'e10adc3949ba59abbe56e057f20f883e', '劳劳', 2);
+INSERT INTO `user` VALUES (1, 'advisor1', 'E10ADC3949BA59ABBE56E057F20F883E', '李教授', 1);
+INSERT INTO `user` VALUES (2, 'member1', 'E10ADC3949BA59ABBE56E057F20F883E', '劳劳', 2);
+INSERT INTO `user` VALUES (3, 'member2', 'E10ADC3949BA59ABBE56E057F20F883E', '欣欣', 2);
+INSERT INTO `user` VALUES (4, 'admin', 'E10ADC3949BA59ABBE56E057F20F883E', '项目管理员', 0);
 
 SET FOREIGN_KEY_CHECKS = 1;

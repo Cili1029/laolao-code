@@ -31,7 +31,7 @@
                                 </Button>
                             </div>
 
-                            <!-- 老师视图按钮 -->
+                            <!-- 组管理员视图按钮 -->
                             <div v-if="userStore.user.role === 1" class="space-y-2">
                                 <div class="flex space-x-2">
                                     <CreateExamDialog v-if="exam?.examPermissions.canEdit" :initial-data="exam">
@@ -226,7 +226,7 @@
         completed: boolean;    // 已完成/已出分
         canceled: boolean      // 已取消
 
-        // 老师权限
+        // 组管理员权限
         canEdit: boolean;        // 可编辑
         canRelease: boolean;     // 可发布
         canDelete: boolean;      // 可删除
@@ -315,10 +315,10 @@
             }
 
             if (p.completed) return { text: '查看结果', disabled: false, action: () => { } }
-        } else { // 老师
+        } else { // 组管理员
             if (p.publishing) return { text: '发布中', disabled: true }
             if (p.canGrade) return { text: '去改卷', disabled: false, action: () => router.push(`/exam/grade/${exam.value?.id}`) }
-            if (p.published) return { text: '进行中', disabled: true } // 老师看的是考试大状态
+            if (p.published) return { text: '进行中', disabled: true } // 组管理员看的是考试大状态
             if (p.completed) return { text: '已批改', disabled: true }
         }
         return null

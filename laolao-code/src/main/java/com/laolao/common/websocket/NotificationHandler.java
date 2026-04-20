@@ -129,7 +129,7 @@ public class NotificationHandler extends TextWebSocketHandler {
     }
 
     /**
-     * 发送给特定用户（老师调试、发布校验结果、学生单题判题结果）
+     * 发送给特定用户（组管理员调试、发布校验结果、学生单题判题结果）
      * 无论用户是否在考试中，只要在线就能收到
      */
     public void sendToUser(Integer userId, String message) {

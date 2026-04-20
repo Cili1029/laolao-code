@@ -2,16 +2,16 @@
     <div class="p-4 flex flex-col space-y-6">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-2xl font-bold">我的学习组</h1>
-                <p v-if="UserStore.user.role == 2" class="text-muted-foreground">你已加入的学习组列表及其基本信息</p>
-                <p v-else class="text-muted-foreground">你指导的学习组列表及其基本信息</p>
+                <h1 class="text-2xl font-bold">我的小组</h1>
+                <p v-if="UserStore.user.role == 2" class="text-muted-foreground">你已加入的小组列表及其基本信息</p>
+                <p v-else class="text-muted-foreground">你管理的小组列表及其基本信息</p>
             </div>
             <GroupDialog />
         </div>
 
-        <!-- 学习组列表 -->
+        <!-- 小组列表 -->
         <div v-if="groups.length !== 0" class="space-y-2">
-            <!-- 学习组卡片 -->
+            <!-- 小组卡片 -->
             <RouterLink v-for="group in groups" :key="group.id" :to="'/group/' + group.id"
                 class="flex flex-col md:flex-row justify-between border shadow-sm rounded-xl p-3 cursor-pointer hover:bg-gray-50 transition-colors group">
                 <div class="flex items-center space-x-4">
@@ -34,7 +34,7 @@
                 <div class="flex items-center mt-4 md:mt-0 space-x-8">
                     <!-- 导师信息 -->
                     <div class="flex flex-col items-end">
-                        <p class="text-xs text-gray-400 mb-1">指导老师</p>
+                        <p class="text-xs text-gray-400 mb-1">组管理员</p>
                         <div class="flex items-center space-x-2">
                             <Avatar class="h-6 w-6">
                                 <AvatarFallback class="text-[10px] bg-orange-100 text-orange-600">
@@ -52,8 +52,8 @@
             <div class="bg-white p-4 rounded-full shadow inline-block mb-4">
                 <Ghost class="h-10 w-10 text-gray-600" />
             </div>
-            <p class="text-gray-600 font-medium">暂无学习组</p>
-            <p class="text-sm text-gray-600">加入学习组后会在此显示</p>
+            <p class="text-gray-600 font-medium">暂无小组</p>
+            <p class="text-sm text-gray-600">加入小组后会在此显示</p>
         </div>
     </div>
 </template>
@@ -81,7 +81,7 @@
             const res = await axios.get("/api/team")
             groups.value = res.data.data
         } catch (e) {
-            console.error("获取学习组失败:", e)
+            console.error("获取小组失败:", e)
         }
     }
 

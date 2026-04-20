@@ -54,11 +54,11 @@ export const useExamStore = defineStore('sidebar', {
         questions: null as Questions[] | null,       // 所有题目列表
         currentQuestion: null as Questions | null,   // 当前作答的题目
 
-        // ===================== 判题相关(附加老师编辑考试时候的判题功能) =====================
+        // ===================== 判题相关(附加组管理员编辑考试时候的判题功能) =====================
         judgeLoading: false,       // 自动判题加载状态
         judgeDialog: false,        // 判题结果弹窗显隐
         judgeRecord: null as JudgeRecord | null,     // 判题结果
-        managerJudgeRecord: null as JudgeRecord | null,  // 老师编辑考试时判题结果
+        managerJudgeRecord: null as JudgeRecord | null,  // 组管理员编辑考试时判题结果
 
         // ===================== 交卷相关 =====================
         submitLoading: false       // 交卷操作加载状态

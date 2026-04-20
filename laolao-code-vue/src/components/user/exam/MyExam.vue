@@ -2,13 +2,13 @@
     <div class="h-full p-4 flex flex-col space-y-6">
         <div class="flex flex-col justify-between">
             <h1 class="text-2xl font-bold">我的考试</h1>
-            <p v-if="UserStore.user.role == 2" class="text-muted-foreground">查看你所有的考试任务</p>
+            <p v-if="userStore.user.role == 2" class="text-muted-foreground">查看你所有的考试任务</p>
             <p v-else class="text-muted-foreground">查看你所有发布的考试任务</p>
         </div>
 
-        <!-- 学习组列表 -->
+        <!-- 小组列表 -->
         <div v-if="exams.length !== 0" class="space-y-2">
-            <!-- 学习组卡片 -->
+            <!-- 小组卡片 -->
             <RouterLink v-for="exam in exams" :key="exam.id" :to="'/exam/' + exam.id"
                 class="flex flex-col md:flex-row justify-between border shadow-sm rounded-xl p-3 cursor-pointer hover:bg-gray-50 transition-colors group">
                 <div class="flex items-center space-x-4">
@@ -59,7 +59,7 @@
                 <Ghost class="h-10 w-10 text-gray-600" />
             </div>
             <p class="text-gray-600 font-medium">暂无考试</p>
-            <p class="text-sm text-gray-600">导师发布后会在此显示</p>
+            <p class="text-sm text-gray-600">{{ userStore.user.role === 2 ? "导师发布后会在此显示" : "你创建的考试会在此显示"}}</p>
         </div>
     </div>
 </template>
@@ -70,7 +70,7 @@
     import { ClipboardList, CalendarDays, Users, ChevronRight, Ghost } from "lucide-vue-next"
     import { Badge } from '@/components/ui/badge'
     import { useUserStore } from '@/stores/UserStore'
-    const UserStore = useUserStore()
+    const userStore = useUserStore()
     import dayjs from 'dayjs'
 
     interface Exam {

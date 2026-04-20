@@ -42,7 +42,7 @@ public class TeamServiceImpl implements TeamService {
         int count = teamMapper.selectCountByUserId(joinTeamDTO);
 
         if (count > 0) {
-            return Result.error("已加入学习组！");
+            return Result.error("已加入小组！");
         }
 
         teamMapper.insertTeamUser(joinTeamDTO);
@@ -51,7 +51,7 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public Result<DetailBaseTeamVO> getDetailTeamBase(Integer teamId) {
-        // 学习组信息和导师信息
+        // 小组信息和导师信息
         DetailBaseTeamVO detailBaseTeamVO = teamMapper.selectDetailBase(teamId);
         // 班级人数
         detailBaseTeamVO.setUserCount(teamMapper.selectUserCount(teamId));
