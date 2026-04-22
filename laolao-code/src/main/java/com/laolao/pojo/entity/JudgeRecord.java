@@ -25,6 +25,11 @@ public class JudgeRecord implements Serializable {
     private Integer id;
 
     /**
+     * 用户ID
+     */
+    private Integer userId;
+
+    /**
      * 关联的考试记录ID
      */
     private Integer examRecordId;
@@ -35,12 +40,7 @@ public class JudgeRecord implements Serializable {
     private Integer questionId;
 
     /**
-     * 用户ID（冗余字段，方便查询）
-     */
-    private Integer userId;
-
-    /**
-     * 判题状态
+     * 判题状态(-1-判题中, 0-AC, 1-WA, 2-MLE, 3-TLE, 4-RE, 5-CE, 6-SE, 7-UN)
      */
     private Integer status;
 
@@ -50,24 +50,39 @@ public class JudgeRecord implements Serializable {
     private Integer score;
 
     /**
-     * 学生提交的代码快照
+     * 代码快照
      */
     private String answerCode;
 
     /**
-     * 标准输出
+     * 编译错误/系统异常
      */
-    private String stdout;
+    private String errorMessage;
 
     /**
-     * 错误输出（包括报错信息）
+     * 测试示例总数
      */
-    private String stderr;
+    private Integer totalCount;
 
     /**
-     * 错误示例Id
+     * 测试示例通过数
      */
-    private Integer questionTestCaseId;
+    private Integer passCount;
+
+    /**
+     * 未通过的的测试示例输入
+     */
+    private String failedInput;
+
+    /**
+     * 未通过的的测试示例预期输出
+     */
+    private String failedExpect;
+
+    /**
+     * 未通过的的测试示例实际输出
+     */
+    private String failedActual;
 
     /**
      * 执行耗时(ms)

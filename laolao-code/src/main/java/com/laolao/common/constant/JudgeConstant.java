@@ -33,13 +33,13 @@ public class JudgeConstant {
             class JudgeResult {
                 public Integer status;
                 public String errorMessage;
-                public Integer caseIndex;
+                public Integer passCount;
                 public List<String> output;
             
-                public JudgeResult(Integer status, String errorMessage, Integer caseIndex, List<String> output) {
+                public JudgeResult(Integer status, String errorMessage, Integer passCount, List<String> output) {
                     this.status = status;
                     this.errorMessage = errorMessage;
-                    this.caseIndex = caseIndex;
+                    this.passCount = passCount;
                     this.output = output;
                 }
             }

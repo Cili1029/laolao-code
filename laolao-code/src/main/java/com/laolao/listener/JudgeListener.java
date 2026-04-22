@@ -103,26 +103,32 @@ public class JudgeListener implements RocketMQListener {
             Integer score = examMapper.selectScoreByExamIdAndQuestionId(examId, judgeRecord.getQuestionId());
             JudgeResult judgeResult = judgeService.judge(judgeRecord.getAnswerCode(), questionTestCases);
 
-            // 填写分数
-            if (judgeResult.getStatus() == JudgeConstant.STATUS_AC) {
+            // 根据状态填写记录表
+            Integer status = judgeResult.getStatus();
+            judgeRecord.setStatus(status);
+            judgeRecord.setTotalCount(judgeResult.getTotalCount());
+            judgeRecord.setPassCount(judgeResult.getPassCount());
+
+            if (status == JudgeConstant.STATUS_AC) {
                 judgeRecord.setScore(score);
-            } else if (judgeResult.getStatus() == JudgeConstant.STATUS_WA) {
-                judgeRecord.setScore((score * judgeResult.getPassTestCaseCount() / questionTestCases.size()));
+                judgeRecord.setTime(judgeResult.getTime());
+                judgeRecord.setMemory(judgeResult.getMemory());
+            } else if (status == JudgeConstant.STATUS_WA) {
+                // 计算分数，防止除以0
+                judgeRecord.setScore(score * judgeResult.getPassCount() / judgeResult.getTotalCount());
+                judgeRecord.setErrorMessage(judgeResult.getErrorMessage());
+                judgeRecord.setFailedInput(judgeResult.getFailedInput());
+                judgeRecord.setFailedExpect(judgeResult.getFailedExpect());
+                judgeRecord.setFailedActual(judgeResult.getFailedActual());
+            } else {
+                // 其他异常状态统一记录错误信息
+                judgeRecord.setErrorMessage(judgeResult.getErrorMessage());
             }
 
-            // 填写记录表
-            judgeRecord.setStdout(judgeResult.getStdout());
-            judgeRecord.setStderr(judgeResult.getStderr());
-            judgeRecord.setQuestionTestCaseId(judgeResult.getQuestionTestCaseId());
-            judgeRecord.setStatus(judgeResult.getStatus());
-            judgeRecord.setTime(judgeResult.getTime());
-            judgeRecord.setMemory(judgeResult.getMemory());
             judgeRecordMapper.updateById(judgeRecord);
 
             // 调用rocketmq传结果
-            JudgeRecordVO judgeRecordVO = mapStruct.JudgeResultToJudgeRecordVO(judgeResult);
-            judgeRecordVO.setQuestionId(judgeRecord.getQuestionId());
-            judgeRecordVO.setScore(judgeRecord.getScore());
+            JudgeRecordVO judgeRecordVO = mapStruct.JudgeRecordToJudgeRecordVO(judgeRecord);
             notificationHandler.sendToUser(judgeRecord.getUserId(), WsResult.of("JUDGE_RESULT", judgeRecordVO));
 
             // 更新最优答案

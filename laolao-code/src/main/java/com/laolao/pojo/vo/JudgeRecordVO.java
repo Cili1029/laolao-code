@@ -1,22 +1,14 @@
 package com.laolao.pojo.vo;
 
-import com.laolao.pojo.entity.QuestionTestCase;
 import lombok.*;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString
 public class JudgeRecordVO {
-
     /**
-     * 问题ID
-     */
-    private Integer questionId;
-
-    /**
-     * 判题状态
+     * 判题状态(-1-判题中, 0-AC, 1-WA, 2-MLE, 3-TLE, 4-RE, 5-CE, 6-SE, 7-UN)
      */
     private Integer status;
 
@@ -26,37 +18,42 @@ public class JudgeRecordVO {
     private Integer score;
 
     /**
-     * 标准输出
+     * 编译错误/系统异常
      */
-    private String stdout;
+    private String errorMessage;
 
     /**
-     * 错误输出（包括报错信息）
+     * 测试示例总数
      */
-    private String stderr;
+    private Integer totalCount;
 
     /**
-     * 提示
+     * 测试示例通过数
      */
-    private String msg;
+    private Integer passCount;
 
     /**
-     * 错误示例Id
+     * 未通过的的测试示例输入
      */
-    private Integer questionTestCaseId;
+    private String failedInput;
 
     /**
-     * 错误示例（用于给前端看）
+     * 未通过的的测试示例预期输出
      */
-    private QuestionTestCase questionTestCase;
+    private String failedExpect;
 
     /**
-     * 消耗时间 (ms)
+     * 未通过的的测试示例实际输出
+     */
+    private String failedActual;
+
+    /**
+     * 执行耗时(ms)
      */
     private Integer time;
 
     /**
-     * 消耗内存 (MB)
+     * 内存消耗(MB)
      */
     private Integer memory;
 }

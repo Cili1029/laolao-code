@@ -13,10 +13,10 @@
                             targetRecord?.status === 0 ? 'text-emerald-600' : 'text-red-600'
                         ]">
                             {{ examStore.statusText }}
+                            <div v-if="targetRecord?.totalCount" class="mt-2 text-sm text-gray-600">
+                                测试用例：{{ targetRecord.passCount }} / {{ targetRecord.totalCount }}
+                            </div>
                         </DialogTitle>
-                        <DialogDescription v-if="targetRecord?.msg" class="text-lg font-medium mt-1">
-                            {{ targetRecord?.msg }}
-                        </DialogDescription>
                     </DialogHeader>
                 </div>
 
@@ -42,7 +42,7 @@
                         <div class="space-y-3">
                             <p class="text-sm font-bold">测试输入</p>
                             <pre
-                                class="w-full p-3 bg-gray-100 rounded font-mono text-gray-800">{{ targetRecord.questionTestCase?.input }}</pre>
+                                class="w-full p-3 bg-gray-100 rounded font-mono text-gray-800">{{ targetRecord.failedInput }}</pre>
                         </div>
                         <div class="flex space-x-3">
                             <p class="w-1/2 text-sm font-bold">预期输出</p>
@@ -50,18 +50,22 @@
                         </div>
                         <div class="flex space-x-3">
                             <pre
-                                class="w-1/2 p-3 bg-gray-100 rounded font-mono text-gray-800">{{ targetRecord.questionTestCase?.output }}</pre>
+                                class="w-1/2 p-3 bg-gray-100 rounded font-mono text-gray-800">{{ targetRecord.failedExpect }}</pre>
                             <pre
-                                class="w-1/2 p-3 bg-gray-100 rounded font-mono text-gray-800">{{ targetRecord.stdout }}</pre>
+                                class="w-1/2 p-3 bg-gray-100 rounded font-mono text-gray-800">{{ targetRecord.failedActual }}</pre>
                         </div>
-
+                        <div class="space-y-3">
+                            <p class="text-sm font-bold">控制台输出</p>
+                            <pre
+                                class="w-full p-3 bg-gray-100 rounded font-mono text-sm leading-relaxed whitespace-pre-wrap break-all overflow-x-auto max-h-75">{{ targetRecord.errorMessage }}</pre>
+                        </div>
                     </div>
 
                     <!-- 编译错误 (CE) -->
                     <div v-if="targetRecord?.status === 5" class="space-y-2">
                         <p class="text-sm font-bold text-red-600">错误信息</p>
                         <pre
-                            class="w-full p-5 bg-red-50 text-red-400 rounded font-mono text-sm leading-relaxed overflow-x-auto max-h-75">{{ targetRecord.stderr }}</pre>
+                            class="w-full p-3 bg-red-50 text-red-400 rounded font-mono text-sm leading-relaxed whitespace-pre-wrap break-all overflow-x-auto max-h-75">{{ targetRecord.errorMessage }}</pre>
                     </div>
                 </div>
             </DialogContent>
@@ -70,12 +74,13 @@
 </template>
 
 <script setup lang="ts">
-    import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
-    import { useExamStore, type JudgeRecord } from "@/stores/ExamStore"
+    import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+    import { useExamStore } from "@/stores/ExamStore"
     import { computed } from 'vue'
+
     const examStore = useExamStore()
 
-    const targetRecord = computed<JudgeRecord | null>(() => {
+    const targetRecord = computed(() => {
         return examStore.managerJudgeRecord ?? examStore.judgeRecord
     })
 </script>

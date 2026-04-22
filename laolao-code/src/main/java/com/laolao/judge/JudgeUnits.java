@@ -70,10 +70,9 @@ public class JudgeUnits {
                         Scanner sc = new Scanner(System.in);
                         Solution sol = new Solution();
                         int testCount = Integer.parseInt(sc.nextLine());
-                        int curTest = -1;
+                        int passCount = 0;
                         ArrayList<String> outputs = new ArrayList<>();
                         for (int i = 0; i < testCount; i++) {
-                            curTest++;
                             try {
                 """);
 
@@ -92,6 +91,7 @@ public class JudgeUnits {
             sb.append("""
                                     sol.%s(%s);
                                     outputs.add(mapper.writeValueAsString(arg0));
+                                    passCount++;
                     """.formatted(info.methodName, appendArgs(info.paramTypes.size())));
         } else {
             // 返回值模式：直接序列化结果
@@ -114,6 +114,9 @@ public class JudgeUnits {
                                         outputs.add(mapper.writeValueAsString(output));
                         """);
             }
+            sb.append("""
+                                        passCount++;
+                        """);
         }
 
         // Main逻辑后半部分
@@ -121,12 +124,12 @@ public class JudgeUnits {
                             } catch (Exception e) {
                                 StringWriter sw = new StringWriter();
                                 e.printStackTrace(new PrintWriter(sw));
-                                JudgeResult judgeResult = new JudgeResult(1, sw.toString(), curTest, null);
+                                JudgeResult judgeResult = new JudgeResult(1, sw.toString(), passCount, null);
                                 System.out.println(mapper.writeValueAsString(judgeResult));
                                 System.exit(1);
                             }
                         }
-                        JudgeResult judgeResult = new JudgeResult(0, null, curTest, outputs);
+                        JudgeResult judgeResult = new JudgeResult(0, null, passCount, outputs);
                         System.out.println(mapper.writeValueAsString(judgeResult));
                     }
                 }

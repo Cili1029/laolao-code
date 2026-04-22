@@ -12,22 +12,26 @@ export interface Questions {
     templateCode: string
 }
 
-export interface QuestionTestCase {
-    id: number
-    questionId: number
-    input: string
-    output: string
-}
-
 export interface JudgeRecord {
-    questionId: number
+    // 判题状态(-1-判题中, 0-AC, 1-WA, 2-MLE, 3-TLE, 4-RE, 5-CE, 6-SE, 7-UN)
     status: number
+    // 得分
     score: number
-    stdout: string
-    stderr: string
-    msg: string
-    questionTestCase: QuestionTestCase
+    // 编译错误/系统异常信息
+    errorMessage: string
+    // 测试示例总数
+    totalCount: number
+    // 测试示例通过数
+    passCount: number
+    // 未通过测试用例的输入
+    failedInput: string
+    // 未通过测试用例的预期输出
+    failedExpect: string
+    // 未通过测试用例的实际输出
+    failedActual: string
+    // 执行耗时(ms)
     time: number
+    // 内存消耗(MB)
     memory: number
 }
 
