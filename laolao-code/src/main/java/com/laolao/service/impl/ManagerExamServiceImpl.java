@@ -47,7 +47,7 @@ public class ManagerExamServiceImpl implements ManagerExamService {
 
         // 发消息踢人
         if (now.isAfter(exam.getStartTime()) && now.isBefore(exam.getEndTime())) {
-            notificationHandler.sendToAllUsersInExam(examId, WsResult.of("EXAM_CANCEL", "本场考试已被管理员取消"));
+            notificationHandler.sendToAllUsersInExam(examId, WsResult.success("EXAM_CANCEL", "本场考试已被管理员取消"));
         }
         return Result.success("取消成功");
     }

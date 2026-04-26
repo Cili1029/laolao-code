@@ -44,7 +44,7 @@ public class ExamEndListener implements RocketMQListener {
             // 执行交卷
             userExamService.submitBatch(examId);
             // 通过 WebSocket 发送通知给前端
-            notificationHandler.sendToAllUsersInExam(examId, WsResult.of("EXAM_SUBMIT", null));
+            notificationHandler.sendToAllUsersInExam(examId, WsResult.success("EXAM_SUBMIT"));
             return ConsumeResult.SUCCESS;
         } catch (NumberFormatException e) {
             log.error("【考试结束通知】消息体解析失败: {}", e.getMessage());

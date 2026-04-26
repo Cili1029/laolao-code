@@ -129,7 +129,7 @@ public class JudgeListener implements RocketMQListener {
 
             // 调用rocketmq传结果
             JudgeRecordVO judgeRecordVO = mapStruct.JudgeRecordToJudgeRecordVO(judgeRecord);
-            notificationHandler.sendToUser(judgeRecord.getUserId(), WsResult.of("JUDGE_RESULT", judgeRecordVO));
+            notificationHandler.sendToUser(judgeRecord.getUserId(), WsResult.success("JUDGE_RESULT", null, judgeRecordVO));
 
             // 更新最优答案
             JudgeUserResult userResult = JudgeUserResult.builder()
@@ -183,7 +183,7 @@ public class JudgeListener implements RocketMQListener {
 
             // 调用rocketmq传结果
             JudgeRecordVO judgeRecordVO = mapStruct.JudgeResultToJudgeRecordVO(judgeResult);
-            notificationHandler.sendToUser(question.getCreatorId(), WsResult.of("JUDGE_RESULT", judgeRecordVO));
+            notificationHandler.sendToUser(question.getCreatorId(), WsResult.success("JUDGE_RESULT", null, judgeRecordVO));
         } catch (Exception e) {
             // 判题失败
             e.printStackTrace();
@@ -230,7 +230,7 @@ public class JudgeListener implements RocketMQListener {
                 if (questionTestCases == null) {
                     allPass = false;
                     notificationHandler.sendToUser(question.getCreatorId(),
-                            WsResult.of("RELEASE_RESULT", "题目 [" + question.getTitle() + "] 缺少测试用例，无法判题"));
+                            WsResult.error("RELEASE_RESULT", "题目 [" + question.getTitle() + "] 缺少测试用例，无法判题"));
                     continue;
                 }
 
@@ -247,7 +247,7 @@ public class JudgeListener implements RocketMQListener {
                     // 调用rocketmq传结果
                     allPass = false;
                     notificationHandler.sendToUser(question.getCreatorId(),
-                            WsResult.of("RELEASE_RESULT", "题目 [" + question.getTitle() + "] 未通过判题"));
+                            WsResult.error("RELEASE_RESULT", "题目 [" + question.getTitle() + "] 未通过判题"));
                 }
             } catch (Exception e) {
                 // 判题失败
@@ -260,11 +260,11 @@ public class JudgeListener implements RocketMQListener {
         if (allPass) {
             examMapper.updateExamStatus(msg.getExamId(), ExamConstant.PUBLISHING, ExamConstant.PUBLISHED);
             // 通知用户：考试发布成功
-            notificationHandler.sendToUser(managerId, WsResult.of("RELEASE_RESULT", "考试已成功发布"));
+            notificationHandler.sendToUser(managerId, WsResult.success("RELEASE_RESULT", "考试已成功发布"));
         } else {
             // 回退到草稿
             examMapper.updateExamStatus(msg.getExamId(), ExamConstant.PUBLISHING, ExamConstant.DRAFT);
-            notificationHandler.sendToUser(managerId, WsResult.of("RELEASE_RESULT", "考试发布失败，部分题目未通过校验"));
+            notificationHandler.sendToUser(managerId, WsResult.error("RELEASE_RESULT", "考试发布失败，部分题目未通过校验"));
         }
     }
 }

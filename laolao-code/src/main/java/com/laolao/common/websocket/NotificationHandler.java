@@ -71,7 +71,7 @@ public class NotificationHandler extends TextWebSocketHandler {
 
             // 处理心跳
             if ("PING".equals(wsResult.getType())) {
-                sendMessage(session, WsResult.of("PONG", null));
+                sendMessage(session, WsResult.success("PONG"));
                 return;
             }
 

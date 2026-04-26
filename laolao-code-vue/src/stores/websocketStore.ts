@@ -1,6 +1,8 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { useExamStore } from './ExamStore'
+import { toast } from "vue-sonner"
+import router from '@/router'
 
 export const useWebsocketStore = defineStore('websocket', () => {
     // 响应式 WebSocket 实例
@@ -79,9 +81,37 @@ export const useWebsocketStore = defineStore('websocket', () => {
             // 统一解析为 JSON 格式（后端所有消息都遵循 WsResult 结构）
             const json = JSON.parse(cleanData)
 
+            // 统一处理失败，项目中并没有失败 + 发数据
+            if (json.code === 0) {
+                toast.error(json.msg)
+
+                // 特殊：判题失败
+                if (json.type === 'JUDGE_RESULT') {
+                    examStore.judgeLoading = false
+                }
+                return
+            }
+
+            // 统一处理成功信息
+            if(json.msg) {
+                toast.success(json.msg)
+            }
+
             // 心跳响应处理
             if (json.type === 'PONG') {
-                return;
+                return
+            }
+            
+            // 考试提交或者考试中管理员取消考试，返回主页
+            if (json.type === 'EXAM_SUBMIT' || json.type === 'EXAM_CANCEL') {
+                router.push("/")
+                return
+            }
+
+            // 发布考试，成功了也应该刷新页面（重新请求）
+            if (json.type === 'RELEASE_RESULT') {
+                location.reload()
+                return
             }
 
             // 判题结果推送
@@ -97,22 +127,13 @@ export const useWebsocketStore = defineStore('websocket', () => {
                 return
             }
 
-            // // 强制交卷处理（统一用 type 字段判断，更规范）
-            // if (json.type === 'SYSTEM_FORCE_SUBMIT' || json.type === 'ADMIN_FORCE_SUBMIT') {
-            //     toast.warning("考试已结束，正在强制交卷...");
-            //     // 1. 触发全局的交卷函数（可以在这里调用 API）
-            //     // 2. 跳转到考试结果页
-            //     router.push('/exam/result');
-            //     return;
-            // }
-
             // 其他未匹配的消息类型（便于调试）
             console.log("接收到未知类型的WebSocket消息:", json)
         } catch (e) {
             // 非 JSON 格式的消息（兼容旧格式/异常消息）
             console.warn("接收到非JSON格式的WebSocket消息:", cleanData)
         }
-    };
+    }
 
     /**
      * 主动关闭 WebSocket 连接
@@ -134,7 +155,7 @@ export const useWebsocketStore = defineStore('websocket', () => {
         socket.value.send(jsonStr)
     }
 
-    // 🔥 考试页面调用这个，不是直接发！
+    // 考试页面调用这个，不是直接发
     function bindExamWhenReady(examId: number) {
         if (isConnected.value) {
             // 已连接 → 直接发
