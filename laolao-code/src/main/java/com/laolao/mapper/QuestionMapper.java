@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.laolao.pojo.ai.ExamQuestionDataContent;
 import com.laolao.pojo.entity.Question;
+import com.laolao.pojo.vo.QuestionBankTagVO;
 import com.laolao.pojo.vo.QuestionBankVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -39,4 +40,6 @@ public interface QuestionMapper extends BaseMapper<Question> {
             where id = #{questionId}
             """)
     Question selectCopyQuestion(Integer questionId);
+
+    List<QuestionBankTagVO> selectTags(List<Integer> questionIds);
 }

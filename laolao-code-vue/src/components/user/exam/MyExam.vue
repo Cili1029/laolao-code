@@ -24,6 +24,8 @@
                                 :class="['border-none text-white', getExamStatusUI(exam).color]">
                                 {{ getExamStatusUI(exam).text }}
                             </Badge>
+                            <ChevronRight
+                                class="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-all transform group-hover:translate-x-1" />
                         </div>
                         <div class="flex items-center text-sm text-gray-500 space-x-3">
                             <span class="flex items-center">
@@ -36,19 +38,10 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col md:items-end justify-center mt-4 md:mt-0 space-y-2">
-                    <!-- 时间信息 -->
-                    <div class="flex items-center text-sm font-medium text-gray-600 px-3 py-1 rounded-md">
-                        <CalendarDays class="h-4 w-4 mr-2 text-gray-500" />
-                        {{ exam.startTime.replace("T", " ") }}
-                    </div>
-
-                    <!-- 提示文字 -->
-                    <p
-                        class="text-[12px] text-blue-600 font-medium flex items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        点击进入考试系统
-                        <ChevronRight class="h-3 w-3 ml-0.5" />
-                    </p>
+                <!-- 时间信息 -->
+                <div class="flex text-sm font-medium text-gray-600 rounded-md">
+                    <CalendarDays class="h-4 w-4 mr-2 text-gray-500" />
+                    {{ exam.startTime.replace("T", " ") }}
                 </div>
             </RouterLink>
         </div>
@@ -59,7 +52,7 @@
                 <Ghost class="h-10 w-10 text-gray-600" />
             </div>
             <p class="text-gray-600 font-medium">暂无考试</p>
-            <p class="text-sm text-gray-600">{{ userStore.user.role === 2 ? "导师发布后会在此显示" : "你创建的考试会在此显示"}}</p>
+            <p class="text-sm text-gray-600">{{ userStore.user.role === 2 ? "导师发布后会在此显示" : "你创建的考试会在此显示" }}</p>
         </div>
     </div>
 </template>

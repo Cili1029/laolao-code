@@ -340,19 +340,42 @@
             currentQuestion.value = questions.value[0]!;
         }
     }
+    
+    const canRun = computed(() => {
+        const q = currentQuestion.value
+        if (!q || examStore.judgeLoading) return false
+
+        // 基础字段校验
+        if (!q.title.trim()) return false
+        if (!q.content.trim()) return false
+        if (q.questionScore <= 0) return false
+        if (q.timeLimit <= 0) return false
+        if (q.memoryLimit <= 0) return false
+
+        // 校验：至少有一个测试用例，且输入输出都不为空
+        const hasValidTestCase = q.testCases.some(tc => {
+            return tc.input.trim() !== '' && tc.output.trim() !== ''
+        })
+        if (!hasValidTestCase) return false
+
+        return true
+    })
 
     const saveAndAddToExam = async () => {
-        if (!currentQuestion.value || examStore.judgeLoading) return
+        if (!canRun.value) {
+            toast.error("请完善题目后运行")
+            return
+        }
 
-        if (!isDirty.value && currentQuestion.value.isValidated === 1) {
+        if (!isDirty.value && currentQuestion.value!.isValidated === 1) {
             toast.success("题目已通过测试，无需重复运行");
-            return;
+            return
         }
 
         examStore.judgeLoading = true
 
         // 如果数据没变且已有 ID，直接运行
-        if (!isDirty.value && currentQuestion.value.id) {
+        if (!isDirty.value && currentQuestion.value!.id) {
             await run()
             return
         }
@@ -366,7 +389,7 @@
             })
 
             if (res.data.code === 1) {
-                currentQuestion.value.id = res.data.data
+                currentQuestion.value!.id = res.data.data
 
                 // 保存成功后，将当前的最新状态存为新的快照
                 currentQuestionSnapshot.value = cloneDeep(currentQuestion.value)
@@ -417,7 +440,7 @@
             return
         }
         question.testCases.splice(index, 1);
-    };
+    }
 
     const run = async () => {
         try {

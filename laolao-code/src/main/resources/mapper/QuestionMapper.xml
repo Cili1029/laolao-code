@@ -21,14 +21,27 @@
     </select>
 
     <select id="selectPublicBank" resultType="com.laolao.pojo.vo.QuestionBankVO">
-        select q.id, q.title, u.name as manager
+        select distinct q.id, q.title
         from question q
-        join user u on u.id = q.creator_id
+        left join question_tag qt on qt.question_id = q.id
+        left join tag t on t.id = qt.tag_id
         where q.is_public = 1 and q.parent_id = 0 and q.is_deleted = 0
         <if test="content != null and content != ''">
             and
             (q.title like concat('%', #{content}, '%')
-                or q.content like concat('%', #{content}, '%'))
+                or q.content like concat('%', #{content}, '%')
+                or t.name like concat('%', #{content}, '%'))
         </if>
+    </select>
+
+    <select id="selectTags" resultType="com.laolao.pojo.vo.QuestionBankTagVO">
+        select q.id, t.name
+        from question q
+                 left join question_tag qt on qt.question_id = q.id
+                 join tag t on t.id = qt.tag_id
+        where q.id in
+        <foreach collection="questionIds" open="(" close=")" separator="," item="id">
+            #{id}
+        </foreach>
     </select>
 </mapper>

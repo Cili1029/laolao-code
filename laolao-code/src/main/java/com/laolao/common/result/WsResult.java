@@ -30,25 +30,20 @@ public class WsResult<T> {
      */
     private T data;
 
-    // 全局复用ObjectMapper
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    // 成功 - 不带数据信息
-    public static <T> String success(String type) {
+    public static String success(String type) {
         return of(type, 1, null, null);
     }
 
-    // 成功 - 不带数据
     public static String success(String type, String msg) {
         return of(type, 1, msg, null);
     }
 
-    // 成功 - 带数据
     public static <T> String success(String type, String msg, T data) {
         return of(type, 1, msg, data);
     }
 
-    // 失败 - 不带数据
     public static String error(String type, String msg) {
         return of(type, 0, msg, null);
     }

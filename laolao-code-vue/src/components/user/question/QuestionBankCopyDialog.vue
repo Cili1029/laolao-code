@@ -14,9 +14,7 @@
         <DialogContent class="sm:max-w-2xl">
             <DialogHeader>
                 <DialogTitle>题库</DialogTitle>
-                <DialogDescription>
-                    选择一题题目以做修改
-                </DialogDescription>
+                <DialogDescription></DialogDescription>
             </DialogHeader>
             <div class="flex flex-col space-y-2">
                 <div class="flex justify-between">
@@ -40,22 +38,26 @@
                         <SearchIcon />
                     </Button>
                 </ButtonGroup>
-                <Table>
+                <Table v-if="total > 0">
                     <TableHeader>
                         <TableRow>
                             <TableHead class="w-25">
                                 题目
                             </TableHead>
-                            <TableHead>作者</TableHead>
-                            <TableHead v-if="currentType === 0">状态</TableHead>
+                            <TableHead v-if="currentType === 1">类型</TableHead>
                             <TableHead class="text-end">操作</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         <TableRow v-for="question in questions" :key="question.id">
                             <TableCell>{{ question.title }}</TableCell>
-                            <TableCell>{{ question.manager }}</TableCell>
-                            <TableCell v-if="currentType === 0">{{ question.isPublic === 0 ? '私有' : '公开' }}</TableCell>
+                            <TableCell v-if="currentType === 1">
+                                <div class="flex space-x-2">
+                                    <Badge v-for="tag in question.tags" class="bg-green-600 text-white">
+                                        {{ tag }}
+                                    </Badge>
+                                </div>
+                            </TableCell>
                             <TableCell class="flex justify-end space-x-2">
                                 <div @click="copyQuestion(question.id)"
                                     class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
@@ -73,6 +75,14 @@
                         </TableRow>
                     </TableBody>
                 </Table>
+                <!-- 空状态 -->
+                <div v-else class="flex flex-col flex-1 justify-center items-center text-center py-24">
+                    <div class="bg-white p-4 rounded-full shadow inline-block mb-4">
+                        <Ghost class="h-10 w-10 text-gray-600" />
+                    </div>
+                    <p class="text-gray-600 font-medium">暂无题目数据</p>
+                    <p class="text-sm text-gray-600">你创建的题目会在此显示</p>
+                </div>
             </div>
             <DialogFooter>
                 <Pagination v-if="total > 0" v-model:page="pageNum" :total="total" :items-per-page="pageSize"
@@ -97,28 +107,29 @@
 <script setup lang="ts">
     import axios from "@/utils/myAxios"
     import { Button } from '@/components/ui/button'
-    import { Copy, File, FileKey, SearchIcon, Trash, Warehouse } from 'lucide-vue-next'
+    import { Badge } from '@/components/ui/badge'
+    import { Copy, File, FileKey, Ghost, SearchIcon, Trash, Warehouse } from 'lucide-vue-next'
     import { ButtonGroup } from '@/components/ui/button-group'
     import { Input } from '@/components/ui/input'
     import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination'
-    import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, } from '@/components/ui/dialog'
+    import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, } from '@/components/ui/dialog'
     import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from '@/components/ui/table'
     import { ref, watch } from "vue"
     import Spinner from '@/components/ui/spinner/Spinner.vue'
+    import DialogDescription from "@/components/ui/dialog/DialogDescription.vue"
 
     const currentType = ref(0) // 0: 私有题库 1: 公共题库
 
     interface QuestionBank {
         id: number
         title: string
-        manager: string
-        isPublic: number
+        tags: string[]
     }
 
     // 私有题库相关
     const questions = ref<QuestionBank[]>([])
     const pageNum = ref(1)
-    const pageSize = ref(3)
+    const pageSize = ref(5)
     const total = ref(0)
 
     // 监听私有题库页码变化

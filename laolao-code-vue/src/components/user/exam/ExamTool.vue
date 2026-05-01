@@ -33,24 +33,24 @@
                             </p>
                         </div>
                         <div class="flex-1 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                            <div v-show="currentSelect == 0" class="flex flex-col p-1">
-                                <div class="flex justify-between">
+                            <div v-show="currentSelect == 0" class="flex flex-col">
+                                <div class="flex justify-between items-center p-1">
                                     <p>
                                         分值：
                                         <span>{{ examStore.currentQuestion?.userScore }}</span>
                                         /
                                         <span>{{ examStore.currentQuestion?.questionScore }}</span>
                                     </p>
-                                    <Badge variant="secondary" :class="['mb-2',
-                                        examStore.currentQuestion?.difficulty === 0 ? 'bg-green-50 border-green-300 text-green-700' :
+                                    <Badge variant="secondary" :class="examStore.currentQuestion?.difficulty === 0 ? 'bg-green-50 border-green-300 text-green-700' :
                                             examStore.currentQuestion?.difficulty === 1 ? 'bg-amber-50 border-amber-300 text-amber-700' :
-                                                'bg-rose-50 border-rose-300 text-rose-700']">
+                                                'bg-rose-50 border-rose-300 text-rose-700'">
                                         {{ examStore.currentQuestion?.difficulty === 0 ? '简单' :
                                             examStore.currentQuestion?.difficulty === 1 ? '中等' : '困难' }}
                                     </Badge>
                                 </div>
-
-                                <article v-html="renderedContent" />
+                                <hr class=" border-t-2">
+                                <p class="p-1 text-2xl font-bold">{{ examStore.currentQuestion?.title }}</p>
+                                <article class="px-1" v-html="renderedContent" />
                             </div>
 
                             <Table v-show="currentSelect == 1">

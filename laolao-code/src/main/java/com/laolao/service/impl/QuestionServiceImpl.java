@@ -9,6 +9,7 @@ import com.laolao.mapper.ExamQuestionConfigMapper;
 import com.laolao.mapper.QuestionMapper;
 import com.laolao.mapper.QuestionTestCaseMapper;
 import com.laolao.pojo.dto.AddQuestionDTO;
+import com.laolao.pojo.vo.QuestionBankTagVO;
 import com.laolao.pojo.entity.ExamQuestionConfig;
 import com.laolao.pojo.entity.Question;
 import com.laolao.pojo.entity.QuestionTestCase;
@@ -19,7 +20,10 @@ import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class QuestionServiceImpl implements QuestionService {
@@ -74,6 +78,18 @@ public class QuestionServiceImpl implements QuestionService {
     public Result<Page<QuestionBankVO>> getPublicQuestions(Integer pageNum, Integer pageSize, String content) {
         Page<QuestionBankVO> page = new Page<>(pageNum, pageSize);
         Page<QuestionBankVO> res = questionMapper.selectPublicBank(page, content);
+        // 获取其标签
+        List<Integer> questionIds = res.getRecords().stream().map(QuestionBankVO::getId).toList();
+        if (!questionIds.isEmpty()) {
+            List<QuestionBankTagVO> tagVOS = questionMapper.selectTags(questionIds);
+            // 分组
+            Map<Integer, List<String>> tagMap = tagVOS.stream().collect(
+                    Collectors.groupingBy(QuestionBankTagVO::getId,
+                            Collectors.mapping(QuestionBankTagVO::getName, Collectors.toList())
+                    ));
+            // 分配
+            res.getRecords().forEach(vo -> vo.setTags(tagMap.getOrDefault(vo.getId(), Collections.emptyList())));
+        }
         return Result.success(res);
     }
 

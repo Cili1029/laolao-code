@@ -3,27 +3,21 @@ package com.laolao.pojo.vo;
 import lombok.*;
 
 import java.io.Serializable;
-import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class QuestionBankVO implements Serializable {
+public class QuestionBankTagVO implements Serializable {
 
     /**
-     * 主键ID
+     * question id
      */
     private Integer id;
 
     /**
-     * 题目标题
+     * 标签名
      */
-    private String title;
-
-    /**
-     * 标签
-     */
-    private List<String> tags;
+    private String name;
 }

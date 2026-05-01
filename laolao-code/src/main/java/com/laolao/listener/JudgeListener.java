@@ -145,9 +145,10 @@ public class JudgeListener implements RocketMQListener {
             judgeUserResultMapper.updateResult(userResult);
         } catch (Exception e) {
             e.printStackTrace();
-            // 失败了更新状态为“异常”
+            // 失败了更新状态为异常
             judgeRecord.setStatus(JudgeConstant.STATUS_UNKNOWN);
             judgeRecordMapper.updateById(judgeRecord);
+            notificationHandler.sendToUser(judgeRecord.getUserId(), WsResult.error("JUDGE_RESULT", "判题失败，请求助组管理员！"));
         }
     }
 
@@ -165,14 +166,15 @@ public class JudgeListener implements RocketMQListener {
         if (questionId == null) return;
 
         System.out.println("题目 " + questionId + " 开始判题");
-        try {
-            // 获取题目
-            Question question = questionMapper.selectById(questionId);
-            // 获取测试用例
-            List<QuestionTestCase> questionTestCases = questionTestCaseMapper.selectList(
-                    Wrappers.lambdaQuery(QuestionTestCase.class)
-                            .eq(QuestionTestCase::getQuestionId, questionId));
 
+        // 获取题目
+        Question question = questionMapper.selectById(questionId);
+        // 获取测试用例
+        List<QuestionTestCase> questionTestCases = questionTestCaseMapper.selectList(
+                Wrappers.lambdaQuery(QuestionTestCase.class)
+                        .eq(QuestionTestCase::getQuestionId, questionId));
+
+        try {
             JudgeResult judgeResult = judgeService.judge(question.getStandardSolution(), questionTestCases);
 
             // 修改验证状态
@@ -186,6 +188,7 @@ public class JudgeListener implements RocketMQListener {
             notificationHandler.sendToUser(question.getCreatorId(), WsResult.success("JUDGE_RESULT", null, judgeRecordVO));
         } catch (Exception e) {
             // 判题失败
+            notificationHandler.sendToUser(question.getCreatorId(), WsResult.error("JUDGE_RESULT", "判题失败，请练习管理员！"));
             e.printStackTrace();
         }
     }
