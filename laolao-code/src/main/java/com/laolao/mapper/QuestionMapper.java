@@ -4,8 +4,9 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.laolao.pojo.ai.ExamQuestionDataContent;
 import com.laolao.pojo.entity.Question;
-import com.laolao.pojo.vo.QuestionBankTagVO;
-import com.laolao.pojo.vo.QuestionBankVO;
+import com.laolao.pojo.vo.QuestionBankDialogTagVO;
+import com.laolao.pojo.vo.QuestionBankDialogVO;
+import com.laolao.pojo.vo.QuestionBankInfoVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -14,9 +15,9 @@ import java.util.List;
 
 @Mapper
 public interface QuestionMapper extends BaseMapper<Question> {
-    Page<QuestionBankVO> selectPrivateBank(Page<QuestionBankVO> page, Integer userId, String content);
+    Page<QuestionBankDialogVO> selectPrivateBank(Page<QuestionBankDialogVO> page, Integer userId, String content);
 
-    Page<QuestionBankVO> selectPublicBank(Page<QuestionBankVO> page, String content);
+    Page<QuestionBankDialogVO> selectPublicBank(Page<QuestionBankDialogVO> page, String content, Integer tagId);
 
     @Update("update question set is_deleted = 1 where question.creator_id = #{userId} and id = #{questionId}")
     void deleteQuestion(Integer userId, Integer questionId);
@@ -41,5 +42,8 @@ public interface QuestionMapper extends BaseMapper<Question> {
             """)
     Question selectCopyQuestion(Integer questionId);
 
-    List<QuestionBankTagVO> selectTags(List<Integer> questionIds);
+    List<QuestionBankDialogTagVO> selectTags(List<Integer> questionIds);
+
+    @Select("select id, title, content, difficulty, time_limit, memory_limit, standard_solution from question where id = #{questionId}")
+    QuestionBankInfoVO selectQuestionInfo(Integer questionId);
 }

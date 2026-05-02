@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
   import type { SidebarProps } from '@/components/ui/sidebar'
-  import { Brain, BugPlay, NotebookText, UsersRound, } from "lucide-vue-next"
+  import { Brain, BugPlay, NotebookText, UsersRound, Warehouse, } from "lucide-vue-next"
   import NavUser from './NavUser.vue'
   import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail, } from '@/components/ui/sidebar'
   import logo from '@/assets/logo.jpg'
@@ -78,6 +78,13 @@
       icon: NotebookText,
       roles: [2],
     },
+    {
+      title: "题目仓库",
+      url: "/question-bank",
+      icon: Warehouse,
+      roles: [1],
+    },
+
     {
       title: "人工智障",
       url: "#",

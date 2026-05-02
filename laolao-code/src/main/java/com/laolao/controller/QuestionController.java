@@ -4,7 +4,8 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.laolao.common.result.Result;
 import com.laolao.pojo.dto.AddQuestionDTO;
 import com.laolao.pojo.vo.DraftQuestionVO;
-import com.laolao.pojo.vo.QuestionBankVO;
+import com.laolao.pojo.vo.QuestionBankDialogVO;
+import com.laolao.pojo.vo.QuestionBankInfoVO;
 import com.laolao.service.QuestionService;
 import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +16,17 @@ import org.springframework.web.bind.annotation.*;
 public class QuestionController {
     @Resource
     private QuestionService questionService;
+
+    /**
+     * 获取单独题目的信息（题目仓库）
+     * @param questionId 题目主键
+     * @return 题目数据
+     */
+    @GetMapping("/single")
+    @PreAuthorize("hasRole('MANAGER')")
+    public Result<QuestionBankInfoVO> getSingleQuestionInfo(@RequestParam Integer questionId) {
+        return questionService.getSingleQuestionInfo(questionId);
+    }
 
     /**
      * 添加题目
@@ -35,7 +47,7 @@ public class QuestionController {
      */
     @GetMapping("/private")
     @PreAuthorize("hasRole('MANAGER')")
-    public Result<Page<QuestionBankVO>> getPrivateQuestions(Integer pageNum, Integer pageSize, String content) {
+    public Result<Page<QuestionBankDialogVO>> getPrivateQuestions(Integer pageNum, Integer pageSize, String content) {
         return questionService.getPrivateQuestions(pageNum, pageSize, content);
     }
 
@@ -46,8 +58,8 @@ public class QuestionController {
      */
     @GetMapping("/public")
     @PreAuthorize("hasRole('MANAGER')")
-    public Result<Page<QuestionBankVO>> getPublicQuestions(Integer pageNum, Integer pageSize, String content) {
-        return questionService.getPublicQuestions(pageNum, pageSize, content);
+    public Result<Page<QuestionBankDialogVO>> getPublicQuestions(Integer pageNum, Integer pageSize, String content, Integer tagId) {
+        return questionService.getPublicQuestions(pageNum, pageSize, content, tagId);
     }
 
     /**

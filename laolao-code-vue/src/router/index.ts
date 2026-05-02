@@ -12,6 +12,7 @@ import MyTeam from "@/components/user/group/MyTeam.vue";
 import MyExam from "@/components/user/exam/MyExam.vue";
 import MyReport from "@/components/user/report/MyReport.vue";
 import UserLayout from "@/components/user/UserLayout.vue";
+import QuestionBank from "@/components/user/question/QuestionBank.vue";
 
 const routes: Array<RouteRecordRaw> = [
     // 注册
@@ -68,6 +69,10 @@ const routes: Array<RouteRecordRaw> = [
             {
                 path: 'user-report/:id',
                 component: UserExamReport,
+            },
+            {
+                path: 'question-bank',
+                component: QuestionBank,
             },
         ]
     }

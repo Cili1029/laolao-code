@@ -9,10 +9,10 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class QuestionBankTagVO implements Serializable {
+public class QuestionBankDialogTagVO implements Serializable {
 
     /**
-     * 主键
+     * question id
      */
     private Integer id;
 
@@ -20,9 +20,4 @@ public class QuestionBankTagVO implements Serializable {
      * 标签名
      */
     private String name;
-
-    /**
-     * 数量
-     */
-    private Integer count;
 }

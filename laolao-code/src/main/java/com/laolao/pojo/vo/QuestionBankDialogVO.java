@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class QuestionBankVO implements Serializable {
+public class QuestionBankDialogVO implements Serializable {
 
     /**
      * 主键ID
@@ -26,4 +26,9 @@ public class QuestionBankVO implements Serializable {
      * 标签
      */
     private List<String> tags;
+
+    /**
+     * 难度
+     */
+    private Integer difficulty;
 }

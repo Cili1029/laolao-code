@@ -112,11 +112,10 @@
     import { ButtonGroup } from '@/components/ui/button-group'
     import { Input } from '@/components/ui/input'
     import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination'
-    import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, } from '@/components/ui/dialog'
+    import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog'
     import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from '@/components/ui/table'
     import { ref, watch } from "vue"
     import Spinner from '@/components/ui/spinner/Spinner.vue'
-    import DialogDescription from "@/components/ui/dialog/DialogDescription.vue"
 
     const currentType = ref(0) // 0: 私有题库 1: 公共题库
 
@@ -193,7 +192,6 @@
     }
 
     const copyQuestion = async (id: number) => {
-        console.log(props.examId)
         try {
             const res = await axios.get("/api/question/copy", {
                 params: {

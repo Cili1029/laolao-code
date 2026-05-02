@@ -8,7 +8,7 @@
         </foreach>
     </delete>
 
-    <select id="selectPrivateBank" resultType="com.laolao.pojo.vo.QuestionBankVO">
+    <select id="selectPrivateBank" resultType="com.laolao.pojo.vo.QuestionBankDialogVO">
         select q.id, q.title, u.name as manager, q.is_public
         from question q
         join user u on u.id = q.creator_id
@@ -20,8 +20,8 @@
         </if>
     </select>
 
-    <select id="selectPublicBank" resultType="com.laolao.pojo.vo.QuestionBankVO">
-        select distinct q.id, q.title
+    <select id="selectPublicBank" resultType="com.laolao.pojo.vo.QuestionBankDialogVO">
+        select distinct q.id, q.title, q.difficulty
         from question q
         left join question_tag qt on qt.question_id = q.id
         left join tag t on t.id = qt.tag_id
@@ -32,9 +32,12 @@
                 or q.content like concat('%', #{content}, '%')
                 or t.name like concat('%', #{content}, '%'))
         </if>
+        <if test="tagId != null">
+            and t.id = #{tagId}
+        </if>
     </select>
 
-    <select id="selectTags" resultType="com.laolao.pojo.vo.QuestionBankTagVO">
+    <select id="selectTags" resultType="com.laolao.pojo.vo.QuestionBankDialogTagVO">
         select q.id, t.name
         from question q
                  left join question_tag qt on qt.question_id = q.id

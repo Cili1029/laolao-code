@@ -7,14 +7,16 @@ import com.laolao.common.util.MapStruct;
 import com.laolao.common.util.SecurityUtils;
 import com.laolao.mapper.ExamQuestionConfigMapper;
 import com.laolao.mapper.QuestionMapper;
+import com.laolao.mapper.QuestionTagMapper;
 import com.laolao.mapper.QuestionTestCaseMapper;
 import com.laolao.pojo.dto.AddQuestionDTO;
-import com.laolao.pojo.vo.QuestionBankTagVO;
+import com.laolao.pojo.vo.QuestionBankDialogTagVO;
 import com.laolao.pojo.entity.ExamQuestionConfig;
 import com.laolao.pojo.entity.Question;
 import com.laolao.pojo.entity.QuestionTestCase;
 import com.laolao.pojo.vo.DraftQuestionVO;
-import com.laolao.pojo.vo.QuestionBankVO;
+import com.laolao.pojo.vo.QuestionBankDialogVO;
+import com.laolao.pojo.vo.QuestionBankInfoVO;
 import com.laolao.service.QuestionService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -35,6 +37,8 @@ public class QuestionServiceImpl implements QuestionService {
     private MapStruct mapStruct;
     @Resource
     private ExamQuestionConfigMapper examQuestionConfigMapper;
+    @Resource
+    private QuestionTagMapper questionTagMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -50,8 +54,6 @@ public class QuestionServiceImpl implements QuestionService {
         } else {
             // 新题，做添加
             questionMapper.insert(question);
-            // 执行完insert后，MyBatis-Plus会自动把数据库生成的自增ID赋值回question
-            // 此时 question.getId() 已经有值了
         }
 
         // 统一插入测试用例
@@ -68,24 +70,24 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Result<Page<QuestionBankVO>> getPrivateQuestions(Integer pageNum, Integer pageSize, String content) {
-        Page<QuestionBankVO> page = new Page<>(pageNum, pageSize);
-        Page<QuestionBankVO> res = questionMapper.selectPrivateBank(page, SecurityUtils.getUserId(), content);
+    public Result<Page<QuestionBankDialogVO>> getPrivateQuestions(Integer pageNum, Integer pageSize, String content) {
+        Page<QuestionBankDialogVO> page = new Page<>(pageNum, pageSize);
+        Page<QuestionBankDialogVO> res = questionMapper.selectPrivateBank(page, SecurityUtils.getUserId(), content);
         return Result.success(res);
     }
 
     @Override
-    public Result<Page<QuestionBankVO>> getPublicQuestions(Integer pageNum, Integer pageSize, String content) {
-        Page<QuestionBankVO> page = new Page<>(pageNum, pageSize);
-        Page<QuestionBankVO> res = questionMapper.selectPublicBank(page, content);
+    public Result<Page<QuestionBankDialogVO>> getPublicQuestions(Integer pageNum, Integer pageSize, String content, Integer tagId) {
+        Page<QuestionBankDialogVO> page = new Page<>(pageNum, pageSize);
+        Page<QuestionBankDialogVO> res = questionMapper.selectPublicBank(page, content, tagId);
         // 获取其标签
-        List<Integer> questionIds = res.getRecords().stream().map(QuestionBankVO::getId).toList();
+        List<Integer> questionIds = res.getRecords().stream().map(QuestionBankDialogVO::getId).toList();
         if (!questionIds.isEmpty()) {
-            List<QuestionBankTagVO> tagVOS = questionMapper.selectTags(questionIds);
+            List<QuestionBankDialogTagVO> tagVOS = questionMapper.selectTags(questionIds);
             // 分组
             Map<Integer, List<String>> tagMap = tagVOS.stream().collect(
-                    Collectors.groupingBy(QuestionBankTagVO::getId,
-                            Collectors.mapping(QuestionBankTagVO::getName, Collectors.toList())
+                    Collectors.groupingBy(QuestionBankDialogTagVO::getId,
+                            Collectors.mapping(QuestionBankDialogTagVO::getName, Collectors.toList())
                     ));
             // 分配
             res.getRecords().forEach(vo -> vo.setTags(tagMap.getOrDefault(vo.getId(), Collections.emptyList())));
@@ -127,5 +129,12 @@ public class QuestionServiceImpl implements QuestionService {
         // 测试示例
         questionVO.setTestCases(questionTestCase);
         return Result.success("克隆成功！", questionVO);
+    }
+
+    @Override
+    public Result<QuestionBankInfoVO> getSingleQuestionInfo(Integer questionId) {
+        QuestionBankInfoVO questionBankInfoVO = questionMapper.selectQuestionInfo(questionId);
+        questionBankInfoVO.setTags(questionTagMapper.selectTagsByQuestion(questionId));
+        return Result.success(questionBankInfoVO);
     }
 }
