@@ -31,4 +31,9 @@ public class QuestionBankDialogVO implements Serializable {
      * 难度
      */
     private Integer difficulty;
+
+    /**
+     * 是否被收藏
+     */
+    private Integer isFavorite;
 }

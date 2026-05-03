@@ -1,7 +1,7 @@
 <template>
-    <div class="p-5 flex flex-col space-y-5 h-full">
-        <div class="space-y-5">
-            <div class="flex space-x-5">
+    <div class="p-5 flex flex-col h-full">
+        <div class="flex justify-between space-y-3">
+            <div class="flex space-x-5 flex-wrap">
                 <div v-for="tag in tags" :key="tag.id" @click="curTag = (curTag === tag.id ? null : tag.id)"
                     class="group cursor-pointer flex items-center space-x-1 transition-colors hover:text-blue-700"
                     :class="curTag === tag.id ? 'text-blue-700' : 'text-gray-500'">
@@ -13,87 +13,91 @@
                     </Badge>
                 </div>
             </div>
-            <div class="flex justify-between">
-                <ButtonGroup class="w-1/2">
-                    <Input v-model="publicSearchContent" placeholder="支持模糊搜索..." />
-                    <Button @click="getPublicQuestions()" variant="outline" aria-label="Search"
-                        :disabled="publicSearchContent === ''">
-                        <SearchIcon />
-                    </Button>
-                </ButtonGroup>
 
-                <Sheet>
-                    <SheetTrigger as-child>
-                        <p @click="getPrivateQuestions()" class="flex cursor-pointer hover:text-blue-700 items-center">
-                            <User />个人仓库
-                        </p>
-                    </SheetTrigger>
-                    <SheetContent class="w-full sm:w-1/3 sm:max-w-none">
-                        <SheetHeader>
-                            <SheetTitle class="text-2xl">个人仓库</SheetTitle>
-                            <SheetDescription>
-                                <ButtonGroup class="w-full">
-                                    <Input v-model="privateSearchContent" placeholder="支持模糊搜索..." />
-                                    <Button @click="getPrivateQuestions()" variant="outline" aria-label="Search"
-                                        :disabled="privateSearchContent === ''">
-                                        <SearchIcon />
-                                    </Button>
-                                </ButtonGroup>
-                            </SheetDescription>
-                        </SheetHeader>
-                        <div class="grid flex-1 auto-rows-min gap-6 px-4 overflow-y-auto">
-                            <Table v-if="privateTotal > 0">
-                                <TableBody>
-                                    <TableRow v-for="question in privateQuestions" :key="question.id">
-                                        <TableCell>
-                                            <QuestionBankInfoDialog :question-id="question.id">
-                                                <template #trigger>
-                                                    {{ question.title }}
-                                                </template>
-                                            </QuestionBankInfoDialog>
-                                        </TableCell>
-                                        <TableCell class="flex justify-end space-x-2">
-                                            <div @click=""
-                                                class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
-                                                <Edit class="h-4 w-4 mr-1" />
-                                                编辑
-                                            </div>
-                                            <div @click="deleteQuestion(question)"
-                                                class="flex cursor-pointer text-red-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
-                                                <Trash class="h-4 w-4 mr-1" />
-                                                删除
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                            <div v-else class="flex flex-col flex-1 justify-center items-center text-center py-24">
-                                <div class="bg-white p-4 rounded-full shadow inline-block mb-4">
-                                    <Ghost class="h-10 w-10 text-gray-600" />
-                                </div>
-                                <p class="text-gray-600 font-medium">暂无题目数据</p>
-                                <p class="text-sm text-gray-600">你创建的题目会在此显示</p>
+            <Sheet>
+                <SheetTrigger as-child>
+                    <p @click="getPrivateQuestions()" class="flex cursor-pointer hover:text-blue-700 items-center">
+                        <User />个人仓库
+                    </p>
+                </SheetTrigger>
+                <SheetContent class="w-full sm:w-1/3 sm:max-w-none">
+                    <SheetHeader>
+                        <SheetTitle class="text-2xl">个人仓库</SheetTitle>
+                        <SheetDescription>
+                            <ButtonGroup class="w-full">
+                                <Input v-model="privateSearchContent" placeholder="支持模糊搜索..." />
+                                <Button @click="getPrivateQuestions()" variant="outline" aria-label="Search"
+                                    :disabled="privateSearchContent === ''">
+                                    <SearchIcon />
+                                </Button>
+                            </ButtonGroup>
+                        </SheetDescription>
+                    </SheetHeader>
+                    <div class="grid flex-1 auto-rows-min gap-6 px-4 overflow-y-auto">
+                        <Table v-if="privateTotal > 0">
+                            <TableBody>
+                                <TableRow v-for="question in privateQuestions" :key="question.id">
+                                    <TableCell>
+                                        <QuestionBankInfoDialog :question-id="question.id">
+                                            <template #trigger>
+                                                {{ question.title }}
+                                            </template>
+                                        </QuestionBankInfoDialog>
+                                    </TableCell>
+                                    <TableCell class="flex justify-end space-x-2">
+                                        <div @click=""
+                                            class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
+                                            <Edit class="h-4 w-4 mr-1" />
+                                            编辑
+                                        </div>
+                                        <div @click="deleteQuestion(question)"
+                                            class="flex cursor-pointer text-red-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
+                                            <Trash class="h-4 w-4 mr-1" />
+                                            删除
+                                        </div>
+                                    </TableCell>
+                                </TableRow>
+                            </TableBody>
+                        </Table>
+                        <div v-else class="flex flex-col flex-1 justify-center items-center text-center py-24">
+                            <div class="bg-white p-4 rounded-full shadow inline-block mb-4">
+                                <Ghost class="h-10 w-10 text-gray-600" />
                             </div>
+                            <p class="text-gray-600 font-medium">暂无题目数据</p>
+                            <p class="text-sm text-gray-600">你创建的题目会在此显示</p>
                         </div>
-                        <SheetFooter>
-                            <Pagination v-if="privateTotal > 0" v-model:page="privatePageNum" :total="privateTotal"
-                                :items-per-page="privatePageSize" :sibling-count="1" show-edges>
-                                <PaginationContent v-slot="{ items }">
-                                    <PaginationPrevious />
-                                    <template v-for="(item, index) in items">
-                                        <PaginationItem v-if="item.type === 'page'" :key="index" :value="item.value"
-                                            :is-active="item.value === privatePageNum">
-                                            {{ item.value }}
-                                        </PaginationItem>
-                                        <PaginationEllipsis v-else :key="item.type" :index="index" />
-                                    </template>
-                                    <PaginationNext />
-                                </PaginationContent>
-                            </Pagination>
-                        </SheetFooter>
-                    </SheetContent>
-                </Sheet>
-            </div>
+                    </div>
+                    <SheetFooter>
+                        <Pagination v-if="privateTotal > 0" v-model:page="privatePageNum" :total="privateTotal"
+                            :items-per-page="privatePageSize" :sibling-count="1" show-edges>
+                            <PaginationContent v-slot="{ items }">
+                                <PaginationPrevious />
+                                <template v-for="(item, index) in items">
+                                    <PaginationItem v-if="item.type === 'page'" :key="index" :value="item.value"
+                                        :is-active="item.value === privatePageNum">
+                                        {{ item.value }}
+                                    </PaginationItem>
+                                    <PaginationEllipsis v-else :key="item.type" :index="index" />
+                                </template>
+                                <PaginationNext />
+                            </PaginationContent>
+                        </Pagination>
+                    </SheetFooter>
+                </SheetContent>
+            </Sheet>
+        </div>
+
+        <div class="flex w-2/3 justify-between">
+            <ButtonGroup class="w-1/2">
+                <Input v-model="publicSearchContent" placeholder="支持模糊搜索..." />
+                <Button @click="getPublicQuestions()" variant="outline" aria-label="Search"
+                    :disabled="publicSearchContent === ''">
+                    <SearchIcon />
+                </Button>
+            </ButtonGroup>
+            <p @click="isFavorite = !isFavorite" class="flex cursor-pointer hover:text-blue-600 items-center" :class="isFavorite ? 'text-blue-600' :''">
+                <Star />仅看收藏
+            </p>
         </div>
 
         <div class="flex-1 overflow-y-auto w-2/3">
@@ -120,6 +124,14 @@
                                 {{ question.difficulty === 0 ? '简单' :
                                     question.difficulty === 1 ? '中等' : '困难' }}
                             </p>
+                        </TableCell>
+                        <TableCell class="flex space-x-2 justify-end">
+                            <div @click="changeFavorite(question)"
+                                class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
+                                <Star v-if="question.isFavorite === 0" class="mr-1" />
+                                <StarOff v-else class="mr-1" />
+                                {{ question.isFavorite === 1 ? '取消' : '收藏' }}
+                            </div>
                         </TableCell>
                     </TableRow>
                 </TableBody>
@@ -149,7 +161,7 @@
     import { ButtonGroup } from '@/components/ui/button-group'
     import { Input } from '@/components/ui/input'
     import { Button } from '@/components/ui/button'
-    import { Edit, Ghost, SearchIcon, Trash, User } from 'lucide-vue-next'
+    import { Edit, Ghost, SearchIcon, Star, StarOff, Trash, User } from 'lucide-vue-next'
     import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination'
     import { Table, TableBody, TableCell, TableRow, } from '@/components/ui/table'
     import { onMounted, ref, watch } from "vue"
@@ -185,6 +197,7 @@
         title: string
         tags: string[]
         difficulty: number
+        isFavorite: number
     }
 
     // 公共题库相关
@@ -209,6 +222,14 @@
         if (newVal === '') getPublicQuestions()
     })
 
+    const isFavorite = ref(false)
+
+    // 监听收藏还是全部
+    watch(isFavorite, () => {
+        publicPageNum.value = 1
+        getPublicQuestions()
+    })
+
     // 获取题库数据
     const getPublicQuestions = async () => {
         try {
@@ -217,7 +238,8 @@
                     pageNum: publicPageNum.value,
                     pageSize: publicPageSize.value,
                     content: publicSearchContent.value,
-                    tagId: curTag.value
+                    tagId: curTag.value,
+                    isFavorite: isFavorite.value ? 1 : null
                 }
             })
             const resData = res.data.data
@@ -260,6 +282,21 @@
             privateTotal.value = resData.total
         } catch (e) {
             console.error('获取失败:', e)
+        }
+    }
+
+    const changeFavorite = async (question: QuestionBank) => {
+        try {
+            const res = await axios.put("/api/question/favorite", null, {
+                params: {
+                    questionId: question.id
+                }
+            })
+            if (res.data.code === 1) {
+                question.isFavorite = 1 - question.isFavorite
+            }
+        } catch (e) {
+            console.error(e)
         }
     }
 

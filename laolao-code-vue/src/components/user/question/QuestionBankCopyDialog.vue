@@ -31,13 +31,22 @@
                         公共题库
                     </div>
                 </div>
-                <ButtonGroup class="w-full">
-                    <Input v-model="searchContent" placeholder="支持模糊搜索..." />
-                    <Button @click="getQuestions()" variant="outline" aria-label="Search"
-                        :disabled="searchContent === ''">
-                        <SearchIcon />
-                    </Button>
-                </ButtonGroup>
+                <div class="flex space-x-2">
+                    <ButtonGroup class="flex-1">
+                        <Input v-model="searchContent" placeholder="支持模糊搜索..." />
+                        <Button @click="getQuestions()" variant="outline" aria-label="Search"
+                            :disabled="searchContent === ''">
+                            <SearchIcon />
+                        </Button>
+                    </ButtonGroup>
+                    <div v-if="currentType === 1" @click="isFavorite = !isFavorite"
+                        class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded"
+                        :class="isFavorite ? 'bg-gray-200' : ''">
+                        <Star class="h-4 w-4 mr-1" />
+                        仅看收藏
+                    </div>
+                </div>
+                
                 <Table v-if="total > 0">
                     <TableHeader>
                         <TableRow>
@@ -108,7 +117,7 @@
     import axios from "@/utils/myAxios"
     import { Button } from '@/components/ui/button'
     import { Badge } from '@/components/ui/badge'
-    import { Copy, File, FileKey, Ghost, SearchIcon, Trash, Warehouse } from 'lucide-vue-next'
+    import { Copy, File, FileKey, Ghost, SearchIcon, Star, Trash, Warehouse } from 'lucide-vue-next'
     import { ButtonGroup } from '@/components/ui/button-group'
     import { Input } from '@/components/ui/input'
     import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination'
@@ -141,6 +150,14 @@
 
     const searchContent = ref("")
 
+    const isFavorite = ref(false)
+
+    // 监听收藏还是全部
+    watch(isFavorite, () => {
+        pageNum.value = 1
+        getQuestions()
+    })
+
     // 获取私有题库数据
     const getQuestions = async () => {
         try {
@@ -152,7 +169,8 @@
                 params: {
                     pageNum: pageNum.value,
                     pageSize: pageSize.value,
-                    content: searchContent.value
+                    content: searchContent.value,
+                    isFavorite: isFavorite.value ? 1 : null
                 }
             })
             const resData = res.data.data

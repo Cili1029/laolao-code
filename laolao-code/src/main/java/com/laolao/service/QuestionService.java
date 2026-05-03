@@ -12,11 +12,13 @@ public interface QuestionService {
 
     Result<Page<QuestionBankDialogVO>> getPrivateQuestions(Integer pageNum, Integer pageSize, String content);
 
-    Result<Page<QuestionBankDialogVO>> getPublicQuestions(Integer pageNum, Integer pageSize, String content, Integer tagId);
+    Result<Page<QuestionBankDialogVO>> getPublicQuestions(Integer pageNum, Integer pageSize, String content, Integer tagId, Integer isFavorite);
 
     Result<String> delete(Integer questionId);
 
     Result<DraftQuestionVO> copyQuestion(Integer questionId, Integer examId);
 
     Result<QuestionBankInfoVO> getSingleQuestionInfo(Integer questionId);
+
+    Result<String> favorite(Integer questionId);
 }

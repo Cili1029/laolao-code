@@ -5,11 +5,9 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.laolao.common.result.Result;
 import com.laolao.common.util.MapStruct;
 import com.laolao.common.util.SecurityUtils;
-import com.laolao.mapper.ExamQuestionConfigMapper;
-import com.laolao.mapper.QuestionMapper;
-import com.laolao.mapper.QuestionTagMapper;
-import com.laolao.mapper.QuestionTestCaseMapper;
+import com.laolao.mapper.*;
 import com.laolao.pojo.dto.AddQuestionDTO;
+import com.laolao.pojo.entity.QuestionFavorite;
 import com.laolao.pojo.vo.QuestionBankDialogTagVO;
 import com.laolao.pojo.entity.ExamQuestionConfig;
 import com.laolao.pojo.entity.Question;
@@ -39,6 +37,8 @@ public class QuestionServiceImpl implements QuestionService {
     private ExamQuestionConfigMapper examQuestionConfigMapper;
     @Resource
     private QuestionTagMapper questionTagMapper;
+    @Resource
+    private QuestionFavoriteMapper questionFavoriteMapper;
 
     @Override
     @Transactional(rollbackFor = Exception.class)
@@ -77,9 +77,9 @@ public class QuestionServiceImpl implements QuestionService {
     }
 
     @Override
-    public Result<Page<QuestionBankDialogVO>> getPublicQuestions(Integer pageNum, Integer pageSize, String content, Integer tagId) {
+    public Result<Page<QuestionBankDialogVO>> getPublicQuestions(Integer pageNum, Integer pageSize, String content, Integer tagId, Integer isFavorite) {
         Page<QuestionBankDialogVO> page = new Page<>(pageNum, pageSize);
-        Page<QuestionBankDialogVO> res = questionMapper.selectPublicBank(page, content, tagId);
+        Page<QuestionBankDialogVO> res = questionMapper.selectPublicBank(page, content, tagId, SecurityUtils.getUserId(), isFavorite);
         // 获取其标签
         List<Integer> questionIds = res.getRecords().stream().map(QuestionBankDialogVO::getId).toList();
         if (!questionIds.isEmpty()) {
@@ -136,5 +136,29 @@ public class QuestionServiceImpl implements QuestionService {
         QuestionBankInfoVO questionBankInfoVO = questionMapper.selectQuestionInfo(questionId);
         questionBankInfoVO.setTags(questionTagMapper.selectTagsByQuestion(questionId));
         return Result.success(questionBankInfoVO);
+    }
+
+    @Override
+    @Transactional
+    public Result<String> favorite(Integer questionId) {
+        Integer userId = SecurityUtils.getUserId();
+        // 查询收藏信息
+        QuestionFavorite favorite = questionFavoriteMapper.selectOne(new LambdaQueryWrapper<QuestionFavorite>()
+                .eq(QuestionFavorite::getUserId, userId)
+                .eq(QuestionFavorite::getQuestionId, questionId));
+
+        // 没有，为新收藏
+        if (favorite == null) {
+            QuestionFavorite newFavorite = QuestionFavorite.builder()
+                    .userId(userId)
+                    .questionId(questionId)
+                    .build();
+            questionFavoriteMapper.insert(newFavorite);
+            return Result.success("收藏成功");
+        } else {
+            // 有，取消收藏
+            questionFavoriteMapper.deleteById(favorite.getId());
+        }
+        return Result.success("取消成功");
     }
 }

@@ -58,8 +58,19 @@ public class QuestionController {
      */
     @GetMapping("/public")
     @PreAuthorize("hasRole('MANAGER')")
-    public Result<Page<QuestionBankDialogVO>> getPublicQuestions(Integer pageNum, Integer pageSize, String content, Integer tagId) {
-        return questionService.getPublicQuestions(pageNum, pageSize, content, tagId);
+    public Result<Page<QuestionBankDialogVO>> getPublicQuestions(Integer pageNum, Integer pageSize, String content, Integer tagId, Integer isFavorite) {
+        return questionService.getPublicQuestions(pageNum, pageSize, content, tagId, isFavorite);
+    }
+
+    /**
+     * 收藏/取消收藏题目
+     * @param questionId 题目ID
+     * @return 结果信息
+     */
+    @PutMapping("/favorite")
+    @PreAuthorize("hasRole('MANAGER')")
+    public Result<String> favorite(@RequestParam Integer questionId) {
+        return questionService.favorite(questionId);
     }
 
     /**

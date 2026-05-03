@@ -17,7 +17,7 @@ import java.util.List;
 public interface QuestionMapper extends BaseMapper<Question> {
     Page<QuestionBankDialogVO> selectPrivateBank(Page<QuestionBankDialogVO> page, Integer userId, String content);
 
-    Page<QuestionBankDialogVO> selectPublicBank(Page<QuestionBankDialogVO> page, String content, Integer tagId);
+    Page<QuestionBankDialogVO> selectPublicBank(Page<QuestionBankDialogVO> page, String content, Integer tagId, Integer userId, Integer isFavorite);
 
     @Update("update question set is_deleted = 1 where question.creator_id = #{userId} and id = #{questionId}")
     void deleteQuestion(Integer userId, Integer questionId);

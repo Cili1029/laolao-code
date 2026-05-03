@@ -21,8 +21,9 @@
     </select>
 
     <select id="selectPublicBank" resultType="com.laolao.pojo.vo.QuestionBankDialogVO">
-        select distinct q.id, q.title, q.difficulty
+        select distinct q.id, q.title, q.difficulty, if(qf.id is not null, 1, 0) as is_favorite
         from question q
+        left join question_favorite qf on qf.question_id = q.id and qf.user_id = #{userId}
         left join question_tag qt on qt.question_id = q.id
         left join tag t on t.id = qt.tag_id
         where q.is_public = 1 and q.parent_id = 0 and q.is_deleted = 0
@@ -34,6 +35,9 @@
         </if>
         <if test="tagId != null">
             and t.id = #{tagId}
+        </if>
+        <if test="isFavorite != null and isFavorite == 1">
+            and qf.id is not null
         </if>
     </select>
 
