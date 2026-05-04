@@ -113,4 +113,7 @@ public interface ExamMapper extends BaseMapper<Exam> {
 
     @Update("update exam set status = #{canceled}, is_queued = 0 where id = #{examId} and (status = 1 or status = 2)")
     void cancelExam(Exam examId, int canceled);
+
+    @Select("select count(id) as examCount from exam where status = 1 or status = 2 or status = 3")
+    Integer selectExamCount();
 }

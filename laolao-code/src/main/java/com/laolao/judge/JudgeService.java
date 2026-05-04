@@ -9,6 +9,7 @@ import com.github.dockerjava.api.model.*;
 import com.laolao.common.constant.JudgeConstant;
 import com.laolao.common.result.JudgeResult;
 import com.laolao.pojo.entity.QuestionTestCase;
+import com.laolao.pojo.vo.AdminJudgerInfoVO;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.annotation.Resource;
@@ -28,6 +29,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 @Service
 public class JudgeService {
@@ -89,6 +91,7 @@ public class JudgeService {
         // 从池中取出一个容器（如果池子空了，最多等 5 秒）
         String containerId = containerQueue.poll(5, TimeUnit.SECONDS);
         if (containerId == null) throw new RuntimeException("当前无可用容器（判题繁忙）");
+        long startTime = System.currentTimeMillis();
 
         try {
             // 上传代码
@@ -97,6 +100,7 @@ public class JudgeService {
             String compileError = compile(containerId);
             // 不为空，编译错误
             if (compileError != null) {
+                failCount.incrementAndGet();
                 return JudgeResult.builder()
                         .status(JudgeConstant.STATUS_CE)
                         .errorMessage(compileError)
@@ -117,6 +121,7 @@ public class JudgeService {
             // 判题逻辑开始
             // 时间超限（容器猝死）
             if (execResult.getExitCode() == 124) {
+                failCount.incrementAndGet();
                 return JudgeResult.builder()
                         .status(JudgeConstant.STATUS_TLE)
                         .totalCount(questionTestCases.size())
@@ -126,6 +131,7 @@ public class JudgeService {
             // 内存超限（容器猝死）
             Boolean oomKilled = dockerClient.inspectContainerCmd(containerId).exec().getState().getOOMKilled();
             if (Boolean.TRUE.equals(oomKilled)) {
+                failCount.incrementAndGet();
                 return JudgeResult.builder()
                         .status(JudgeConstant.STATUS_MLE)
                         .totalCount(questionTestCases.size())
@@ -137,6 +143,7 @@ public class JudgeService {
             parseMetrics(execResult);
             // 兜底，这种情况估计只能是系统问题了
             if (execResult.getTime() == null || execResult.getMemory() == null) {
+                systemErrorCount.incrementAndGet();
                 return JudgeResult.builder()
                         .status(JudgeConstant.STATUS_SE)
                         .errorMessage(execResult.getStderr()) // 此时 stderr 里通常有 JVM 报错
@@ -162,6 +169,7 @@ public class JudgeService {
                 int status = jsonRes.get("status").asInt();
                 // 运行错误 但是这个时候可能有跑通的用例（空指针，除零等等）
                 if (status != 0) {
+                    failCount.incrementAndGet();
                     return JudgeResult.builder()
                             .status(JudgeConstant.STATUS_RE)
                             .errorMessage(jsonRes.get("errorMessage").asText())
@@ -171,13 +179,13 @@ public class JudgeService {
                 }
 
 
-
                 // 答案错误
                 JsonNode outputs = jsonRes.get("output");
                 for (int i = 0; i < outputs.size(); i++) {
                     String userOutput = outputs.get(i).asText();
                     String standardOutput = questionTestCases.get(i).getOutput();
                     if (!compareOutput(userOutput, standardOutput)) {
+                        failCount.incrementAndGet();
                         return JudgeResult.builder()
                                 .status(JudgeConstant.STATUS_WA)
                                 .errorMessage(realError)
@@ -190,6 +198,7 @@ public class JudgeService {
                     }
                 }
             } catch (Exception e) {
+                failCount.incrementAndGet();
                 // 如果 JSON 解析失败，说明程序崩溃且没输出 JSON (未捕获的 RE)
                 return JudgeResult.builder()
                         .status(JudgeConstant.STATUS_RE)
@@ -199,6 +208,7 @@ public class JudgeService {
             }
 
             // 全部通过
+            successCount.incrementAndGet();
             return JudgeResult.builder()
                     .status(JudgeConstant.STATUS_AC)
                     .time(execResult.getTime())
@@ -207,6 +217,8 @@ public class JudgeService {
                     .passCount(questionTestCases.size())
                     .build();
         } finally {
+            totalJudgeCount.incrementAndGet();
+            totalProcessingTime.addAndGet(System.currentTimeMillis() - startTime);
             // 清理容器
             CompletableFuture.runAsync(() -> {
                 try {
@@ -414,6 +426,10 @@ public class JudgeService {
     public void onStart() {
         cleanOldContainers();
         initPool();
+        Version version = dockerClient.versionCmd().exec();
+        dockerEngineVersion = version.getVersion();
+        hostArch = version.getArch();
+        hostOs = version.getOperatingSystem();
     }
 
     /**
@@ -434,11 +450,12 @@ public class JudgeService {
         }
     }
 
+    private static final int POOL_SIZE = 3;
+
     /**
      * 初始化池子
      */
     private void initPool() {
-        int POOL_SIZE = 3;
         for (int i = 0; i < POOL_SIZE; i++) {
             createNewContainerToPool();
         }
@@ -482,6 +499,7 @@ public class JudgeService {
 
     /**
      * 清理容器以便复用
+     *
      * @param containerId 容器Id
      */
     private void resetAndReturnContainer(String containerId) {
@@ -522,5 +540,49 @@ public class JudgeService {
                 }
             }
         }
+    }
+
+    // 自项目启动以来总判题数
+    private final AtomicInteger totalJudgeCount = new AtomicInteger(0);
+    // AC数量
+    private final AtomicInteger successCount = new AtomicInteger(0);
+    // 非AC数量(WA, TLE, MLE, RE, CE)
+    private final AtomicInteger failCount = new AtomicInteger(0);
+    // SE数量(系统错误)
+    private final AtomicInteger systemErrorCount = new AtomicInteger(0);
+    // 耗时统计
+    private final AtomicLong totalProcessingTime = new AtomicLong(0);
+    // Docker引擎版本
+    private String dockerEngineVersion;
+    // 宿主机架构 amd64/arm64
+    private String hostArch;
+    // 宿主机系统 linux/windows
+    private String hostOs;
+
+    /**
+     * 获取判题机信息
+     *
+     * @return 结果信息
+     */
+    public AdminJudgerInfoVO getJudgeInfo() {
+        // 实时获取内存信息（因为内存占用是动态的）
+        Info info = dockerClient.infoCmd().exec();
+        double totalMem = info.getMemTotal() == null
+                ? 0.0
+                : Math.round((info.getMemTotal() / (1024.0 * 1024 * 1024)) * 100) / 100.0;
+        return AdminJudgerInfoVO.builder()
+                .poolSize(POOL_SIZE)
+                .idleCount(containerQueue.size())
+                .busyCount(POOL_SIZE - containerQueue.size())
+                .totalJudgeCount(totalJudgeCount.get())
+                .successCount(successCount.get())
+                .failCount(failCount.get())
+                .systemErrorCount(systemErrorCount.get())
+                .avgTimeCost(totalJudgeCount.get() == 0 ? 0 : (totalProcessingTime.get() / totalJudgeCount.get()))
+                .dockerEngineVersion(dockerEngineVersion)
+                .hostArch(hostArch)
+                .hostOs(hostOs)
+                .hostMemoryTotal(totalMem)
+                .build();
     }
 }

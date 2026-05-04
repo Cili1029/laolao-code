@@ -1,14 +1,15 @@
 package com.laolao.service.impl;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.laolao.common.result.Result;
 import com.laolao.common.util.SecurityUtils;
+import com.laolao.mapper.ExamMapper;
 import com.laolao.mapper.TeamMapper;
+import com.laolao.pojo.dto.AdminTeamUpdateDTO;
 import com.laolao.pojo.dto.CreateTeamDTO;
 import com.laolao.pojo.dto.JoinTeamDTO;
 import com.laolao.pojo.entity.Team;
-import com.laolao.pojo.vo.DetailBaseTeamVO;
-import com.laolao.pojo.vo.DetailExamTeamVO;
-import com.laolao.pojo.vo.TeamVO;
+import com.laolao.pojo.vo.*;
 import com.laolao.service.TeamService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,8 @@ import java.util.UUID;
 public class TeamServiceImpl implements TeamService {
     @Resource
     private TeamMapper teamMapper;
+    @Resource
+    private ExamMapper examMapper;
 
     @Override
     public Result<List<TeamVO>> getSimpleTeam() {
@@ -74,5 +77,35 @@ public class TeamServiceImpl implements TeamService {
                 .description(createTeamDTO.getDescription()).build();
         teamMapper.insert(team);
         return Result.success("创建成功");
+    }
+
+    @Override
+    public Result<Page<AdminTeamVO>> getAllTeam(Integer pageNum, Integer pageSize, String content) {
+        Page<AdminTeamVO> page = new Page<>(pageNum, pageSize);
+        Page<AdminTeamVO> adminTeamVOList = teamMapper.selectAllTeam(page, content);
+        return Result.success(adminTeamVOList);
+    }
+
+    @Override
+    public Result<String> changeStatus(Integer teamId) {
+        teamMapper.changeStatusByUserId(teamId);
+        return Result.success("操作成功");
+    }
+
+    @Override
+    public Result<String> updateUser(AdminTeamUpdateDTO adminTeamUpdateDTO) {
+        teamMapper.updateTeamWithAdmin(adminTeamUpdateDTO);
+        return Result.success("更新成功");
+    }
+
+    @Override
+    public Result<AdminTeamSummaryVO> getSummary() {
+        Integer teamCount = teamMapper.selectTeamCount();
+        Integer examCount = examMapper.selectExamCount();
+        AdminTeamSummaryVO adminTeamSummaryVO = AdminTeamSummaryVO.builder()
+                .teamCount(teamCount)
+                .examCount(examCount)
+                .build();
+        return Result.success(adminTeamSummaryVO);
     }
 }

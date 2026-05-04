@@ -12,7 +12,7 @@
         <!-- 小组列表 -->
         <div v-if="groups.length !== 0" class="space-y-2">
             <!-- 小组卡片 -->
-            <RouterLink v-for="group in groups" :key="group.id" :to="'/group/' + group.id"
+            <RouterLink v-for="group in groups" :key="group.id" :to="'/my-team/' + group.id"
                 class="flex flex-col md:flex-row justify-between border shadow-sm rounded-xl p-3 cursor-pointer hover:bg-gray-50 transition-colors group">
                 <div class="flex items-center space-x-4">
                     <div class="bg-blue-50 p-3 rounded-lg group-hover:bg-blue-100 transition-colors">

@@ -79,8 +79,12 @@
         withCredentials: true
       })
       if (res.data.code === 1) {
-        userStore.getInfo()
-        router.push("/")
+        await userStore.getInfo()
+        if (userStore.user.role === 0) {
+          router.push('/user')
+        } else {
+          router.push('/my-team')
+        }
       }
     } catch (e) {
       console.log(e);

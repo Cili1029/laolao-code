@@ -1,4 +1,4 @@
-package com.laolao.pojo.entity;
+package com.laolao.pojo.vo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -15,12 +15,11 @@ import java.io.Serializable;
 @AllArgsConstructor
 @ToString
 @Builder
-public class Team implements Serializable {
+public class AdminTeamVO implements Serializable {
 
     /**
      * 主键ID
      */
-    @TableId(type = IdType.AUTO)
     private Integer id;
 
     /**
@@ -37,6 +36,16 @@ public class Team implements Serializable {
      * 创建组管理员的ID
      */
     private Integer managerId;
+
+    /**
+     * 组管理员账号
+     */
+    private String managerUsername;
+
+    /**
+     * 组管理员名字
+     */
+    private String managerName;
 
     /**
      * 组邀请码

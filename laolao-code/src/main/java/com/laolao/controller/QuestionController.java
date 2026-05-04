@@ -3,9 +3,7 @@ package com.laolao.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.laolao.common.result.Result;
 import com.laolao.pojo.dto.AddQuestionDTO;
-import com.laolao.pojo.vo.DraftQuestionVO;
-import com.laolao.pojo.vo.QuestionBankDialogVO;
-import com.laolao.pojo.vo.QuestionBankInfoVO;
+import com.laolao.pojo.vo.*;
 import com.laolao.service.QuestionService;
 import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,7 +21,7 @@ public class QuestionController {
      * @return 题目数据
      */
     @GetMapping("/single")
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public Result<QuestionBankInfoVO> getSingleQuestionInfo(@RequestParam Integer questionId) {
         return questionService.getSingleQuestionInfo(questionId);
     }
@@ -57,7 +55,7 @@ public class QuestionController {
      * @return 主键Id
      */
     @GetMapping("/public")
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public Result<Page<QuestionBankDialogVO>> getPublicQuestions(Integer pageNum, Integer pageSize, String content, Integer tagId, Integer isFavorite) {
         return questionService.getPublicQuestions(pageNum, pageSize, content, tagId, isFavorite);
     }
@@ -80,7 +78,7 @@ public class QuestionController {
      * @return 结果信息
      */
     @DeleteMapping("/delete")
-    @PreAuthorize("hasRole('MANAGER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public Result<String> delete(@RequestParam Integer questionId) {
         return questionService.delete(questionId);
     }
@@ -92,5 +90,16 @@ public class QuestionController {
     @PreAuthorize("hasRole('MANAGER')")
     public Result<DraftQuestionVO> copyQuestion(@RequestParam Integer questionId, @RequestParam Integer examId) {
         return questionService.copyQuestion(questionId, examId);
+    }
+
+    /**
+     * 获取网站题库概览
+     *
+     * @return 题库概览
+     */
+    @GetMapping("/summary")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    public Result<AdminQuestionSummaryVO> getSummary() {
+        return questionService.getSummary();
     }
 }

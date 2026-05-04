@@ -13,6 +13,9 @@ import MyExam from "@/components/user/exam/MyExam.vue";
 import MyReport from "@/components/user/report/MyReport.vue";
 import UserLayout from "@/components/user/UserLayout.vue";
 import QuestionBank from "@/components/user/question/QuestionBank.vue";
+import User from "@/components/user/admin/User.vue";
+import Team from "@/components/user/admin/Team.vue";
+import Docker from "@/components/user/admin/Docker.vue";
 
 const routes: Array<RouteRecordRaw> = [
     // 注册
@@ -32,14 +35,13 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
         component: UserLayout,
-        redirect: '/group',
         children: [
             {
-                path: 'group',
+                path: 'my-team',
                 component: MyTeam,
             },
             {
-                path: 'group/:id',
+                path: 'my-team/:id',
                 component: Group,
             },
             {
@@ -73,6 +75,18 @@ const routes: Array<RouteRecordRaw> = [
             {
                 path: 'question-bank',
                 component: QuestionBank,
+            },
+            {
+                path: 'user',
+                component: User,
+            },
+            {
+                path: 'team',
+                component: Team,
+            },
+            {
+                path: 'docker',
+                component: Docker,
             },
         ]
     }

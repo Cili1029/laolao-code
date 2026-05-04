@@ -42,7 +42,7 @@
 
 <script setup lang="ts">
   import type { SidebarProps } from '@/components/ui/sidebar'
-  import { Brain, BugPlay, NotebookText, UsersRound, Warehouse, } from "lucide-vue-next"
+  import { Brain, BugPlay, Container, NotebookText, User, UsersRound, Warehouse, } from "lucide-vue-next"
   import NavUser from './NavUser.vue'
   import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail, } from '@/components/ui/sidebar'
   import logo from '@/assets/logo.jpg'
@@ -60,9 +60,10 @@
 
 
   const navMainData = [
+    // 组管理员/组员通用
     {
       title: "我的小组",
-      url: "/group",
+      url: "/my-team",
       icon: UsersRound,
       roles: [1, 2],
     },
@@ -73,23 +74,46 @@
       roles: [1, 2],
     },
     {
+      title: "人工智障",
+      url: "#",
+      icon: Brain,
+      roles: [1, 2],
+    },
+
+    // 组员
+    {
       title: "考试报告",
       url: "/user-report",
       icon: NotebookText,
       roles: [2],
     },
+
+    // 管理员
+    {
+      title: "用户管理",
+      url: "/user",
+      icon: User,
+      roles: [0],
+    },
+    {
+      title: "判题机管理",
+      url: "/docker",
+      icon: Container,
+      roles: [0],
+    },
+    {
+      title: "组管理",
+      url: "/team",
+      icon: UsersRound,
+      roles: [0],
+    },
+
+    // 组管理员/管理员
     {
       title: "题目仓库",
       url: "/question-bank",
       icon: Warehouse,
-      roles: [1],
-    },
-
-    {
-      title: "人工智障",
-      url: "#",
-      icon: Brain,
-      roles: [1, 2],
+      roles: [0, 1],
     },
   ]
 

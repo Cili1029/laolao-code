@@ -1,11 +1,11 @@
 package com.laolao.controller;
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.laolao.common.result.Result;
+import com.laolao.pojo.dto.AdminTeamUpdateDTO;
 import com.laolao.pojo.dto.CreateTeamDTO;
 import com.laolao.pojo.dto.JoinTeamDTO;
-import com.laolao.pojo.vo.DetailBaseTeamVO;
-import com.laolao.pojo.vo.DetailExamTeamVO;
-import com.laolao.pojo.vo.TeamVO;
+import com.laolao.pojo.vo.*;
 import com.laolao.service.TeamService;
 import jakarta.annotation.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -72,5 +72,51 @@ public class TeamController {
     @PreAuthorize("hasRole('MANAGER')")
     public Result<String> createTeam(@RequestBody CreateTeamDTO createTeamDTO) {
         return teamService.createTeam(createTeamDTO);
+    }
+
+    /**
+     * 获取所有小组
+     *
+     * @return 小组列表
+     */
+    @GetMapping("/all")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<Page<AdminTeamVO>> getAllTeam(Integer pageNum, Integer pageSize, String content) {
+        return teamService.getAllTeam(pageNum, pageSize, content);
+    }
+
+    /**
+     * 启用/禁用组
+     *
+     * @param teamId 组Id
+     * @return 结果信息
+     */
+    @PutMapping("/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<String> changeStatus(@RequestParam Integer teamId) {
+        return teamService.changeStatus(teamId);
+    }
+
+    /**
+     * 更新组信息
+     *
+     * @param adminTeamUpdateDTO 更新信息
+     * @return 结果信息
+     */
+    @PutMapping("/update")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<String> update(@RequestBody AdminTeamUpdateDTO adminTeamUpdateDTO) {
+        return teamService.updateUser(adminTeamUpdateDTO);
+    }
+
+    /**
+     * 获取网站用户概览
+     *
+     * @return 用户概览
+     */
+    @GetMapping("/summary")
+    @PreAuthorize("hasRole('ADMIN')")
+    public Result<AdminTeamSummaryVO> getSummary() {
+        return teamService.getSummary();
     }
 }

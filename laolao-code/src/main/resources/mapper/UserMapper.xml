@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.laolao.mapper.UserMapper">
+    <select id="selectAllUser" resultType="com.laolao.pojo.vo.AdminUserVO">
+        select id, status, username, name, role from user
+        <where>
+            <if test="content != null and content != ''">
+                username like concat('%',#{content},'%')
+                or name like concat('%',#{content},'%')
+            </if>
+        </where>
+    </select>
+</mapper>

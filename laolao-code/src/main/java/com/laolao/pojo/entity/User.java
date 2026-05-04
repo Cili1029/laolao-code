@@ -43,6 +43,11 @@ public class User implements Serializable {
      */
     private Integer role;
 
+    /**
+     * 状态
+     */
+    private Integer status;
+
     // 获取权限标识
     public String getRoleName() {
         if (this.role == 0) {

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.laolao.pojo.ai.ExamQuestionDataContent;
 import com.laolao.pojo.entity.Question;
+import com.laolao.pojo.vo.AdminQuestionSummaryVO;
 import com.laolao.pojo.vo.QuestionBankDialogTagVO;
 import com.laolao.pojo.vo.QuestionBankDialogVO;
 import com.laolao.pojo.vo.QuestionBankInfoVO;
@@ -46,4 +47,11 @@ public interface QuestionMapper extends BaseMapper<Question> {
 
     @Select("select id, title, content, difficulty, time_limit, memory_limit, standard_solution from question where id = #{questionId}")
     QuestionBankInfoVO selectQuestionInfo(Integer questionId);
+
+    @Select("""
+            select sum(if(parent_id = 0, 1, 0)) AS question_count,
+                   sum(if(parent_id != 0, 1, 0)) AS copy_count
+            from question;
+            """)
+    AdminQuestionSummaryVO selectQuestionSummary();
 }

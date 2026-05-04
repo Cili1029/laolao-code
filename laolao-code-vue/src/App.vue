@@ -10,12 +10,20 @@
   import { useUserStore } from "@/stores/UserStore"
   import { onMounted, onUnmounted } from 'vue'
   import { useWebsocketStore } from '@/stores/WebsocketStore'
+  import router from './router'
   const wsStore = useWebsocketStore()
 
   const userStore = useUserStore()
 
   onMounted(async () => {
-    userStore.getInfo()
+    await userStore.getInfo()
+    if (window.location.pathname === '/') {
+      if (userStore.user.role === 0) {
+        router.push('/user')
+      } else {
+        router.push('/my-team')
+      }
+    }
   })
 
   onUnmounted(() => {

@@ -3,6 +3,7 @@ package com.laolao.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.laolao.common.result.Result;
 import com.laolao.pojo.dto.AddQuestionDTO;
+import com.laolao.pojo.vo.AdminQuestionSummaryVO;
 import com.laolao.pojo.vo.DraftQuestionVO;
 import com.laolao.pojo.vo.QuestionBankDialogVO;
 import com.laolao.pojo.vo.QuestionBankInfoVO;
@@ -21,4 +22,6 @@ public interface QuestionService {
     Result<QuestionBankInfoVO> getSingleQuestionInfo(Integer questionId);
 
     Result<String> favorite(Integer questionId);
+
+    Result<AdminQuestionSummaryVO> getSummary();
 }

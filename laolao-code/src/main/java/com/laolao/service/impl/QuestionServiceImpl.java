@@ -8,13 +8,10 @@ import com.laolao.common.util.SecurityUtils;
 import com.laolao.mapper.*;
 import com.laolao.pojo.dto.AddQuestionDTO;
 import com.laolao.pojo.entity.QuestionFavorite;
-import com.laolao.pojo.vo.QuestionBankDialogTagVO;
+import com.laolao.pojo.vo.*;
 import com.laolao.pojo.entity.ExamQuestionConfig;
 import com.laolao.pojo.entity.Question;
 import com.laolao.pojo.entity.QuestionTestCase;
-import com.laolao.pojo.vo.DraftQuestionVO;
-import com.laolao.pojo.vo.QuestionBankDialogVO;
-import com.laolao.pojo.vo.QuestionBankInfoVO;
 import com.laolao.service.QuestionService;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -160,5 +157,11 @@ public class QuestionServiceImpl implements QuestionService {
             questionFavoriteMapper.deleteById(favorite.getId());
         }
         return Result.success("取消成功");
+    }
+
+    @Override
+    public Result<AdminQuestionSummaryVO> getSummary() {
+        AdminQuestionSummaryVO adminQuestionSummaryVO = questionMapper.selectQuestionSummary();
+        return Result.success(adminQuestionSummaryVO);
     }
 }

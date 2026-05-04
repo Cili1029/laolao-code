@@ -1,14 +1,15 @@
 package com.laolao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.laolao.pojo.dto.AdminTeamUpdateDTO;
 import com.laolao.pojo.dto.JoinTeamDTO;
 import com.laolao.pojo.entity.Team;
-import com.laolao.pojo.vo.DetailBaseTeamVO;
-import com.laolao.pojo.vo.DetailExamTeamVO;
-import com.laolao.pojo.vo.TeamVO;
+import com.laolao.pojo.vo.*;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -68,4 +69,15 @@ public interface TeamMapper extends BaseMapper<Team> {
             where e.id = #{examId}
             """)
     Integer selectUserCountByExamId(Integer examId);
+
+    Page<AdminTeamVO> selectAllTeam(Page<AdminTeamVO> page, String content);
+
+    @Select("update team set status = 1 - status where id = #{teamId}")
+    void changeStatusByUserId(Integer teamId);
+
+    @Update("update team set name = #{name}, invite_code = #{inviteCode}, description = #{description} where id = #{id}")
+    void updateTeamWithAdmin(AdminTeamUpdateDTO adminTeamUpdateDTO);
+
+    @Select("select count(id) as teamCount from team where status = 1")
+    Integer selectTeamCount();
 }

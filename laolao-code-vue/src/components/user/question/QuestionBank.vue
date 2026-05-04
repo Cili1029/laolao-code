@@ -14,7 +14,7 @@
                 </div>
             </div>
 
-            <Sheet>
+            <Sheet v-if="userStore.user.role === 1">
                 <SheetTrigger as-child>
                     <p @click="getPrivateQuestions()" class="flex cursor-pointer hover:text-blue-700 items-center">
                         <User />个人仓库
@@ -95,47 +95,87 @@
                     <SearchIcon />
                 </Button>
             </ButtonGroup>
-            <p @click="isFavorite = !isFavorite" class="flex cursor-pointer hover:text-blue-600 items-center" :class="isFavorite ? 'text-blue-600' :''">
+            <p v-if="userStore.user.role === 1" @click="isFavorite = !isFavorite"
+                class="flex cursor-pointer hover:text-blue-600 items-center" :class="isFavorite ? 'text-blue-600' : ''">
                 <Star />仅看收藏
             </p>
         </div>
 
-        <div class="flex-1 overflow-y-auto w-2/3">
-            <Table>
-                <TableBody>
-                    <TableRow v-for="question in publicQuestions" :key="question.id">
-                        <TableCell class="cursor-pointer hover:text-blue-600">
-                            <QuestionBankInfoDialog :question-id="question.id">
-                                <template #trigger>
-                                    {{ question.title }}
-                                </template>
-                            </QuestionBankInfoDialog>
-                        </TableCell>
-                        <TableCell>
-                            <div class="flex space-x-2">
-                                <Badge v-for="tag in question.tags" class="bg-green-600 text-white">
-                                    {{ tag }}
-                                </Badge>
-                            </div>
-                        </TableCell>
-                        <TableCell>
-                            <p variant="secondary" :class="question.difficulty === 0 ? 'text-green-500' :
-                                question.difficulty === 1 ? 'text-orange-400' : 'text-red-500'">
-                                {{ question.difficulty === 0 ? '简单' :
-                                    question.difficulty === 1 ? '中等' : '困难' }}
+        <div class="flex flex-1 space-x-3">
+            <div class="overflow-y-auto w-2/3">
+                <Table>
+                    <TableBody>
+                        <TableRow v-for="question in publicQuestions" :key="question.id">
+                            <TableCell class="cursor-pointer hover:text-blue-600">
+                                <QuestionBankInfoDialog :question-id="question.id">
+                                    <template #trigger>
+                                        {{ question.title }}
+                                    </template>
+                                </QuestionBankInfoDialog>
+                            </TableCell>
+                            <TableCell>
+                                <div class="flex space-x-2">
+                                    <Badge v-for="tag in question.tags" class="bg-green-600 text-white">
+                                        {{ tag }}
+                                    </Badge>
+                                </div>
+                            </TableCell>
+                            <TableCell>
+                                <p variant="secondary" :class="question.difficulty === 0 ? 'text-green-500' :
+                                    question.difficulty === 1 ? 'text-orange-400' : 'text-red-500'">
+                                    {{ question.difficulty === 0 ? '简单' :
+                                        question.difficulty === 1 ? '中等' : '困难' }}
+                                </p>
+                            </TableCell>
+                            <TableCell class="flex space-x-2 justify-end">
+                                <div v-if="userStore.user.role === 1" @click="changeFavorite(question)"
+                                    class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
+                                    <Star v-if="question.isFavorite === 0" class="mr-1" />
+                                    <StarOff v-else class="mr-1" />
+                                    {{ question.isFavorite === 1 ? '取消' : '收藏' }}
+                                </div>
+                                <div v-if="userStore.user.role === 0" @click=""
+                                    class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
+                                    <Edit class="h-4 w-4 mr-1" />
+                                    编辑
+                                </div>
+                                <div v-if="userStore.user.role === 0" @click="deleteQuestion(question)"
+                                    class="flex cursor-pointer text-red-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
+                                    <Trash class="h-4 w-4 mr-1" />
+                                    删除
+                                </div>
+                            </TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
+            </div>
+            <div class="flex flex-col w-1/3 items-center">
+                <Card class="w-full max-w-sm">
+                    <CardHeader>
+                        <CardTitle>仓库统计</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div class="grid w-full items-center gap-4">
+                            <p class="flex justify-between">
+                                <span>
+                                    题目数量
+                                </span>
+                                <span>
+                                    {{ summary?.questionCount }}
+                                </span>
                             </p>
-                        </TableCell>
-                        <TableCell class="flex space-x-2 justify-end">
-                            <div @click="changeFavorite(question)"
-                                class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
-                                <Star v-if="question.isFavorite === 0" class="mr-1" />
-                                <StarOff v-else class="mr-1" />
-                                {{ question.isFavorite === 1 ? '取消' : '收藏' }}
-                            </div>
-                        </TableCell>
-                    </TableRow>
-                </TableBody>
-            </Table>
+                            <p class="flex justify-between">
+                                <span>
+                                    克隆次数
+                                </span>
+                                <span>
+                                    {{ summary?.copyCount }}
+                                </span>
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
 
         <Pagination v-if="publicTotal > 0" v-model:page="publicPageNum" :total="publicTotal"
@@ -167,10 +207,14 @@
     import { onMounted, ref, watch } from "vue"
     import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger, SheetFooter } from '@/components/ui/sheet'
     import QuestionBankInfoDialog from "./QuestionBankInfoDialog.vue"
+    import { useUserStore } from "@/stores/UserStore"
+    const userStore = useUserStore()
+    import { Card, CardContent, CardHeader, CardTitle, } from '@/components/ui/card'
 
     onMounted(() => {
         getTag()
         getPublicQuestions()
+        getSummary()
     })
 
     interface Tag {
@@ -250,7 +294,19 @@
         }
     }
 
-
+    interface Summary {
+        questionCount: number
+        copyCount: number
+    }
+    const summary = ref<Summary>()
+    const getSummary = async () => {
+        try {
+            const res = await axios.get("/api/question/summary")
+            summary.value = res.data.data
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     // ----------------------------------------以下为私人题库----------------------------------------
     const privateSearchContent = ref("")
