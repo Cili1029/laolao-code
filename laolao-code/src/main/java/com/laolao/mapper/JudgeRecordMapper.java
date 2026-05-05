@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.laolao.pojo.ai.JudgeRecordContext;
 import com.laolao.pojo.ai.UserAnswerDataContent;
 import com.laolao.pojo.entity.JudgeRecord;
-import com.laolao.pojo.vo.GradeJudgeRecordVO;
-import com.laolao.pojo.vo.JudgeRecordVO;
-import com.laolao.pojo.vo.UserExamJudgeRecordVO;
-import com.laolao.pojo.vo.SimpleJudgeRecordVO;
+import com.laolao.pojo.vo.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -90,4 +87,14 @@ public interface JudgeRecordMapper extends BaseMapper<JudgeRecord> {
             WHERE e.id = #{examId};
             """)
     List<UserAnswerDataContent> selectUserAnswersByExamId(Integer examId);
+
+
+    @Select("""
+            select jr.id, u.username, u.name, jr.status, jr.time, jr.memory
+            from judge_record jr
+                     join user u on u.id = jr.user_id
+            order by jr.submit_time desc
+            limit 6
+            """)
+    List<AdminJudgeRecordVO> selectJudgeRecordWithAdmin();
 }

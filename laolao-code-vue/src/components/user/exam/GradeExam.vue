@@ -1,5 +1,5 @@
 <template>
-    <div class="flex bg-gray-100">
+    <div class="flex flex-row bg-gray-100 h-full">
         <div
             class="h-full w-14 shrink-0 flex flex-col items-center py-4 gap-4 border-r bg-gray-50 overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <div v-for="user in users" :key="user.id" @click="currentUser = user" :class="[
@@ -44,6 +44,7 @@
                     <span>提交时间：{{ dayjs(currentUser?.submitTime).format('YYYY/MM/DD HH:mm') }}</span>
                 </div>
             </div>
+            
             <div class=" w-5/7 shrink-0 border rounded py-2 px-6 space-y-2 bg-white">
                 <div v-for="judgeRecord in currentUser?.judgeRecords" :key="judgeRecord.id">
                     <div class="flex justify-between">

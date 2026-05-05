@@ -67,8 +67,6 @@
                                         variant="outline">
                                         删除草稿
                                     </Button>
-
-                                    <!-- 已改完状态的特殊按钮（如查看统计）可以在此扩展 -->
                                 </div>
                             </div>
                         </div>
@@ -93,24 +91,8 @@
         <!-- 下半部分：报告与时间线 -->
         <div class="flex-1 min-h-0 w-6/7 mx-auto flex justify-center space-x-5">
             <div
-                class="h-full w-4/5 shadow rounded-lg p-2 bg-white overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                <!-- AI报告：逻辑改为判断 isCompleted -->
-                <div v-if="exam?.examPermissions.completed && userStore.user.role === 1">
-                    <div class="flex" v-if="!report?.aiReport">
-                        <div @click="aiManagerExamReport()"
-                            class="flex cursor-pointer text-green-600 items-center px-2 py-2 mb-2 bg-gray-100 text-sm hover:bg-gray-200 rounded">
-                            <Spinner v-if="isGenerating" class="mr-1" />
-                            <Rocket v-else class="h-4 w-4 mr-1" />
-                            {{ isGenerating ? 'AI 正在思考...' : '生成 AI 诊断报告' }}
-                        </div>
-                    </div>
-                    <div v-if="report?.aiReport || isGenerating"
-                        class="p-4 bg-slate-50 border border-blue-100 rounded-lg">
-                        <div class="text-sm text-gray-700" v-html="renderMarkdown(report?.aiReport || '')"></div>
-                        <span v-if="isGenerating"
-                            class="inline-block w-2 h-4 bg-blue-500 animate-pulse ml-1 align-middle"></span>
-                    </div>
-                </div>
+                class="h-full w-4/5 shadow rounded-lg p-2 bg-white overflow-y-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden flex flex-col">
+                <ExamDetails :exam-id="Number(route.params.id)" :status="exam?.status ?? 0" />
             </div>
 
             <!-- 右侧时间线：逻辑改为判断 timelineStep -->
@@ -167,30 +149,28 @@
     import { useRoute } from 'vue-router'
     import axios from "@/utils/myAxios"
     import { Badge } from '@/components/ui/badge'
-    import { Bug, Rocket } from 'lucide-vue-next';
+    import { Bug } from 'lucide-vue-next';
     import { Button } from '@/components/ui/button'
     import dayjs from 'dayjs'
     import router from '@/router';
     import { useUserStore } from '@/stores/UserStore'
     import CreateExamDialog from './CreateOrUpdateExamDialog.vue';
-    import MarkdownIt from 'markdown-it'
-    import Spinner from '@/components/ui/spinner/Spinner.vue'
-    const md = new MarkdownIt({ breaks: true }); // breaks: true 允许回车换行
-    const renderMarkdown = (text: string) => md.render(text);
+
+
+    import ExamDetails from './ExamDetails.vue';
+
     const userStore = useUserStore()
 
     const route = useRoute()
 
     onMounted(() => {
         getExamInfo()
-        getManagerReport()
     })
 
     watch(
         () => route.params.id,
         async () => {
             getExamInfo()
-            getManagerReport()
         }
     )
 
@@ -314,10 +294,9 @@
                 return { text: '已截止', disabled: true }
             }
 
-            if (p.completed) return { text: '查看结果', disabled: false, action: () => { } }
         } else { // 组管理员
             if (p.publishing) return { text: '发布中', disabled: true }
-            if (p.canGrade) return { text: '去改卷', disabled: false, action: () => router.push(`/exam/grade/${exam.value?.id}`) }
+            if (p.canGrade) return { text: '去改卷', disabled: false, action: () => router.push(`/grade/${exam.value?.id}`) }
             if (p.published) return { text: '进行中', disabled: true } // 组管理员看的是考试大状态
             if (p.completed) return { text: '已批改', disabled: true }
         }
@@ -368,28 +347,6 @@
         }
     }
 
-    // 导师改完卷后显示
-    const isGenerating = ref<boolean>(false)
-
-    interface ExamCompleteReport {
-        aiReport: string
-    }
-
-    const report = ref<ExamCompleteReport>()
-
-    const getManagerReport = async () => {
-        try {
-            const res = await axios.get("/api/exam/complete-report", {
-                params: {
-                    examId: route.params.id
-                }
-            })
-            report.value = res.data.data
-        } catch (e) {
-            console.log(e)
-        }
-    }
-
     const cancelExam = async () => {
         try {
             await axios.post("/api/exam/manager/cancel", {}, {
@@ -399,26 +356,6 @@
             })
         } catch (e) {
             console.log(e)
-        }
-    }
-
-    const aiManagerExamReport = () => {
-        if (isGenerating.value) return
-        isGenerating.value = true
-        report.value!.aiReport = ''
-
-        const eventSource = new EventSource(`/api/ai/report/exam-report?examId=${route.params.id}`)
-
-        // 接收SSE消息，拼接内容
-        eventSource.onmessage = (event) => {
-            // 4. 响应式变量拼接必须操作.value
-            report.value!.aiReport += event.data.replace(/\\n/g, '\n')
-        }
-
-        // 连接异常/结束处理
-        eventSource.onerror = () => {
-            isGenerating.value = false
-            eventSource.close()
         }
     }
 </script>

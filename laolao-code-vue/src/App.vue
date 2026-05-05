@@ -19,7 +19,7 @@
     await userStore.getInfo()
     if (window.location.pathname === '/') {
       if (userStore.user.role === 0) {
-        router.push('/user')
+        router.push('/docker')
       } else {
         router.push('/my-team')
       }

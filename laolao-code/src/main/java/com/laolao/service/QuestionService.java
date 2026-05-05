@@ -3,10 +3,8 @@ package com.laolao.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.laolao.common.result.Result;
 import com.laolao.pojo.dto.AddQuestionDTO;
-import com.laolao.pojo.vo.AdminQuestionSummaryVO;
-import com.laolao.pojo.vo.DraftQuestionVO;
-import com.laolao.pojo.vo.QuestionBankDialogVO;
-import com.laolao.pojo.vo.QuestionBankInfoVO;
+import com.laolao.pojo.dto.SaveEditQuestionDTO;
+import com.laolao.pojo.vo.*;
 
 public interface QuestionService {
     Result<Integer> addOrUpdateQuestion(AddQuestionDTO addQuestionDTO);
@@ -24,4 +22,8 @@ public interface QuestionService {
     Result<String> favorite(Integer questionId);
 
     Result<AdminQuestionSummaryVO> getSummary();
+
+    Result<EditQuestionVO> getEditTarget(Integer questionId);
+
+    Result<String> saveEdit(SaveEditQuestionDTO saveEditQuestionDTO);
 }

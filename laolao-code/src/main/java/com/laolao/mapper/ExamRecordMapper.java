@@ -2,10 +2,7 @@ package com.laolao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.laolao.pojo.entity.ExamRecord;
-import com.laolao.pojo.vo.ExamRecordVO;
-import com.laolao.pojo.vo.GradeUserVO;
-import com.laolao.pojo.vo.UserExamRecord;
-import com.laolao.pojo.vo.UserReportVO;
+import com.laolao.pojo.vo.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -77,4 +74,26 @@ public interface ExamRecordMapper extends BaseMapper<ExamRecord> {
 
     @Update("update exam_record set status = #{newStatus} where exam_id = #{examId} and status = #{oldStatus}")
     void updateStatus(Integer examId, int oldStatus, int newStatus);
+
+    @Select("""
+            SELECT u.name   AS name,
+                   er.score AS score,
+                   er.id    AS exam_record_id
+            FROM
+                -- 通过考试ID找到对应的小组
+                exam e
+                    -- 关联该小组的所有成员
+                    JOIN team_user gm ON gm.team_id = e.team_id
+                    -- 关联成员的用户信息
+                    JOIN user u ON u.id = gm.user_id
+                    -- 左连接该考试的成绩（缺考则score为NULL）
+                    LEFT JOIN exam_record er ON er.user_id = gm.user_id AND er.exam_id = e.id
+            -- 只需要指定考试ID，无需指定组ID
+            WHERE e.id = #{examId}
+            ORDER BY er.score DESC, er.score IS NULL
+            """)
+    List<ExamCompleteUserVO> selectUserJoinExamInfo(Integer examId);
+
+    @Select("select id as exam_record_id, score from exam_record where exam_id = #{examId} and user_id = #{userId}")
+    UserExamAnswerInfoVO selectUserExamScore(Integer examId, Integer userId);
 }

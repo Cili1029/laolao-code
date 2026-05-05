@@ -11,4 +11,6 @@ public interface ExamQueryService {
     Result<ExamInfoVO> getExamInfo(Integer examId);
 
     Result<ExamCompleteReportVO> getExamCompleteReport(Integer examId);
+
+    Result<UserExamAnswerInfoVO> getUserExamAnswerInfo(Integer examId);
 }

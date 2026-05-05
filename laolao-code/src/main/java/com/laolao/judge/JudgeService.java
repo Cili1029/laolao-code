@@ -80,6 +80,7 @@ public class JudgeService {
         try {
             methodInfo = JudgeUnits.paramParsing(userCode);
         } catch (Exception e) {
+            failCount.incrementAndGet();
             String errMessage = e.getMessage();
             return JudgeResult.builder()
                     .status(JudgeConstant.STATUS_CE)
@@ -450,13 +451,33 @@ public class JudgeService {
         }
     }
 
-    private static final int POOL_SIZE = 3;
+    private final AtomicInteger POOL_SIZE = new AtomicInteger(3);
+
+    /**
+     * 扩展容器池大小
+     *
+     * @param newSize 新的目标大小
+     */
+    public boolean adjustPoolSize(int newSize) {
+        int oldSize = POOL_SIZE.get();
+        if (oldSize > newSize) {
+            // 不可做缩减
+            return false;
+        }
+        POOL_SIZE.set(newSize);
+
+        // 需要扩容，补充差额
+        for (int i = 0; i < (newSize - oldSize); i++) {
+            createNewContainerToPool();
+        }
+        return true;
+    }
 
     /**
      * 初始化池子
      */
     private void initPool() {
-        for (int i = 0; i < POOL_SIZE; i++) {
+        for (int i = 0; i < POOL_SIZE.get(); i++) {
             createNewContainerToPool();
         }
     }
@@ -571,9 +592,9 @@ public class JudgeService {
                 ? 0.0
                 : Math.round((info.getMemTotal() / (1024.0 * 1024 * 1024)) * 100) / 100.0;
         return AdminJudgerInfoVO.builder()
-                .poolSize(POOL_SIZE)
+                .poolSize(POOL_SIZE.get())
                 .idleCount(containerQueue.size())
-                .busyCount(POOL_SIZE - containerQueue.size())
+                .busyCount(POOL_SIZE.get() - containerQueue.size())
                 .totalJudgeCount(totalJudgeCount.get())
                 .successCount(successCount.get())
                 .failCount(failCount.get())

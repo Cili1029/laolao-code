@@ -9,18 +9,21 @@ import com.laolao.pojo.entity.*;
 import com.laolao.pojo.vo.*;
 import com.laolao.service.ExamQueryService;
 import jakarta.annotation.Resource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-public class ExamQueryQueryServiceImpl implements ExamQueryService {
+public class ExamQueryServiceImpl implements ExamQueryService {
     @Resource
     private ExamMapper examMapper;
     @Resource
     private ExamRecordMapper examRecordMapper;
     @Resource
     private AiReportMapper aiReportMapper;
+    @Autowired
+    private QuestionMapper questionMapper;
 
     @Override
     public Result<List<ExamVO>> getSimpleExam() {
@@ -53,13 +56,26 @@ public class ExamQueryQueryServiceImpl implements ExamQueryService {
 
     @Override
     public Result<ExamCompleteReportVO> getExamCompleteReport(Integer examId) {
-        AiReport report = aiReportMapper.selectOne(Wrappers.<AiReport>lambdaQuery()
+        ExamCompleteReportVO examCompleteReportVO = new ExamCompleteReportVO();
+        // 学生情况
+        examCompleteReportVO.setUserList(examRecordMapper.selectUserJoinExamInfo(examId));
+
+        // ai报告
+        AiReport aireport = aiReportMapper.selectOne(Wrappers.<AiReport>lambdaQuery()
                 .eq(AiReport::getTargetType, 3)
                 .eq(AiReport::getTargetId, examId));
-        ExamCompleteReportVO examCompleteReportVO = new ExamCompleteReportVO();
-        if (report != null) {
-            examCompleteReportVO.setAiReport(report.getContent());
+        if (aireport != null) {
+            examCompleteReportVO.setAiReport(aireport.getContent());
         }
         return Result.success(examCompleteReportVO);
+    }
+
+    @Override
+    public Result<UserExamAnswerInfoVO> getUserExamAnswerInfo(Integer examId) {
+        // 获取分数和报告
+        UserExamAnswerInfoVO userExamAnswerInfoVO = examRecordMapper.selectUserExamScore(examId, SecurityUtils.getUserId());
+        // 获取每一题作答情况
+        userExamAnswerInfoVO.setQuestions(questionMapper.selectUserExamQuestionAnswerInfo(examId, SecurityUtils.getUserId()));
+        return Result.success(userExamAnswerInfoVO);
     }
 }

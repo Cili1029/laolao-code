@@ -8,6 +8,11 @@ import lombok.*;
 @AllArgsConstructor
 public class JudgeRecordVO {
     /**
+     * 题目ID
+     */
+    private Integer questionId;
+
+    /**
      * 判题状态(-1-判题中, 0-AC, 1-WA, 2-MLE, 3-TLE, 4-RE, 5-CE, 6-SE, 7-UN)
      */
     private Integer status;

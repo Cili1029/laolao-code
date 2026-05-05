@@ -242,7 +242,6 @@
         title: string
         content: string
         questionScore: number
-        tags: string[]
         difficulty: number
         timeLimit: number
         memoryLimit: number
@@ -295,7 +294,6 @@
             title: '',
             content: '',
             questionScore: 0,
-            tags: [],
             difficulty: 0,
             timeLimit: 0,
             memoryLimit: 0,

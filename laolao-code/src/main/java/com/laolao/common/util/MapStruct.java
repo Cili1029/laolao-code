@@ -1,6 +1,7 @@
 package com.laolao.common.util;
 
 import com.laolao.pojo.dto.AddQuestionDTO;
+import com.laolao.pojo.dto.SaveEditQuestionDTO;
 import com.laolao.pojo.dto.UpdateDraftDTO;
 import com.laolao.pojo.entity.Exam;
 import com.laolao.common.result.JudgeResult;
@@ -13,6 +14,8 @@ import org.mapstruct.MappingConstants;
 
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface MapStruct {
+
+    Question SaveEditQuestionDTOToQuestion(SaveEditQuestionDTO saveEditQuestionDTO);
 
     JudgeRecordVO JudgeRecordToJudgeRecordVO(JudgeRecord judge);
 

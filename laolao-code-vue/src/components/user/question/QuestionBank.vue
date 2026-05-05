@@ -45,11 +45,11 @@
                                         </QuestionBankInfoDialog>
                                     </TableCell>
                                     <TableCell class="flex justify-end space-x-2">
-                                        <div @click=""
+                                        <RouterLink :to="'/editor/' + question.id"
                                             class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
                                             <Edit class="h-4 w-4 mr-1" />
                                             编辑
-                                        </div>
+                                        </RouterLink>
                                         <div @click="deleteQuestion(question)"
                                             class="flex cursor-pointer text-red-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
                                             <Trash class="h-4 w-4 mr-1" />
@@ -134,11 +134,11 @@
                                     <StarOff v-else class="mr-1" />
                                     {{ question.isFavorite === 1 ? '取消' : '收藏' }}
                                 </div>
-                                <div v-if="userStore.user.role === 0" @click=""
+                                <RouterLink :to="'/editor/' + question.id" v-if="userStore.user.role === 0"
                                     class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
                                     <Edit class="h-4 w-4 mr-1" />
                                     编辑
-                                </div>
+                                </RouterLink>
                                 <div v-if="userStore.user.role === 0" @click="deleteQuestion(question)"
                                     class="flex cursor-pointer text-red-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
                                     <Trash class="h-4 w-4 mr-1" />

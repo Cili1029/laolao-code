@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.laolao.pojo.ai.ExamQuestionDataContent;
 import com.laolao.pojo.entity.Question;
-import com.laolao.pojo.vo.AdminQuestionSummaryVO;
-import com.laolao.pojo.vo.QuestionBankDialogTagVO;
-import com.laolao.pojo.vo.QuestionBankDialogVO;
-import com.laolao.pojo.vo.QuestionBankInfoVO;
+import com.laolao.pojo.vo.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -54,4 +51,13 @@ public interface QuestionMapper extends BaseMapper<Question> {
             from question;
             """)
     AdminQuestionSummaryVO selectQuestionSummary();
+
+    @Select("""
+            select q.title, eqc.score as question_score, jur.score as user_score
+            from exam_question_config eqc
+                     join question q on q.id = eqc.question_id
+                     left join judge_user_result jur on jur.question_id = q.id and jur.user_id = #{userId}
+            where eqc.exam_id = #{examId}
+            """)
+    List<UserExamAnswerQuestionStatusVO> selectUserExamQuestionAnswerInfo(Integer examId, Integer userId);
 }

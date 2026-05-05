@@ -90,15 +90,15 @@
 
     // 管理员
     {
-      title: "用户管理",
-      url: "/user",
-      icon: User,
-      roles: [0],
-    },
-    {
       title: "判题机管理",
       url: "/docker",
       icon: Container,
+      roles: [0],
+    },
+    {
+      title: "用户管理",
+      url: "/user",
+      icon: User,
       roles: [0],
     },
     {

@@ -16,6 +16,7 @@ import QuestionBank from "@/components/user/question/QuestionBank.vue";
 import User from "@/components/user/admin/User.vue";
 import Team from "@/components/user/admin/Team.vue";
 import Docker from "@/components/user/admin/Docker.vue";
+import QuestionEditor from "@/components/user/question/QuestionEditor.vue";
 
 const routes: Array<RouteRecordRaw> = [
     // 注册
@@ -87,6 +88,10 @@ const routes: Array<RouteRecordRaw> = [
             {
                 path: 'docker',
                 component: Docker,
+            },
+            {
+                path: 'editor/:id',
+                component: QuestionEditor,
             },
         ]
     }

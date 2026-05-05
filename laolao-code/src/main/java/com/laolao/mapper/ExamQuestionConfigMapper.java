@@ -3,6 +3,7 @@ package com.laolao.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.laolao.pojo.entity.ExamQuestionConfig;
 import com.laolao.pojo.vo.DraftQuestionVO;
+import com.laolao.pojo.vo.EditQuestionVO;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
@@ -31,4 +32,19 @@ public interface ExamQuestionConfigMapper extends BaseMapper<ExamQuestionConfig>
     List<Integer> selectQuestionIdByExamId(Integer examId);
 
     void deleteDraft(List<Integer> questionIds);
+
+    @Select("""
+                        select q.id,
+                               q.title,
+                               q.content,
+                               q.difficulty,
+                               q.time_limit,
+                               q.memory_limit,
+                               q.template_code,
+                               q.standard_solution,
+                               q.is_validated
+                        from question q
+                        where id = #{questionId};
+            """)
+    EditQuestionVO selectEditQuestion(Integer questionId);
 }

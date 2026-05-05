@@ -45,4 +45,15 @@ public class ExamQueryController {
     public Result<ExamCompleteReportVO> getExamCompleteReport(@RequestParam Integer examId) {
         return examQueryService.getExamCompleteReport(examId);
     }
+
+    /**
+     * 考生获得考试后简易考试数据
+     *
+     * @param examId 考试Id
+     * @return 考试数据
+     */
+    @GetMapping("/user-answer-report")
+    public Result<UserExamAnswerInfoVO> getUserExamAnswerInfo(@RequestParam Integer examId) {
+        return examQueryService.getUserExamAnswerInfo(examId);
+    }
 }

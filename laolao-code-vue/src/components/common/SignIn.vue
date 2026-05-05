@@ -81,7 +81,7 @@
       if (res.data.code === 1) {
         await userStore.getInfo()
         if (userStore.user.role === 0) {
-          router.push('/user')
+          router.push('/docker')
         } else {
           router.push('/my-team')
         }

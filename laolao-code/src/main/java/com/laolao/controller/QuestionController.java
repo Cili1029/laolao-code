@@ -3,6 +3,8 @@ package com.laolao.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.laolao.common.result.Result;
 import com.laolao.pojo.dto.AddQuestionDTO;
+import com.laolao.pojo.dto.SaveAndAddToExamDTO;
+import com.laolao.pojo.dto.SaveEditQuestionDTO;
 import com.laolao.pojo.vo.*;
 import com.laolao.service.QuestionService;
 import jakarta.annotation.Resource;
@@ -101,5 +103,28 @@ public class QuestionController {
     @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
     public Result<AdminQuestionSummaryVO> getSummary() {
         return questionService.getSummary();
+    }
+
+    /**
+     * 编辑题目
+     *
+     * @return 题目信息
+     */
+    @GetMapping("/edit-target")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    public Result<EditQuestionVO> getEditTarget(@RequestParam Integer questionId) {
+        return questionService.getEditTarget(questionId);
+    }
+
+    /**
+     * 添加题目到考试
+     *
+     * @param saveEditQuestionDTO 添加的题目
+     * @return 题目Id
+     */
+    @PostMapping("/save-edit")
+    @PreAuthorize("hasAnyRole('ADMIN', 'MANAGER')")
+    public Result<String> saveEdit(@RequestBody SaveEditQuestionDTO saveEditQuestionDTO) {
+        return questionService.saveEdit(saveEditQuestionDTO);
     }
 }

@@ -7,6 +7,7 @@ import com.laolao.common.util.MapStruct;
 import com.laolao.common.util.SecurityUtils;
 import com.laolao.mapper.*;
 import com.laolao.pojo.dto.AddQuestionDTO;
+import com.laolao.pojo.dto.SaveEditQuestionDTO;
 import com.laolao.pojo.entity.QuestionFavorite;
 import com.laolao.pojo.vo.*;
 import com.laolao.pojo.entity.ExamQuestionConfig;
@@ -36,7 +37,6 @@ public class QuestionServiceImpl implements QuestionService {
     private QuestionTagMapper questionTagMapper;
     @Resource
     private QuestionFavoriteMapper questionFavoriteMapper;
-
     @Override
     @Transactional(rollbackFor = Exception.class)
     public Result<Integer> addOrUpdateQuestion(AddQuestionDTO addQuestionDTO) {
@@ -163,5 +163,35 @@ public class QuestionServiceImpl implements QuestionService {
     public Result<AdminQuestionSummaryVO> getSummary() {
         AdminQuestionSummaryVO adminQuestionSummaryVO = questionMapper.selectQuestionSummary();
         return Result.success(adminQuestionSummaryVO);
+    }
+
+    @Override
+    public Result<EditQuestionVO> getEditTarget(Integer questionId) {
+        EditQuestionVO editQuestionVO = examQuestionConfigMapper.selectEditQuestion(questionId);
+        List<QuestionTestCase> questionTestCases = questionTestCaseMapper.selectBatchByQuestionIds(Collections.singletonList(questionId));
+        editQuestionVO.setTestCases(questionTestCases);
+        return Result.success(editQuestionVO);
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Result<String> saveEdit(SaveEditQuestionDTO saveEditQuestionDTO) {
+        // 更新题目
+        Question question = mapStruct.SaveEditQuestionDTOToQuestion(saveEditQuestionDTO);
+        question.setIsValidated(0);
+        questionMapper.updateById(question);
+        // 删除原本示例
+        questionTestCaseMapper.delete(new LambdaQueryWrapper<QuestionTestCase>()
+                .eq(QuestionTestCase::getQuestionId, question.getId()));
+        // 保存新示例
+        List<QuestionTestCase> testCases = saveEditQuestionDTO.getTestCases();
+        if (testCases != null && !testCases.isEmpty()) {
+            for (QuestionTestCase testCase : testCases) {
+                testCase.setQuestionId(question.getId());
+            }
+            // 批量插入测试用例
+            questionTestCaseMapper.insertBatch(testCases);
+        }
+        return Result.success("保存成功");
     }
 }
