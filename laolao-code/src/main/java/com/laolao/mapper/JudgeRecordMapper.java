@@ -1,8 +1,8 @@
 package com.laolao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.laolao.pojo.ai.JudgeRecordContext;
-import com.laolao.pojo.ai.UserAnswerDataContent;
+import com.laolao.ai.pojo.content.JudgeRecordContext;
+import com.laolao.ai.pojo.content.UserAnswerDataContent;
 import com.laolao.pojo.entity.JudgeRecord;
 import com.laolao.pojo.vo.*;
 import org.apache.ibatis.annotations.Mapper;

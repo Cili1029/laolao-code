@@ -1,3 +1,3 @@
-package com.laolao.pojo.ai;
+package com.laolao.ai.pojo.content;
 
 public record ExamQuestionDataContent(Integer questionId, String title, String standardSolution) {}

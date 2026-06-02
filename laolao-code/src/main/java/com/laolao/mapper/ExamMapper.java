@@ -1,7 +1,7 @@
 package com.laolao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.laolao.pojo.ai.ExamScoreDataContent;
+import com.laolao.ai.pojo.content.ExamScoreDataContent;
 import com.laolao.pojo.entity.Exam;
 import com.laolao.pojo.vo.ExamInfoVO;
 import com.laolao.pojo.vo.ExamQuestionVO;

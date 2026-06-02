@@ -1,9 +1,9 @@
-package com.laolao.aitool;
+package com.laolao.ai.tool;
 
+import com.laolao.ai.pojo.content.*;
 import com.laolao.mapper.ExamMapper;
 import com.laolao.mapper.JudgeRecordMapper;
 import com.laolao.mapper.QuestionMapper;
-import com.laolao.pojo.ai.*;
 import jakarta.annotation.Resource;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
@@ -31,14 +31,14 @@ public class RecordAiTools {
     }
 
     @Tool(description = "【用于类型3(exam)】根据考试Id，一次性获取生成班级报告所需的全部数据：包括考勤与成绩分布、考试题目详情、以及全班学生的具体作答代码。")
-    public managerExamReportContent queryClassExamFullData(@ToolParam(description = "这一场考试的主键") Integer examId) {
+    public ManagerExamReportContent queryClassExamFullData(@ToolParam(description = "这一场考试的主键") Integer examId) {
         // 查成绩和考勤
         List<ExamScoreDataContent> scores = examMapper.selectAttendanceAndScores(examId);
         // 查考题和标准答案
         List<ExamQuestionDataContent> questions = questionMapper.selectQuestionsByExamId(examId);
         // 查全班实际作答代码
         List<UserAnswerDataContent> answers = judgeRecordMapper.selectUserAnswersByExamId(examId);
-        return managerExamReportContent.builder()
+        return ManagerExamReportContent.builder()
                 .attendanceAndScores(scores)
                 .examQuestions(questions)
                 .userAnswers(answers)

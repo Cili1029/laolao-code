@@ -3,7 +3,6 @@ package com.laolao.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.laolao.common.result.Result;
 import com.laolao.pojo.dto.AddQuestionDTO;
-import com.laolao.pojo.dto.SaveAndAddToExamDTO;
 import com.laolao.pojo.dto.SaveEditQuestionDTO;
 import com.laolao.pojo.vo.*;
 import com.laolao.service.QuestionService;

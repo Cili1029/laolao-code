@@ -1,13 +1,13 @@
-package com.laolao.common.config;
+package com.laolao.ai.config;
 
-import com.laolao.aitool.RecordAiTools;
+import com.laolao.ai.tool.RecordAiTools;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.deepseek.DeepSeekChatModel;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class AiConfig {
+public class RoleConfig {
     @Bean
     public ChatClient tutorClient(DeepSeekChatModel deepSeek, RecordAiTools recordAiTools) {
         String systemPrompt = """

@@ -1,11 +1,11 @@
-package com.laolao.pojo.ai;
+package com.laolao.ai.pojo.content;
 
 import lombok.Builder;
 
 import java.util.List;
 
 @Builder
-public record managerExamReportContent(
+public record ManagerExamReportContent(
         // 学生的实考、缺勤和得分情况
         List<ExamScoreDataContent> attendanceAndScores,
 

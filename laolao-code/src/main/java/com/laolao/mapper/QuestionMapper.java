@@ -2,7 +2,7 @@ package com.laolao.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.laolao.pojo.ai.ExamQuestionDataContent;
+import com.laolao.ai.pojo.content.ExamQuestionDataContent;
 import com.laolao.pojo.entity.Question;
 import com.laolao.pojo.vo.*;
 import org.apache.ibatis.annotations.Mapper;

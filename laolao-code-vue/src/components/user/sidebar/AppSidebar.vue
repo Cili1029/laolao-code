@@ -75,7 +75,7 @@
     },
     {
       title: "人工智障",
-      url: "#",
+      url: "/chat",
       icon: Brain,
       roles: [1, 2],
     },

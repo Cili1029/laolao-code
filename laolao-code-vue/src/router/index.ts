@@ -17,6 +17,7 @@ import User from "@/components/user/admin/User.vue";
 import Team from "@/components/user/admin/Team.vue";
 import Docker from "@/components/user/admin/Docker.vue";
 import QuestionEditor from "@/components/user/question/QuestionEditor.vue";
+import ChatAi from "@/components/user/ai/ChatAi.vue";
 
 const routes: Array<RouteRecordRaw> = [
     // 注册
@@ -93,6 +94,11 @@ const routes: Array<RouteRecordRaw> = [
                 path: 'editor/:id',
                 component: QuestionEditor,
             },
+            {
+                path: 'chat',
+                component: ChatAi,
+            },
+
         ]
     }
 ]

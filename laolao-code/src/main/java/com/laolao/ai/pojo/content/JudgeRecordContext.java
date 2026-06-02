@@ -1,4 +1,4 @@
-package com.laolao.pojo.ai;
+package com.laolao.ai.pojo.content;
 
 import lombok.Builder;
 
