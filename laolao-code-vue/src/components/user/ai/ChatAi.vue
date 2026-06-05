@@ -2,61 +2,60 @@
     <div class="flex flex-col h-full pb-4 px-2">
         <div ref="scrollRef"
             class="max-w-4xl w-full mx-auto flex-1 bg-white  overflow-y-auto p-4 space-y-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            <div v-if="messages.length === 0" class="text-center text-gray-400 mt-20 font-light">
-                <p class="text-lg">开始一段对话吧</p>
-                <p class="text-xs mt-2">记忆保留 24 小时</p>
+            <div v-if="messages.length === 0"
+                class="flex flex-col h-full items-center justify-center gap-4 text-center">
+                <div class="rounded-full bg-muted/30 p-4">
+                    <Candy class="h-10 w-10 text-muted-foreground/60" />
+                </div>
+                <div class="space-y-1 text-gray-400">
+                    <h3 class="text-lg font-medium">开始一段对话吧</h3>
+                    <p class="text-sm text-muted-foreground">
+                        记忆保留 24 小时
+                    </p>
+                </div>
             </div>
 
             <div v-for="(msg, index) in messages" :key="index"
                 :class="['flex', msg.type === 'user' ? 'justify-end' : 'justify-start']">
-                <div :class="['max-w-[85%] px-4 py-2 rounded-2xl text-sm shadow-sm',
-                    msg.type === 'user' ? 'bg-[#4c83eb] text-white' : 'bg-gray-100 text-gray-800']">
+                <div :class="['px-4 py-2 rounded-2xl text-sm',
+                    msg.type === 'user' ? 'bg-blue-50 text-gray-800' : 'shadow-sm']">
 
                     <div class="markdown-body" v-html="renderMarkdown(msg.content || '')"></div>
                 </div>
             </div>
         </div>
 
-        <div class="max-w-4xl w-full mx-auto">
-            <div class="bg-white border border-gray-200 rounded-3xl p-2 shadow-sm">
-                <textarea v-model="userInput" @keyup.enter.exact.prevent="chat" placeholder="给人工智障发送消息"
-                    class="w-full px-3 py-2 h-16 resize-none outline-none text-sm text-gray-700 bg-transparent"
-                    :disabled="isLoading"></textarea>
 
-                <div class="flex justify-between items-center px-2 pb-1">
-                    <AlertDialog>
-                        <AlertDialogTrigger>
-                            <button
-                                class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-red-400">
-                                <Trash class="w-5 h-5" />
-                            </button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>删除记忆?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    此操作不可撤销
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>取消</AlertDialogCancel>
-                                <AlertDialogAction @click="clear()">确定</AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                    </AlertDialog>
-
-
-                    <button @click="chat" :disabled="!userInput.trim() || isLoading"
-                        :class="userInput.trim() && !isLoading ? 'bg-black text-white hover:opacity-80' : 'bg-gray-100 text-gray-400'"
-                        class="w-8 h-8 flex items-center justify-center rounded-full transition-all">
-                        <span v-if="isLoading"
-                            class="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
-                        <svg v-else class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5"
-                            viewBox="0 0 24 24">
-                            <path d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                        </svg>
-                    </button>
-                </div>
+        <div class="max-w-4xl w-full mx-auto flex flex-col bg-white border border-gray-200 rounded-3xl p-2 shadow-sm">
+            <Textarea v-model="userInput" :disabled="isLoading" placeholder="给人工智障发送消息"
+                class="min-h-16 max-h-64 border-none resize-none shadow-none focus-visible:ring-0 text-gray-700 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" />
+            <div class="flex justify-between items-center">
+                <AlertDialog>
+                    <AlertDialogTrigger>
+                        <button v-if="messages.length > 0"
+                            class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 text-red-400">
+                            <Trash class="w-5 h-5" />
+                        </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                        <AlertDialogHeader>
+                            <AlertDialogTitle>删除记忆?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                                此操作不可撤销
+                            </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                            <AlertDialogCancel>取消</AlertDialogCancel>
+                            <AlertDialogAction @click="clear()">确定</AlertDialogAction>
+                        </AlertDialogFooter>
+                    </AlertDialogContent>
+                </AlertDialog>
+                <button @click="chat" :disabled="!userInput.trim() || isLoading"
+                    :class="userInput.trim() && !isLoading ? 'bg-blue-500' : 'bg-blue-300'"
+                    class="w-8 h-8 flex items-center justify-center rounded-full transition-all">
+                    <Spinner v-if="isLoading" class="w-5 h-5 text-white" />
+                    <ArrowUp v-else class="w-5 h-5 text-white" />
+                </button>
             </div>
         </div>
     </div>
@@ -65,9 +64,11 @@
 <script setup lang="ts">
     import { ref, onMounted, nextTick } from 'vue'
     import axios from 'axios'
-    import { Trash } from 'lucide-vue-next'
+    import { ArrowUp, Candy, Trash } from 'lucide-vue-next'
+    import { Spinner } from '@/components/ui/spinner'
     import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger, } from '@/components/ui/alert-dialog'
     import MarkdownIt from 'markdown-it'
+    import Textarea from '@/components/ui/textarea/Textarea.vue'
     const md = new MarkdownIt({
         breaks: true,
         linkify: true,

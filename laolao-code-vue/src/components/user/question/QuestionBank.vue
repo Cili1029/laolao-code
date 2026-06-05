@@ -25,7 +25,7 @@
                         <SheetTitle class="text-2xl">个人仓库</SheetTitle>
                         <SheetDescription>
                             <ButtonGroup class="w-full">
-                                <Input v-model="privateSearchContent" placeholder="支持模糊搜索..." />
+                                <Input v-model="privateSearchContent" @keyup.enter.exact.prevent="getPrivateQuestions()" placeholder="支持模糊搜索..." />
                                 <Button @click="getPrivateQuestions()" variant="outline" aria-label="Search"
                                     :disabled="privateSearchContent === ''">
                                     <SearchIcon />
@@ -89,7 +89,7 @@
 
         <div class="flex w-2/3 justify-between">
             <ButtonGroup class="w-1/2">
-                <Input v-model="publicSearchContent" placeholder="支持模糊搜索..." />
+                <Input v-model="publicSearchContent" @keyup.enter.exact.prevent="getPublicQuestions()" placeholder="支持模糊搜索..." />
                 <Button @click="getPublicQuestions()" variant="outline" aria-label="Search"
                     :disabled="publicSearchContent === ''">
                     <SearchIcon />

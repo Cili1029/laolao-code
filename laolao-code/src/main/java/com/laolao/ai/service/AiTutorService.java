@@ -1,4 +1,4 @@
-package com.laolao.service;
+package com.laolao.ai.service;
 
 import reactor.core.publisher.Flux;
 

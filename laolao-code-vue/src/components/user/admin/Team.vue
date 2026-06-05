@@ -28,7 +28,7 @@
                 <div class="flex-1"></div>
                 <div class="flex justify-end items-end">
                     <ButtonGroup class="w-full">
-                        <Input v-model="content" placeholder="支持模糊搜索..." />
+                        <Input v-model="content" @keyup.enter.exact.prevent="getTeam()" placeholder="支持模糊搜索..." />
                         <Button @click="getTeam()" variant="outline" aria-label="Search" :disabled="content === ''">
                             <SearchIcon />
                         </Button>

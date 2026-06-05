@@ -21,7 +21,7 @@ import static java.lang.Boolean.TRUE;
 @Service
 public class ChatServiceImpl implements ChatService {
     @Resource
-    private ChatClient chatClient;
+    private ChatClient aiChatClient;
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
     @Resource
@@ -56,7 +56,15 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public Flux<String> chat(String userInput) {
-        return chatClient.prompt()
+        return aiChatClient.prompt()
+                .system(s -> s.text("""
+                    当前用户信息：
+                    - 用户ID: {userId}
+                    - 用户角色: {role}
+                    请根据该身份执行后续指令。
+                    """)
+                        .param("userId", SecurityUtils.getUserId())
+                        .param("role", SecurityUtils.getUserInfo().getAuthorities()))
                 .user(userInput)
                 .advisors(a -> a
                         .param(ChatMemory.CONVERSATION_ID, SecurityUtils.getUserId() == null ? "0" : SecurityUtils.getUserId().toString())

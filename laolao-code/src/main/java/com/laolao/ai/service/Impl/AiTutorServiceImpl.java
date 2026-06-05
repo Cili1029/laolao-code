@@ -1,10 +1,10 @@
-package com.laolao.service.impl;
+package com.laolao.ai.service.Impl;
 
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.laolao.common.util.SecurityUtils;
 import com.laolao.mapper.AiReportMapper;
 import com.laolao.pojo.entity.AiReport;
-import com.laolao.service.AiTutorService;
+import com.laolao.ai.service.AiTutorService;
 import jakarta.annotation.Resource;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Service;

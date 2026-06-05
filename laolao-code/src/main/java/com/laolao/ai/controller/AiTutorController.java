@@ -1,6 +1,6 @@
-package com.laolao.controller;
+package com.laolao.ai.controller;
 
-import com.laolao.service.AiTutorService;
+import com.laolao.ai.service.AiTutorService;
 import jakarta.annotation.Resource;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;

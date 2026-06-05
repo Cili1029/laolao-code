@@ -33,7 +33,7 @@
                 </div>
                 <div class="flex space-x-2">
                     <ButtonGroup class="flex-1">
-                        <Input v-model="searchContent" placeholder="支持模糊搜索..." />
+                        <Input v-model="searchContent" @keyup.enter.exact.prevent="getQuestions()" placeholder="支持模糊搜索..." />
                         <Button @click="getQuestions()" variant="outline" aria-label="Search"
                             :disabled="searchContent === ''">
                             <SearchIcon />
