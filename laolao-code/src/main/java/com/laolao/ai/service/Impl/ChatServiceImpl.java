@@ -11,10 +11,13 @@ import jakarta.annotation.Resource;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.lang.Boolean.TRUE;
 
@@ -56,18 +59,27 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public Flux<String> chat(String userInput) {
+        Integer userId = SecurityUtils.getUserId();
+        String role = SecurityUtils.getUserInfo() == null ? "" : SecurityUtils.getUserInfo().getAuthorities().stream()
+                .findFirst()
+                .map(GrantedAuthority::getAuthority)
+                .orElse("");
+        Map<String, Object> toolContext = new HashMap<>();
+        if (userId != null) {
+            toolContext.put("userId", userId);
+        }
+        toolContext.put("role", role);
+
         return aiChatClient.prompt()
                 .system(s -> s.text("""
-                    当前用户信息：
-                    - 用户ID: {userId}
-                    - 用户角色: {role}
-                    请根据该身份执行后续指令。
+                    当前用户信息： 用户ID: {userId} 用户角色: {role} 请根据该身份执行后续指令。
                     """)
-                        .param("userId", SecurityUtils.getUserId())
-                        .param("role", SecurityUtils.getUserInfo().getAuthorities()))
+                        .param("userId", userId)
+                        .param("role", role))
                 .user(userInput)
+                .toolContext(toolContext)
                 .advisors(a -> a
-                        .param(ChatMemory.CONVERSATION_ID, SecurityUtils.getUserId() == null ? "0" : SecurityUtils.getUserId().toString())
+                        .param(ChatMemory.CONVERSATION_ID, userId == null ? "0" : userId.toString())
                 )
                 .stream()
                 .content();

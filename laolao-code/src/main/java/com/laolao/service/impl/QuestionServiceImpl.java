@@ -177,7 +177,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Transactional(rollbackFor = Exception.class)
     public Result<String> saveEdit(SaveEditQuestionDTO saveEditQuestionDTO) {
         // 更新题目
-        Question question = mapStruct.SaveEditQuestionDTOToQuestion(saveEditQuestionDTO);
+        Question question = mapStruct.saveEditQuestionDTOToQuestion(saveEditQuestionDTO);
         question.setIsValidated(0);
         questionMapper.updateById(question);
         // 删除原本示例

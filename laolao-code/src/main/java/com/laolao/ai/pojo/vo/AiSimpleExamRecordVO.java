@@ -1,4 +1,4 @@
-package com.laolao.pojo.vo;
+package com.laolao.ai.pojo.vo;
 
 import lombok.*;
 
@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @ToString
 @Builder
-public class ExamRecordVO implements Serializable {
+public class AiSimpleExamRecordVO implements Serializable {
 
     /**
      * 主键ID
@@ -32,4 +32,9 @@ public class ExamRecordVO implements Serializable {
      * 开始时间
      */
     private LocalDateTime time;
+
+    /**
+     * 跳转链接
+     */
+    private String link;
 }

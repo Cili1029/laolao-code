@@ -128,7 +128,7 @@ public class JudgeListener implements RocketMQListener {
             judgeRecordMapper.updateById(judgeRecord);
 
             // 调用rocketmq传结果
-            JudgeRecordVO judgeRecordVO = mapStruct.JudgeRecordToJudgeRecordVO(judgeRecord);
+            JudgeRecordVO judgeRecordVO = mapStruct.judgeRecordToJudgeRecordVO(judgeRecord);
             notificationHandler.sendToUser(judgeRecord.getUserId(), WsResult.success("JUDGE_RESULT", null, judgeRecordVO));
 
             // 更新最优答案
@@ -184,7 +184,7 @@ public class JudgeListener implements RocketMQListener {
                     .update();
 
             // 调用rocketmq传结果
-            JudgeRecordVO judgeRecordVO = mapStruct.JudgeResultToJudgeRecordVO(judgeResult);
+            JudgeRecordVO judgeRecordVO = mapStruct.judgeResultToJudgeRecordVO(judgeResult);
             notificationHandler.sendToUser(question.getCreatorId(), WsResult.success("JUDGE_RESULT", null, judgeRecordVO));
         } catch (Exception e) {
             // 判题失败
