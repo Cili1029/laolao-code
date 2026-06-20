@@ -41,6 +41,11 @@ public class GradeExamServiceImpl implements GradeExamService {
     }
 
     @Override
+    public Result<List<GradeJudgeRecordVO>> getUserAnswer(Integer examRecordId) {
+        return Result.success(judgeRecordMapper.selectGradeInfoByRecordId(examRecordId));
+    }
+
+    @Override
     @Transactional
     public Result<Integer> updateScore(UpdateScoreDTO updateScoreDTO) {
         // 先获取这一道题的旧分数

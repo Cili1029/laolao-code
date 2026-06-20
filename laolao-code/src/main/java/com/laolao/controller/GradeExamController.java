@@ -2,6 +2,7 @@ package com.laolao.controller;
 
 import com.laolao.common.result.Result;
 import com.laolao.pojo.dto.UpdateScoreDTO;
+import com.laolao.pojo.vo.GradeJudgeRecordVO;
 import com.laolao.pojo.vo.GradeUserVO;
 import com.laolao.service.GradeExamService;
 import jakarta.annotation.Resource;
@@ -17,12 +18,23 @@ public class GradeExamController {
 
     /**
      * 获取参与考试的考生
+     * 自动获取第一个考生的作答数据
      *
      * @return 考生数据
      */
     @GetMapping
     public Result<List<GradeUserVO>> getGradeUser(@RequestParam Integer examId) {
         return gradeExamService.getGradeUser(examId);
+    }
+
+    /**
+     * 根据记录Id获取考生的作答数据
+     *
+     * @return 考生数据
+     */
+    @GetMapping("/user-answer")
+    public Result<List<GradeJudgeRecordVO>> getUserAnswer(@RequestParam Integer examRecordId) {
+        return gradeExamService.getUserAnswer(examRecordId);
     }
 
     /**

@@ -23,7 +23,7 @@
         </div>
 
         <!-- 展开/收起 按钮 -->
-        <div @click="showAiReport = !showAiReport"
+        <div v-if="report?.aiReport" @click="showAiReport = !showAiReport"
             class="cursor-pointer text-blue-600 text-sm mt-2 mb-1 flex items-center gap-1">
             <Play class="h-6 w-6 transform transition-transform duration-200" :class="{ 'rotate-90': showAiReport }" />
             {{ showAiReport ? '收起AI报告' : '查看AI报告' }}

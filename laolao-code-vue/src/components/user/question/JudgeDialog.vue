@@ -61,8 +61,8 @@
                         </div>
                     </div>
 
-                    <!-- 编译错误 (CE) -->
-                    <div v-if="targetRecord?.status === 5" class="space-y-2">
+                    <!-- 编译错误 (CE)，运行错误 (RE) -->
+                    <div v-if="targetRecord?.status === 5 || targetRecord?.status === 4" class="space-y-2">
                         <p class="text-sm font-bold text-red-600">错误信息</p>
                         <pre
                             class="w-full p-3 bg-red-50 text-red-400 rounded font-mono text-sm leading-relaxed whitespace-pre-wrap break-all overflow-x-auto max-h-75">{{ targetRecord.errorMessage }}</pre>
