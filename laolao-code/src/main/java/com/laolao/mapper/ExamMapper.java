@@ -52,17 +52,17 @@ public interface ExamMapper extends BaseMapper<Exam> {
 
     @Select("""
             select q.id,
-                   e.score                 as question_score,
-                   ifnull(max(j.score), 0) as user_score,
+                   e.score                                 as question_score,
+                   ifnull(j.score, 0)                      as user_score,
                    q.title,
                    q.content,
                    q.difficulty,
-                   q.template_code
+                   ifnull(jr.answer_code, q.template_code) as template_code
             from question q
                      join exam_question_config e on q.id = e.question_id
-                     left join judge_record j on j.question_id = q.id and j.user_id = #{userId} and j.exam_record_id = #{recordId}
+                     left join judge_user_result j on j.question_id = q.id and j.user_id = #{userId} and j.exam_record_id = #{recordId}
+                     left join judge_record jr on jr.id = j.best_judge_record_id
             where e.exam_id = #{examId}
-            Group by q.id, question_score, q.title, q.content, q.difficulty, q.template_code;
             """)
     List<ExamQuestionVO> selectQuestionById(Integer examId, Integer recordId, Integer userId);
 
