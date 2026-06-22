@@ -3,7 +3,10 @@
         <div class="flex space-x-3">
             <Card class="w-1/3">
                 <CardHeader>
-                    <CardTitle>容器池状态</CardTitle>
+                    <CardTitle class="flex items-center gap-2">
+                        <Container class="w-4 h-4" />
+                        容器池状态
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div class="text-2xl font-bold">{{ adminJudgerInfo?.poolSize }}
@@ -26,7 +29,10 @@
 
             <Card class="w-1/3">
                 <CardHeader>
-                    <CardTitle>任务统计</CardTitle>
+                    <CardTitle class="flex items-center gap-2">
+                        <Shell class="w-4 h-4" />
+                        任务统计
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div class="text-2xl font-bold">{{ adminJudgerInfo?.totalJudgeCount }}
@@ -50,7 +56,10 @@
 
             <Card class="w-1/3">
                 <CardHeader>
-                    <CardTitle>平均性能</CardTitle>
+                    <CardTitle class="flex items-center gap-2">
+                        <Zap class="w-4 h-4" />
+                        平均性能
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
                     <div class="text-2xl font-bold">
@@ -187,7 +196,7 @@
     import { Input } from '@/components/ui/input'
     import { Avatar, AvatarFallback } from '@/components/ui/avatar'
     import { useExamStore } from "@/stores/ExamStore"
-    import { Cpu, Timer } from 'lucide-vue-next';
+    import { Container, Cpu, Shell, Timer, Zap } from 'lucide-vue-next';
     const examStore = useExamStore()
 
     interface AdminJudgerInfo {

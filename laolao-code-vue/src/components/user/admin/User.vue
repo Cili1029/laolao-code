@@ -3,25 +3,45 @@
         <div class="flex space-x-3">
             <Card class="w-1/3">
                 <CardHeader>
-                    <CardTitle>网站人数</CardTitle>
+                    <CardTitle class="flex items-center gap-2">
+                        <Users class="w-4 h-4" />
+                        网站用户数
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div class="flex justify-between">
-                        <p>组管理员</p>
-                        <p>{{ summary?.managerCount }}</p>
+                    <div class="flex items-center justify-between">
+                        <span class="flex items-center gap-2 text-sm">
+                            <UserCog class="w-4 h-4" />
+                            组管理员
+                        </span>
+                        <span class="font-semibold tabular-nums">{{ summary?.managerCount }}</span>
                     </div>
-                    <div class="flex justify-between">
-                        <p>组员</p>
-                        <p>{{ summary?.userCount }}</p>
+                    <div class="flex items-center justify-between">
+                        <span class="flex items-center gap-2 text-sm">
+                            <User class="w-4 h-4" />
+                            组员
+                        </span>
+                        <span class="font-semibold tabular-nums">{{ summary?.userCount }}</span>
                     </div>
                 </CardContent>
             </Card>
             <Card class="w-1/3">
                 <CardHeader>
-                    <CardTitle>在线人数</CardTitle>
+                    <CardTitle class="flex items-center gap-2">
+                        <Activity class="w-5 h-5" />
+                        在线人数
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p>TODO</p>
+                    <div class="flex justify-between items-center">
+                        <div class="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:ring-2">
+                            <Avatar v-for="value in summary?.onlineCount" :key="value">
+                                <AvatarImage :src="userAvatar" alt="@shadcn" />
+                                <AvatarFallback>USER</AvatarFallback>
+                            </Avatar>
+                        </div>
+                        <span class="font-semibold tabular-nums text-lg">{{ summary?.onlineCount }}</span>
+                    </div>
                 </CardContent>
             </Card>
             <div class="w-1/3 flex flex-col">
@@ -179,16 +199,17 @@
     dayjs.locale('zh-cn')
     import { Button } from '@/components/ui/button'
     import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from '@/components/ui/table'
-    import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+    import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
     import { Badge } from '@/components/ui/badge'
     import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, } from '@/components/ui/dialog'
     import { Input } from '@/components/ui/input'
     import { Label } from '@/components/ui/label'
     import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination'
-    import { Ghost, SearchIcon, } from 'lucide-vue-next'
+    import { Ghost, SearchIcon, UserCog, Users, User, Activity } from 'lucide-vue-next'
     import { Checkbox } from '@/components/ui/checkbox'
     import { ButtonGroup } from '@/components/ui/button-group'
     import { Card, CardContent, CardHeader, CardTitle, } from '@/components/ui/card'
+    import userAvatar from '@/assets/user.jpg'
 
 
     onMounted(() => {
@@ -207,6 +228,7 @@
     interface Summary {
         managerCount: number
         userCount: number
+        onlineCount: number
     }
 
     const users = ref<User[]>([])

@@ -3,25 +3,43 @@
         <div class="flex space-x-3">
             <Card class="w-1/3">
                 <CardHeader>
-                    <CardTitle>组概览</CardTitle>
+                    <CardTitle class="flex items-center gap-2">
+                        <PieChart class="w-4 h-4" />
+                        组概览
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div class="flex justify-between">
-                        <p>组数量</p>
-                        <p>{{ summary?.teamCount }}</p>
-                    </div>
-                    <div class="flex justify-between">
-                        <p>考试发布数量</p>
-                        <p>{{ summary?.examCount }}</p>
+                    <div class="flex items-center justify-between">
+                        <span class="flex items-center gap-2 text-sm">
+                            <Users class="w-4 h-4" />
+                            组数量
+                        </span>
+                        <span class="font-semibold tabular-nums">{{ summary?.teamCount }}</span>
                     </div>
                 </CardContent>
             </Card>
             <Card class="w-1/3">
                 <CardHeader>
-                    <CardTitle>TODO</CardTitle>
+                    <CardTitle class="flex items-center gap-2">
+                        <BugPlay class="w-4 h-4" />
+                        考试概览
+                    </CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <p>TODO</p>
+                    <div class="flex items-center justify-between">
+                        <span class="flex items-center gap-2 text-sm">
+                            <BookOpen class="w-4 h-4" />
+                            考试发布数量
+                        </span>
+                        <span class="font-semibold tabular-nums">{{ summary?.examCount }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <span class="flex items-center gap-2 text-sm">
+                            <Check class="w-4 h-4" />
+                            考试完成数量
+                        </span>
+                        <span class="font-semibold tabular-nums">{{ summary?.finishExamCount }}</span>
+                    </div>
                 </CardContent>
             </Card>
             <div class="w-1/3 flex flex-col">
@@ -168,7 +186,7 @@
     import { Input } from '@/components/ui/input'
     import { Label } from '@/components/ui/label'
     import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination'
-    import { Ghost, SearchIcon, } from 'lucide-vue-next'
+    import { BookOpen, BugPlay, Check, Ghost, PieChart, SearchIcon, Users, } from 'lucide-vue-next'
     import { ButtonGroup } from '@/components/ui/button-group'
     import { Card, CardContent, CardHeader, CardTitle, } from '@/components/ui/card'
 
@@ -192,6 +210,7 @@
     interface Summary {
         teamCount: number
         examCount: number
+        finishExamCount: number
     }
 
     const teams = ref<Team[]>([])

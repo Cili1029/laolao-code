@@ -24,4 +24,9 @@ public class AdminTeamSummaryVO implements Serializable {
      * 考试发布数量
      */
     private Integer examCount;
+
+    /**
+     * 已完成考试数量
+     */
+    private Integer finishExamCount;
 }

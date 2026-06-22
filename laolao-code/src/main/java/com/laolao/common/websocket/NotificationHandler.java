@@ -23,9 +23,6 @@ public class NotificationHandler extends TextWebSocketHandler {
     // 全局连接池：UserID -> Session
     private static final Map<Integer, WebSocketSession> userSessions = new ConcurrentHashMap<>();
 
-    // 管理员全局连接池：UserID -> Session 用于通知信息
-    private static final Map<Integer, WebSocketSession> adminSessions = new ConcurrentHashMap<>();
-
     // 考试分组索引：ExamID -> Set<UserID> (仅用于考试广播)
     private static final Map<Integer, Set<Integer>> examUsers = new ConcurrentHashMap<>();
 
@@ -165,5 +162,12 @@ public class NotificationHandler extends TextWebSocketHandler {
                 }
             }
         }
+    }
+
+    /**
+     * 获取在线人数
+     */
+    public Integer getOnlineCount() {
+        return userSessions.size();
     }
 }

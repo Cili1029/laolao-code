@@ -100,12 +100,8 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public Result<AdminTeamSummaryVO> getSummary() {
-        Integer teamCount = teamMapper.selectTeamCount();
-        Integer examCount = examMapper.selectExamCount();
-        AdminTeamSummaryVO adminTeamSummaryVO = AdminTeamSummaryVO.builder()
-                .teamCount(teamCount)
-                .examCount(examCount)
-                .build();
+        AdminTeamSummaryVO adminTeamSummaryVO = examMapper.selectExamCount();
+        adminTeamSummaryVO.setTeamCount(teamMapper.selectTeamCount());
         return Result.success(adminTeamSummaryVO);
     }
 }

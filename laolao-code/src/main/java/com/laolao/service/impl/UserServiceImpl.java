@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.laolao.common.result.Result;
 import com.laolao.common.security.MyPasswordEncoder;
 import com.laolao.common.util.SecurityUtils;
+import com.laolao.common.websocket.NotificationHandler;
 import com.laolao.mapper.UserMapper;
 import com.laolao.pojo.dto.AdminUserUpdateDTO;
 import com.laolao.pojo.entity.User;
@@ -22,6 +23,8 @@ public class UserServiceImpl implements UserService {
     private UserMapper userMapper;
     @Resource
     private MyPasswordEncoder myPasswordEncoder;
+    @Resource
+    private NotificationHandler notificationHandler;
 
     @Override
     public Result<String> signUp(User user) {
@@ -65,6 +68,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Result<AdminUserSummaryVO> getSummary() {
         AdminUserSummaryVO adminUserSummaryVO = userMapper.selectUserCount();
+        adminUserSummaryVO.setOnlineCount(notificationHandler.getOnlineCount());
         return Result.success(adminUserSummaryVO);
     }
 }

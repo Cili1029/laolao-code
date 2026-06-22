@@ -25,7 +25,8 @@
                         <SheetTitle class="text-2xl">个人仓库</SheetTitle>
                         <SheetDescription>
                             <ButtonGroup class="w-full">
-                                <Input v-model="privateSearchContent" @keyup.enter.exact.prevent="getPrivateQuestions()" placeholder="支持模糊搜索..." />
+                                <Input v-model="privateSearchContent" @keyup.enter.exact.prevent="getPrivateQuestions()"
+                                    placeholder="支持模糊搜索..." />
                                 <Button @click="getPrivateQuestions()" variant="outline" aria-label="Search"
                                     :disabled="privateSearchContent === ''">
                                     <SearchIcon />
@@ -89,7 +90,8 @@
 
         <div class="flex w-2/3 justify-between">
             <ButtonGroup class="w-1/2">
-                <Input v-model="publicSearchContent" @keyup.enter.exact.prevent="getPublicQuestions()" placeholder="支持模糊搜索..." />
+                <Input v-model="publicSearchContent" @keyup.enter.exact.prevent="getPublicQuestions()"
+                    placeholder="支持模糊搜索..." />
                 <Button @click="getPublicQuestions()" variant="outline" aria-label="Search"
                     :disabled="publicSearchContent === ''">
                     <SearchIcon />
@@ -152,26 +154,27 @@
             <div class="flex flex-col w-1/3 items-center">
                 <Card class="w-full max-w-sm">
                     <CardHeader>
-                        <CardTitle>仓库统计</CardTitle>
+                        <CardTitle class="flex items-center gap-2">
+                            <Warehouse class="w-4 h-4" />
+                            仓库统计
+                        </CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div class="grid w-full items-center gap-4">
-                            <p class="flex justify-between">
-                                <span>
+                            <div class="flex items-center justify-between">
+                                <span class="flex items-center gap-2 text-sm">
+                                    <FileQuestionMark class="w-4 h-4" />
                                     题目数量
                                 </span>
-                                <span>
-                                    {{ summary?.questionCount }}
-                                </span>
-                            </p>
-                            <p class="flex justify-between">
-                                <span>
+                                <span class="font-semibold tabular-nums">{{ summary?.questionCount }}</span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="flex items-center gap-2 text-sm">
+                                    <Copy class="w-4 h-4" />
                                     克隆次数
                                 </span>
-                                <span>
-                                    {{ summary?.copyCount }}
-                                </span>
-                            </p>
+                                <span class="font-semibold tabular-nums">{{ summary?.copyCount }}</span>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>
@@ -201,7 +204,7 @@
     import { ButtonGroup } from '@/components/ui/button-group'
     import { Input } from '@/components/ui/input'
     import { Button } from '@/components/ui/button'
-    import { Edit, Ghost, SearchIcon, Star, StarOff, Trash, User } from 'lucide-vue-next'
+    import { Copy, Edit, FileQuestionMark, Ghost, SearchIcon, Star, StarOff, Trash, User, Warehouse } from 'lucide-vue-next'
     import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationNext, PaginationPrevious, } from '@/components/ui/pagination'
     import { Table, TableBody, TableCell, TableRow, } from '@/components/ui/table'
     import { onMounted, ref, watch } from "vue"

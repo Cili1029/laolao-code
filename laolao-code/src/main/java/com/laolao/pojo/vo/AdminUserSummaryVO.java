@@ -16,12 +16,17 @@ import java.io.Serializable;
 public class AdminUserSummaryVO implements Serializable {
 
     /**
-     * 主键ID
+     * 组管理员人数
      */
     private Integer managerCount;
 
     /**
-     * 账号
+     * 组员人数
      */
     private String userCount;
+
+    /**
+     * 在线人数
+     */
+    private Integer onlineCount;
 }

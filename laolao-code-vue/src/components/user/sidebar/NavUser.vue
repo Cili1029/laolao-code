@@ -6,7 +6,7 @@
           <SidebarMenuButton size="lg"
             class="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
             <Avatar class="h-8 w-8 rounded-lg">
-              <AvatarImage :src="userStore.user?.avatar || ''" />
+              <AvatarImage :src="userStore.user?.avatar || userAvatar" />
               <AvatarFallback class="rounded-lg">
                 <Ghost />
               </AvatarFallback>
@@ -23,7 +23,7 @@
           <DropdownMenuLabel class="p-0 font-normal">
             <div class="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
               <Avatar class="h-8 w-8 rounded-lg">
-                <AvatarImage :src="userStore.user?.avatar || ''" />
+                <AvatarImage :src="userStore.user?.avatar || userAvatar" />
                 <AvatarFallback class="rounded-lg">
                   <Ghost />
                 </AvatarFallback>
@@ -69,6 +69,7 @@
   import { useUserStore } from "@/stores/UserStore"
   import router from "@/router"
   import { useWebsocketStore } from '@/stores/WebsocketStore'
+  import userAvatar from '@/assets/user.jpg'
 
   const wsStore = useWebsocketStore()
   const userStore = useUserStore()

@@ -3,10 +3,7 @@ package com.laolao.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.laolao.ai.pojo.content.ExamScoreDataContent;
 import com.laolao.pojo.entity.Exam;
-import com.laolao.pojo.vo.ExamInfoVO;
-import com.laolao.pojo.vo.ExamQuestionVO;
-import com.laolao.pojo.vo.ExamVO;
-import com.laolao.pojo.vo.ReleaseExamQuestionVO;
+import com.laolao.pojo.vo.*;
 import org.apache.ibatis.annotations.*;
 
 import java.util.List;
@@ -114,6 +111,11 @@ public interface ExamMapper extends BaseMapper<Exam> {
     @Update("update exam set status = #{canceled}, is_queued = 0 where id = #{examId} and (status = 1 or status = 2)")
     void cancelExam(Exam examId, int canceled);
 
-    @Select("select count(id) as examCount from exam where status = 1 or status = 2 or status = 3")
-    Integer selectExamCount();
+    @Select("""
+            SELECT COUNT(id)                                   AS examCount,
+                   SUM(IF(status = 3, 1, 0)) AS finishExamCount
+            FROM exam
+            WHERE status IN (1, 2, 3);
+            """)
+    AdminTeamSummaryVO selectExamCount();
 }
