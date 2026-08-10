@@ -33,7 +33,9 @@
 
         <Dialog v-else-if="UserStore.user.role === 1">
             <DialogTrigger as-child>
-                <span class="flex justify-end cursor-pointer hover:text-blue-500 text-gray-500 text-sm">创建小组</span>
+                <span class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
+                    创建小组
+                </span>
             </DialogTrigger>
             <DialogContent class="sm:max-w-106.25">
                 <DialogHeader>

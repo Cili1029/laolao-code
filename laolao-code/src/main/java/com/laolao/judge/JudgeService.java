@@ -179,7 +179,6 @@ public class JudgeService {
                             .build();
                 }
 
-
                 // 答案错误
                 JsonNode outputs = jsonRes.get("output");
                 for (int i = 0; i < outputs.size(); i++) {

@@ -2,6 +2,7 @@ package com.laolao.service.impl;
 
 import com.laolao.common.constant.ExamRecordConstant;
 import com.laolao.common.constant.JudgeConstant;
+import com.laolao.common.properties.RocketMQTopicProperties;
 import com.laolao.common.result.Result;
 import com.laolao.common.util.SecurityUtils;
 import com.laolao.mapper.*;
@@ -28,6 +29,8 @@ public class UserExamServiceImpl implements UserExamService {
     private ExamRecordMapper examRecordMapper;
     @Resource
     private RocketMQClientTemplate rocketMQClientTemplate;
+    @Resource
+    private RocketMQTopicProperties rocketMQTopicProperties;
 
     @Override
     public Result<Integer> startExam(Integer examId) {
@@ -80,7 +83,7 @@ public class UserExamServiceImpl implements UserExamService {
                 .build();
 
         // 发送队列
-        rocketMQClientTemplate.convertAndSend("JudgeTopic:USER", examIdAndJudgeRecordIdDTO);
+        rocketMQClientTemplate.convertAndSend(rocketMQTopicProperties.getJudgeTopicUser(), examIdAndJudgeRecordIdDTO);
         // 返回记录Id
         return Result.success(judgeRecord.getId());
     }

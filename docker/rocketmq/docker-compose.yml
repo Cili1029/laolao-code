@@ -6,9 +6,9 @@ services:
     ports:
       - 9876:9876
     environment:
-     # 压榨到 128M 堆内存，NameServer 完全够用
+      # 压榨到 128M 堆内存，NameServer 够用
       - JAVA_OPT_EXT=-Xms128m -Xmx128m
-    # 2. 限制 Docker 容器物理内存
+    # 限制 Docker 容器物理内存
     deploy:
       resources:
         limits:
@@ -16,7 +16,7 @@ services:
     networks:
       - rocketmq
     command: sh mqnamesrv
-    
+
   broker:
     image: apache/rocketmq:5.4.0
     container_name: rmqbroker
@@ -37,6 +37,27 @@ services:
     networks:
       - rocketmq
     command: sh mqbroker
+
+  # ============================================================
+  # 初始化 Topic 容器：broker 启动 15s 后自动创建需要的 Topic
+  # Consumer 启动前 Topic 必须存在，否则会报 No topic route info
+  # RocketMQ 5.x 用 -a 属性指定消息类型：DELAY=定时, NORMAL=普通
+  # ============================================================
+  init-topic:
+    image: apache/rocketmq:5.4.0
+    container_name: rmqinit
+    depends_on:
+      - broker
+    networks:
+      - rocketmq
+    environment:
+      - NAMESRV_ADDR=rmqnamesrv:9876
+    entrypoint: >
+      sh -c "
+        sleep 15 &&
+        sh mqadmin updateTopic -n rmqnamesrv:9876 -t ExamEndTopic -c DefaultCluster -a +message.type=DELAY &&
+        sh mqadmin updateTopic -n rmqnamesrv:9876 -t JudgeTopic -c DefaultCluster -a +message.type=NORMAL
+      "
 
   proxy:
     image: apache/rocketmq:5.4.0
@@ -62,7 +83,7 @@ services:
       # 挂载自定义的配置文件
       - ./rmq-proxy.json:/home/rocketmq/rocketmq-5.4.0/conf/rmq-proxy.json
     command: sh mqproxy -pc /home/rocketmq/rocketmq-5.4.0/conf/rmq-proxy.json
-  
+
   dashboard:
     image: apacherocketmq/rocketmq-dashboard:latest
     container_name: rmqdashboard

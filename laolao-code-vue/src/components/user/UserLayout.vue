@@ -10,7 +10,10 @@
                 <Separator v-if="!examStore.examBegin" orientation="vertical"
                     class="mr-2 data-[orientation=vertical]:h-4" />
                 <div v-if="examStore.examBegin" class="flex w-full justify-between">
-                    <p class="cursor-pointer" @click="examStore.examBegin = !examStore.examBegin">退出测试</p>
+                    <span @click="examStore.examBegin = !examStore.examBegin"
+                        class="flex cursor-pointer text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded">
+                        退出测试（项目测试用）
+                    </span>
                     <div @click="examStore.judgeLoading ? '' : examStore.judge()"
                         class="flex text-green-600 items-center px-2 py-1 bg-gray-100 text-sm hover:bg-gray-200 rounded cursor-pointer">
                         <CloudUpload v-if="!examStore.judgeLoading" class="h-4 w-4 mr-1" />
@@ -23,9 +26,6 @@
                         <Spinner class="mr-1" v-else />
                         交卷
                     </div>
-                </div>
-                <div v-if="route.path === '/chat'" class="flex w-full justify-between">
-                    <p class="text-lg font-bold">人工智障</p>
                 </div>
             </header>
             <!-- 用一个 main 包装器接管剩余空间，并承担局部滚动条的职责 -->
@@ -48,8 +48,6 @@
     import { useExamStore } from "@/stores/ExamStore"
     import { ref, watch } from "vue"
     const examStore = useExamStore()
-    import { useRoute } from 'vue-router'
-    const route = useRoute()
 
     const isSidebarOpen = ref(false)
 

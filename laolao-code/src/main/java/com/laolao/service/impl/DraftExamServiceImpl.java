@@ -2,6 +2,7 @@ package com.laolao.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.laolao.common.constant.ExamConstant;
+import com.laolao.common.properties.RocketMQTopicProperties;
 import com.laolao.common.result.Result;
 import com.laolao.common.util.MapStruct;
 import com.laolao.common.util.SecurityUtils;
@@ -46,6 +47,8 @@ public class DraftExamServiceImpl implements DraftExamService {
     private TeamMapper teamMapper;
     @Resource
     private RocketMQClientTemplate rocketMQClientTemplate;
+    @Resource
+    private RocketMQTopicProperties rocketMQTopicProperties;
 
     @Override
     public Result<Integer> createExam(CreateExamDTO createExamDTO) {
@@ -67,7 +70,7 @@ public class DraftExamServiceImpl implements DraftExamService {
     @Override
     public Result<String> judgeTestCase(Integer questionId) {
         // 发送队列
-        rocketMQClientTemplate.convertAndSend("JudgeTopic:MANAGER", questionId);
+        rocketMQClientTemplate.convertAndSend(rocketMQTopicProperties.getJudgeTopicManager(), questionId);
         return Result.success();
     }
 
@@ -202,7 +205,7 @@ public class DraftExamServiceImpl implements DraftExamService {
             public void afterCommit() {
                 // 封装消息对象
                 ReleaseExamMessage message = new ReleaseExamMessage(SecurityUtils.getUserId(), examId, questionIds);
-                rocketMQClientTemplate.convertAndSend("JudgeTopic:RELEASE", message);
+                rocketMQClientTemplate.convertAndSend(rocketMQTopicProperties.getJudgeTopicRelease(), message);
             }
         });
         return Result.success("后台判题中，耐心等待");

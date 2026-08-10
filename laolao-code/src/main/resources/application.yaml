@@ -43,6 +43,10 @@ rocketmq:
   producer:
     endpoints: 127.0.0.1:9081
 
+rocketmq-topic:
+  judge-topic: JudgeTopic
+  exam-end-topic: ExamEndTopic
+
 jwt:
   # 设置jwt签名加密时使用的秘钥
   user-secret-key: ${jwt.user-secret-key}

@@ -122,7 +122,9 @@ export const useWebsocketStore = defineStore('websocket', () => {
 
                 const targetQuestion = examStore.questions?.find(q => q.id === json.data.questionId)
                 if (targetQuestion) {
-                    targetQuestion.userScore = examStore.judgeRecord!.score
+                    if(targetQuestion.userScore < examStore.judgeRecord!.score){
+                        targetQuestion.userScore = examStore.judgeRecord!.score
+                    }
                 }
                 return
             }

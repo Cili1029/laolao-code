@@ -2,6 +2,7 @@ package com.laolao.common.task;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.laolao.common.constant.ExamConstant;
+import com.laolao.common.properties.RocketMQTopicProperties;
 import com.laolao.mapper.ExamMapper;
 import com.laolao.pojo.entity.Exam;
 import jakarta.annotation.Resource;
@@ -19,6 +20,8 @@ public class ExamEndTask {
     private ExamMapper examMapper;
     @Resource
     private RocketMQClientTemplate rocketMQClientTemplate;
+    @Resource
+    private RocketMQTopicProperties rocketMQTopicProperties;
 
     @Scheduled(cron = "0 */5 * * * *")
     public void scanEndExams() {
@@ -46,7 +49,7 @@ public class ExamEndTask {
 
             // 发送延时消息
             rocketMQClientTemplate.syncSendDelayMessage(
-                    "ExamEndTopic",
+                    rocketMQTopicProperties.getExamEndTopic(),
                     exam.getId(),
                     Duration.ofSeconds(delaySeconds)
             );
