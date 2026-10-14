@@ -18,7 +18,7 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 @Service
 @RocketMQMessageListener(
-        endpoints = "127.0.0.1:9081",
+        endpoints = "${rocketmq.producer.endpoints}",
         topic = "ExamEndTopic",
         consumerGroup = "exam_end_consumer_group",
         tag = "*"

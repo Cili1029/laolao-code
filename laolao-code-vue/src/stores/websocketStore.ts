@@ -25,8 +25,15 @@ export const useWebsocketStore = defineStore('websocket', () => {
         // 如果已有连接且处于打开状态，则直接返回，避免重复连接
         if (socket.value && socket.value.readyState === WebSocket.OPEN) return
 
-        // 构建 WebSocket URL（这里硬编码了后端地址，生产环境应从环境变量读取）
-        const url = `ws://localhost:8080/ws/connect`
+        // 构建 WebSocket URL
+        // 开发环境：直连本地后端；生产环境：走当前域名，由 Nginx 反代到后端
+        let url: string
+        if (import.meta.env.DEV) {
+            url = `ws://localhost:8080/ws/connect`
+        } else {
+            const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws'
+            url = `${protocol}://${window.location.host}/ws/connect`
+        }
         socket.value = new WebSocket(url)
 
         // 连接建立时的处理

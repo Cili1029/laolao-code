@@ -37,14 +37,17 @@ request.interceptors.response.use(
         // HTTP状态码错误
         if (error.response) {
             const status = error.response.status
+            // 登录页、注册页未登录是正常状态，不弹"登录已过期"气泡
+            const isAuthPage = router.currentRoute.value.path === '/sign-in'
+                || router.currentRoute.value.path === '/sign-up'
             switch (status) {
                 case 401:
-                    // 跳转到登录页
-                    router.replace('/sign-in')
-                    toast.info("登录已过期，请重新登录！")
-                    // 清空现有user数据
-                    const userStore = useUserStore()
-                    userStore.clearUser()
+                    if (!isAuthPage) {
+                        router.replace('/sign-in')
+                        toast.info("登录已过期，请重新登录！")
+                        const userStore = useUserStore()
+                        userStore.clearUser()
+                    }
                     break
                 case 403:
                     // 跳转到用户首页
@@ -52,7 +55,9 @@ request.interceptors.response.use(
                     toast.error("非管理员，无权限！")
                     break
                 default:
-                    toast.error("未知错误！")
+                    // 优先显示后端返回的错误信息，没有再用兜底
+                    const msg = error.response.data?.msg
+                    toast.error(msg || "未知错误！")
             }
         }
         return Promise.reject(error)

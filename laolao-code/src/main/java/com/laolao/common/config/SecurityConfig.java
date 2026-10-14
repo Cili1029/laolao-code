@@ -88,7 +88,9 @@ public class SecurityConfig {
                             response.getWriter().write(objectMapper.writeValueAsString(Result.success("登录成功")));
                         })
                         .failureHandler((request, response, exception) -> {
-                            response.setStatus(401);
+                            // 账号或密码错误属于业务校验失败，返回 200 + code=0，
+                            // 由前端按业务错误提示"账号或密码错误"，避免与未登录的 401 混淆
+                            response.setStatus(200);
                             response.setContentType("application/json;charset=utf-8");
                             response.getWriter().write(objectMapper.writeValueAsString(Result.error("账号或密码错误")));
                         })

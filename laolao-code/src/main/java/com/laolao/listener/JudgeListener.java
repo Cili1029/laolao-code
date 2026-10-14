@@ -33,7 +33,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RocketMQMessageListener(
-        endpoints = "127.0.0.1:9081",
+        endpoints = "${rocketmq.producer.endpoints}",
         topic = "JudgeTopic",
         consumerGroup = "judge_consumer_group",
         tag = "*", // 监听 USER, MANAGER, RELEASE
