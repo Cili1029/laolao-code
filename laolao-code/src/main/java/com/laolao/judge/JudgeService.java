@@ -292,8 +292,10 @@ public class JudgeService {
         String execId = dockerClient.execCreateCmd(containerId)
                 .withAttachStdout(true)
                 .withAttachStderr(true)
-                // 使用 sh -c 来执行带重定向的命令，限制 3 秒
-                .withCmd("sh", "-c", "timeout 3s /usr/bin/time -f '{\"time\":%e,\"mem\":%M}' java -Xmx128m Main < input.txt")
+                // 使用 sh -c 来执行带重定向的命令，限制 5 秒（含 JVM 冷启动余量）
+                // -XX:+UseSerialGC：单/少核场景下比默认 G1 启动更快、更省资源
+                // -Xss256k：减小线程栈，降低内存峰值
+                .withCmd("sh", "-c", "timeout 5s /usr/bin/time -f '{\"time\":%e,\"mem\":%M}' java -Xmx128m -XX:+UseSerialGC -Xss256k Main < input.txt")
                 .exec().getId();
 
         dockerClient.execStartCmd(execId).exec(new ResultCallback.Adapter<Frame>() {
@@ -501,7 +503,7 @@ public class JudgeService {
                         .withWorkingDir("/judger")                  // 设置容器内的工作目录
                         .withHostConfig(HostConfig.newHostConfig()
                                 .withMemory(256 * 1024 * 1024L)     // 限制内存 256MB
-                                .withCpuQuota(50000L)               // 限制 CPU 使用率 (0.5核)
+                                .withCpuQuota(150000L)              // 限制 CPU 使用率 (1.5核，确保 JVM 冷启动不被节流到触发 timeout)
                                 .withPidsLimit(50L)                 // 限制进程数
                                 .withUlimits(Collections.singletonList(new Ulimit("fsize", 1024 * 1024 * 10L, 1024 * 1024 * 10L)))
                         )
