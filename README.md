@@ -9,12 +9,16 @@ Laolao Code 是一个面向编程教学、训练营作业和课程考试场景�
 - 公共题库、私有题库、题目复制和测试用例管理
 - 考试草稿创建、题目添加、标准答案预校验和正式发布
 - Monaco Editor 在线 Java 编程作答
-- RocketMQ 异步判题与考试结束任务处理
+- RocketMQ 异步判题与考试结束任务处理（`ExamEndTopic` 为延迟消息类型）
 - Docker 沙箱编译、运行用户代码，并限制 CPU、内存、进程数和网络
+- 判题容器池预热与动态扩容，管理员可在前端调整池大小并查看判题机指标
 - WebSocket 实时推送判题结果
 - 支持按测试用例通过情况记录提交状态、得分与执行信息
 - 教师侧人工阅卷、调分与考试完成情况查看
-- Spring AI + DeepSeek 生成单题讲解、个人考试报告和整场考试分析
+- Spring AI + DeepSeek 双角色智能助手：
+  - **AI 导师**（无记忆）：SSE 流式生成单题讲解、个人考试报告、全班考试分析
+  - **AI 聊天助手**（Redis 多轮记忆）：通过 Function Calling 调用业务工具，可查询用户的小组、考试、报告数据，并解答算法与编程问题
+- 全部判题结果支持 AC / WA / CE / RE / TLE / MLE / SE 状态
 
 ## 技术栈
 
@@ -49,46 +53,75 @@ Laolao Code 是一个面向编程教学、训练营作业和课程考试场景�
 Vue 3 + Vite
 |-- HTTP 调用 Spring Boot API
 |-- WebSocket 接收判题结果
+|-- SSE 接收 AI 报告/聊天流式响应
 `-- Monaco Editor 提供在线 Java 编辑器
 
 Spring Boot
 |-- Spring Security + JWT 处理登录态与接口权限
 |-- MyBatis-Plus 访问 MySQL
-|-- Redis 存储登录 token 等运行数据
+|-- Redis 存储登录 token、AI 多轮对话记忆
 |-- RocketMQ 解耦判题、考试发布和考试结束任务
-|-- Docker 沙箱编译并运行用户代码
-`-- Spring AI 调用 DeepSeek 生成报告
+|   |-- JudgeTopic（普通消息）：异步判题
+|   `-- ExamEndTopic（延迟消息）：考试到点自动收卷
+|-- Docker 容器池：预热 + 动态扩容，沙箱编译并运行用户代码
+`-- Spring AI 调用 DeepSeek
+    |-- AI 导师 ChatClient：生成单题/个人/全班报告
+    `-- AI 聊天 ChatClient：带 ChatMemory，通过 Function Calling 调用业务工具
 ```
 
 典型判题流程：
 
 1. 学员在考试页面提交 Java 代码。
 2. 后端创建判题记录，并投递到 `JudgeTopic`。
-3. RocketMQ 消费者取出任务，调用 Docker 沙箱编译和运行代码。
-4. 系统比对所有测试用例输出，保存 AC / WA / CE / RE / TLE / MLE 等结果。
-5. 后端通过 WebSocket 将判题结果推送给前端。
+3. RocketMQ 消费者取出任务，从判题容器池取出一个容器，编译并运行代码（超时 5s、内存 256MB、CPU 1.5 核、网络禁用、进程数 50、输出文件 10MB 上限）。
+4. 系统比对所有测试用例输出，保存 AC / WA / CE / RE / TLE / MLE / SE 结果。
+5. 后端通过 WebSocket 将判题结果推送给前端，容器清理后归还池中复用。
 
 ## 目录结构
 
 ```text
 .
+|-- docker-compose.yml          # 服务器一键部署编排（Nginx + 后端 + MySQL + Redis + RocketMQ）
 |-- docker/
+|   |-- docker-compose.yml      # 本地开发中间件编排（仅 Redis + RocketMQ）
+|   |-- rmq-proxy.json          # RocketMQ Proxy 配置（两份编排共用）
+|   |-- DEPLOY.md               # Docker Compose 一键部署教程
 |   |-- judger/                 # 判题沙箱镜像构建文件
-|   `-- rocketmq/               # RocketMQ 本地开发编排
+|   `-- nginx/                  # Nginx 容器反代配置
 |-- laolao-code/                # Spring Boot 后端
+|   |-- Dockerfile              # 后端运行镜像
+|   |-- .dockerignore           # 构建上下文仅保留打包后的 jar
 |   |-- src/main/java/com/laolao/
-|   |   |-- common/             # 安全、配置、WebSocket、工具类
+|   |   |-- ai/                 # AI 子系统
+|   |   |   |-- config/         # ChatClient、ChatMemory 配置
+|   |   |   |-- constant/       # Prompt 模板、AI 常量
+|   |   |   |-- controller/     # AiTutor / Chat 接口
+|   |   |   |-- pojo/           # 报告数据载体、DTO、VO
+|   |   |   |-- service/        # AI 业务实现
+|   |   |   `-- tool/           # Function Calling 工具集（AiChatTools / RecordAiTools）
+|   |   |-- common/             # 安全、配置、WebSocket、工具类、定时任务
 |   |   |-- controller/         # 接口层
-|   |   |-- judge/              # Docker 判题服务
-|   |   |-- listener/           # RocketMQ 消费者
+|   |   |-- judge/              # Docker 判题服务（容器池、编译运行）
+|   |   |-- listener/           # RocketMQ 消费者（判题、考试结束）
 |   |   |-- mapper/             # MyBatis Mapper
 |   |   |-- pojo/               # Entity / DTO / VO
 |   |   `-- service/            # 业务逻辑
 |   `-- src/main/resources/
 |       |-- application.yaml
+|       |-- application-docker.yaml # Docker 部署环境配置（随 jar 打包，不入库）
 |       `-- mapper/
 |-- laolao-code-vue/            # Vue 3 前端
 |   |-- src/components/
+|   |   |-- common/             # 登录、注册、Monaco Editor
+|   |   |-- ui/                 # Reka UI 本地化组件库
+|   |   `-- user/               # 业务页面
+|   |       |-- admin/          # 用户/小组/Docker 管理
+|   |       |-- ai/             # AI 聊天页
+|   |       |-- exam/           # 我的考试、考试详情、答题、阅卷
+|   |       |-- group/          # 我的小组、小组详情
+|   |       |-- question/       # 题库、题目编辑
+|   |       |-- report/         # 报告查看
+|   |       `-- sidebar/        # 侧边栏导航
 |   |-- src/router/
 |   |-- src/stores/
 |   `-- src/utils/
@@ -101,9 +134,8 @@ Spring Boot
 
 - JDK 17+
 - Node.js 18+
-- MySQL 8+
-- Redis 6+
-- Docker / Docker Desktop
+- MySQL 8+（本机直装，方便开发时改表）
+- Docker / Docker Desktop（提供 Redis 与 RocketMQ）
 - Maven 3.9+，也可以直接使用后端目录内置的 Maven Wrapper
 
 ### 1. 初始化数据库
@@ -125,19 +157,23 @@ CREATE DATABASE laolao_code DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicod
 | `member1` | 学员 |
 | `member2` | 学员 |
 
-### 2. 准备 RocketMQ
+### 2. 启动 Redis 与 RocketMQ
 
-在仓库根目录执行：
+本地开发只把重中间件放进容器（前后端和 MySQL 仍在本机运行，方便热更新与改表）。进入 `docker` 目录启动：
 
 ```bash
-docker compose -f docker/rocketmq/docker-compose.yml up -d
+cd docker
+docker compose up -d
 ```
 
 默认端口：
 
+- Redis: `6379`（dev profile 使用 database 2）
 - NameServer: `9876`
 - Proxy: `9080` / `9081`
 - Dashboard: `9877`
+
+停止中间件：在 `docker` 目录执行 `docker compose down`。
 
 ### 3. 构建判题镜像
 
@@ -227,6 +263,10 @@ Vite 开发服务器已配置代理：
 - `/api` -> `http://localhost:8080`
 - `/ws` -> `ws://localhost:8080`
 
+## Docker 一键部署
+
+项目提供单机容器化部署（Nginx + 后端 + MySQL + Redis + RocketMQ，对应 Spring profile `docker`），打包、上传、启动与运维的完整教程见 [docker/DEPLOY.md](docker/DEPLOY.md)。
+
 ## 常用命令
 
 后端测试：
@@ -243,10 +283,11 @@ cd laolao-code-vue
 npm run build
 ```
 
-停止 RocketMQ：
+停止本地中间件（Redis + RocketMQ）：
 
 ```bash
-docker compose -f docker/rocketmq/docker-compose.yml down
+cd docker
+docker compose down
 ```
 
 ## 角色说明
@@ -262,12 +303,11 @@ docker compose -f docker/rocketmq/docker-compose.yml down
 - 当前在线判题语言主要面向 Java。
 - 判题依赖本机 Docker 服务，后端启动时会初始化判题容器池。
 - AI 报告依赖 DeepSeek API Key，未配置时相关能力不可用。
-- 仓库暂未提供完整生产环境部署脚本。
+- 容器化部署面向单机演示环境，未包含 HTTPS、高可用与监控告警等生产化方案。
 
 ## 后续计划
 
 - 增加更多判题语言支持
 - 补充接口文档和页面截图
 - 增加单元测试与集成测试覆盖
-- 提供 Docker Compose 一键启动 MySQL、Redis、RocketMQ、后端与前端
 - 将配置进一步迁移到环境变量或统一密钥管理方案

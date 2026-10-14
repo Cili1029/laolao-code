@@ -1,0 +1,5 @@
+# 只把打包好的 jar 送进构建上下文，源码和 .git 不上传
+*
+!target/
+target/*
+!target/*.jar

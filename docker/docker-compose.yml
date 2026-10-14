@@ -1,8 +1,46 @@
-version: "3.8"
+# ============================================================
+# laolao-code 本地开发用编排（仅中间件）
+# 只启动：Redis + RocketMQ
+# 不启动：MySQL（本机直装，方便改表）、后端（IDEA 跑 dev profile，热重启）、
+#         前端（npm run dev，热更新）、Nginx（前端 dev server 直连后端）
+#
+# 使用方式（在本目录 docker/ 下执行）：
+#   启动：docker compose up -d
+#   停止：docker compose down
+#   日志：docker compose logs -f proxy
+#
+# 前置：本机 MySQL 已起（localhost:3306，库 laolao_code）；
+#       判题功能还需在仓库根目录构建一次判题镜像：
+#       docker build -t judger ./docker/judger
+#
+# RocketMQ 调优参数与服务器总编排（根目录 docker-compose.yml）保持完全一致，
+# rmq-proxy.json 就放在本目录，两个编排共用同一份配置
+# ============================================================
+
+name: laolao-dev
+
 services:
+  redis:
+    image: redis:6-alpine
+    container_name: laolao-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"   # 本机后端通过 localhost:6379 连接（dev 用 database 2）
+    volumes:
+      - redis-dev-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - laolao-dev-net
+
+  # ============ RocketMQ（参数与根目录总编排完全一致） ============
   namesrv:
     image: apache/rocketmq:5.4.0
     container_name: rmqnamesrv
+    restart: unless-stopped
     ports:
       - 9876:9876
     environment:
@@ -13,13 +51,14 @@ services:
       resources:
         limits:
           memory: 256M  # 物理内存给 256M
-    networks:
-      - rocketmq
     command: sh mqnamesrv
+    networks:
+      - laolao-dev-net
 
   broker:
     image: apache/rocketmq:5.4.0
     container_name: rmqbroker
+    restart: unless-stopped
     ports:
       - 10909:10909
       - 10911:10911
@@ -34,9 +73,9 @@ services:
           memory: 768M  # 物理内存给 768M（留出系统 Buffer）
     depends_on:
       - namesrv
-    networks:
-      - rocketmq
     command: sh mqbroker
+    networks:
+      - laolao-dev-net
 
   # ============================================================
   # 初始化 Topic 容器：broker 启动 15s 后自动创建需要的 Topic
@@ -48,8 +87,6 @@ services:
     container_name: rmqinit
     depends_on:
       - broker
-    networks:
-      - rocketmq
     environment:
       - NAMESRV_ADDR=rmqnamesrv:9876
     entrypoint: >
@@ -58,19 +95,19 @@ services:
         sh mqadmin updateTopic -n rmqnamesrv:9876 -t ExamEndTopic -c DefaultCluster -a +message.type=DELAY &&
         sh mqadmin updateTopic -n rmqnamesrv:9876 -t JudgeTopic -c DefaultCluster -a +message.type=NORMAL
       "
+    networks:
+      - laolao-dev-net
 
   proxy:
     image: apache/rocketmq:5.4.0
     container_name: rmqproxy
-    networks:
-      - rocketmq
+    restart: unless-stopped
     depends_on:
       - broker
       - namesrv
     ports:
       - 9080:9080
-      - 9081:9081
-    restart: on-failure
+      - 9081:9081   # 本机后端通过 127.0.0.1:9081 连接
     environment:
       - NAMESRV_ADDR=rmqnamesrv:9876
       # Proxy 主要是转发，给 256M 堆和 128M 堆外即可
@@ -80,13 +117,17 @@ services:
         limits:
           memory: 512M  # 物理内存给 512M
     volumes:
-      # 挂载自定义的配置文件
-      - ./rmq-proxy.json:/home/rocketmq/rocketmq-5.4.0/conf/rmq-proxy.json
+      # 与服务器总编排共用同一份 Proxy 配置（本目录下）
+      - ./rmq-proxy.json:/home/rocketmq/rocketmq-5.4.0/conf/rmq-proxy.json:ro
     command: sh mqproxy -pc /home/rocketmq/rocketmq-5.4.0/conf/rmq-proxy.json
+    networks:
+      - laolao-dev-net
 
+  # 本地开发可访问 http://localhost:9877 查看消息；内存紧张可整段删除
   dashboard:
     image: apacherocketmq/rocketmq-dashboard:latest
     container_name: rmqdashboard
+    restart: unless-stopped
     ports:
       - 9877:8082
     environment:
@@ -99,7 +140,11 @@ services:
           # 容器物理内存限制，比堆内存大 256M 左右即可
           memory: 400M  # 物理内存给 400M
     networks:
-      - rocketmq
+      - laolao-dev-net
+
 networks:
-  rocketmq:
+  laolao-dev-net:
     driver: bridge
+
+volumes:
+  redis-dev-data:
