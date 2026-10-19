@@ -34,7 +34,7 @@ public interface QuestionMapper extends BaseMapper<Question> {
             select title, content, difficulty,
                    time_limit, memory_limit,
                    template_code, standard_solution,
-                   id as parent_id, is_validated
+                   parent_id, is_deleted, is_validated
             from question
             where id = #{questionId}
             """)
@@ -48,7 +48,8 @@ public interface QuestionMapper extends BaseMapper<Question> {
     @Select("""
             select sum(if(parent_id = 0, 1, 0)) AS question_count,
                    sum(if(parent_id != 0, 1, 0)) AS copy_count
-            from question;
+            from question
+            where is_deleted = 0;
             """)
     AdminQuestionSummaryVO selectQuestionSummary();
 

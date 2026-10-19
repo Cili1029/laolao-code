@@ -103,6 +103,13 @@ public class QuestionServiceImpl implements QuestionService {
     public Result<DraftQuestionVO> copyQuestion(Integer questionId, Integer examId) {
         // 题目
         Question question = questionMapper.selectCopyQuestion(questionId);
+        if (question == null || question.getIsDeleted() == 1) {
+            return Result.error("题目不存在");
+        }
+        if (question.getParentId() != 0) {
+            return Result.error("只能从题库选题，不能克隆考试子题");
+        }
+        question.setParentId(questionId); // 认祖宗
         question.setCreatorId(SecurityUtils.getUserId());
         questionMapper.insert(question);
 
